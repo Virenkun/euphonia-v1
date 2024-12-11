@@ -1,8 +1,16 @@
 import { redirect } from "next/navigation";
 
 export function isValidEmail(email: string) {
-  var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   return regex.test(email);
+}
+
+export function isValidPhoneNumber(phoneNumber: string) {
+  // Ensure the phone number contains only digits (optional "+" at the beginning)
+  const phoneRegex = /^\+?[0-9]{10,15}$/;
+
+  // Check if the phone number matches the regex
+  return phoneRegex.test(phoneNumber);
 }
 
 export async function redirectToPath(path: string) {
@@ -55,7 +63,7 @@ export const postData = async ({
 };
 
 export const toDateTime = (secs: number) => {
-  var t = new Date(+0); // Unix epoch start.
+  const t = new Date(+0); // Unix epoch start.
   t.setSeconds(secs);
   return t;
 };

@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { handleRequest } from "@/helpers/auth-helpers";
-import { signInWithEmail } from "@/services/auth/action";
+import { signInWithEmail, signInWithPhone } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Separator from "./Separator";
 
 interface EmailSignInProps {
   allowPassword: boolean;
@@ -20,13 +21,36 @@ export default function EmailSignIn({
   redirectMethod,
   disableButton,
 }: EmailSignInProps) {
-  const router = redirectMethod === "client" ? useRouter() : null;
+  const router = useRouter();
+  const shouldRedirect = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (e.target.value.trim()) {
+      setPhone(""); // Clear phone field if email is entered
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(e.target.value);
+    if (e.target.value.trim()) {
+      setEmail(""); // Clear email field if phone is entered
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log(e.target);
     e.preventDefault();
-    setIsSubmitting(true);
-    await handleRequest(e, signInWithEmail, router);
+    console.log(email);
+    console.log(phone);
+    if (email !== "")
+      await handleRequest(e, signInWithEmail, shouldRedirect ? router : null);
+    if (phone !== "")
+      await handleRequest(e, signInWithPhone, shouldRedirect ? router : null);
     setIsSubmitting(false);
   };
 
@@ -34,7 +58,7 @@ export default function EmailSignIn({
     <Card className="w-full min-w-max">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">
-          Sign in with Email
+          Sign in to your account
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -51,6 +75,26 @@ export default function EmailSignIn({
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
+              value={email}
+              onChange={handleEmailChange}
+              className="w-full"
+            />
+          </div>
+          <Separator text="OR" />
+          <div className="space-y-2">
+            <label htmlFor="phone" className="text-sm font-medium">
+              Phone
+            </label>
+            <Input
+              id="phone"
+              placeholder="+917408070150"
+              type="tel"
+              name="phone"
+              autoCapitalize="none"
+              autoComplete="tel"
+              autoCorrect="off"
+              value={phone}
+              onChange={handlePhoneChange}
               className="w-full"
             />
           </div>
@@ -74,7 +118,7 @@ export default function EmailSignIn({
               href="/signin/signup"
               className="block text-center text-sm text-gray-600 hover:underline"
             >
-              Don't have an account? Sign up
+              Dont have an account? Sign up
             </Link>
           </div>
         )}

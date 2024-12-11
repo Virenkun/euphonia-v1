@@ -6,6 +6,7 @@ import {
   getStatusRedirect,
   getURL,
   isValidEmail,
+  isValidPhoneNumber,
 } from "@/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
@@ -148,7 +149,7 @@ export async function signInWithEmail(formData: FormData) {
   }
 
   const supabase = await createClient();
-  let options = {
+  const options = {
     emailRedirectTo: callbackURL,
     shouldCreateUser: true,
   };
@@ -171,6 +172,61 @@ export async function signInWithEmail(formData: FormData) {
     cookieStore.set("preferredSignInView", "email_signin", { path: "/" });
     redirectPath = getStatusRedirect(
       `/confirm?email=${email}&`,
+      "Success!",
+      "Please check your email for a magic link. You may now close this tab.",
+      true
+    );
+  } else {
+    redirectPath = getErrorRedirect(
+      "/signin/email_signin",
+      "Hmm... Something went wrong.",
+      "You could not be signed in."
+    );
+  }
+
+  return redirectPath;
+}
+
+export async function signInWithPhone(formData: FormData) {
+  const cookieStore = await cookies();
+  const callbackURL = getURL("/auth/callback");
+
+  const phoneNumber = String(formData.get("phone")).trim();
+  console.log(phoneNumber, "phone");
+  let redirectPath: string;
+
+  if (!isValidPhoneNumber(phoneNumber)) {
+    redirectPath = getErrorRedirect(
+      "/signin/email_signin",
+      "Invalid phone number.",
+      "Please try again."
+    );
+  }
+
+  const supabase = await createClient();
+  const options = {
+    emailRedirectTo: callbackURL,
+    shouldCreateUser: true,
+  };
+
+  // // If allowPassword is false, do not create a new user
+  // const { allowPassword } = getAuthTypes();
+  // if (allowPassword) options.shouldCreateUser = false;
+  const { data, error } = await supabase.auth.signInWithOtp({
+    phone: phoneNumber,
+    options: options,
+  });
+
+  if (error) {
+    redirectPath = getErrorRedirect(
+      "/signin/email_signin",
+      `You could not be signed in. ${phoneNumber}`,
+      error.message
+    );
+  } else if (data) {
+    cookieStore.set("preferredSignInView", "email_signin", { path: "/" });
+    redirectPath = getStatusRedirect(
+      `/confirm?email=${phoneNumber}&`,
       "Success!",
       "Please check your email for a magic link. You may now close this tab.",
       true

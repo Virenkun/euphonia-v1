@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import PasswordSignIn from "@/components/ui/AuthForms/PasswordSignIn";
 import EmailSignIn from "@/components/ui/AuthForms/EmailSignIn";
-import Separator from "@/components/ui/AuthForms/Separator";
-import OauthSignIn from "@/components/ui/AuthForms/OauthSignIn";
 import ForgotPassword from "@/components/ui/AuthForms/ForgotPassword";
 import UpdatePassword from "@/components/ui/AuthForms/UpdatePassword";
 import SignUp from "@/components/ui/AuthForms/Signup";
@@ -23,7 +21,7 @@ export default async function SignIn({
   params: { id: string };
   searchParams: { disable_button: boolean };
 }) {
-  const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
+  const { allowEmail, allowPassword } = getAuthTypes();
   const viewTypes = getViewTypes();
   const redirectMethod = getRedirectMethod();
 
@@ -54,8 +52,8 @@ export default async function SignIn({
   }
 
   return (
-    <div className="flex justify-center height-screen-helper">
-      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
+    <div className="flex justify-center items-center  min-h-screen">
+      <div className="flex flex-col justify-between items-center max-w-lg p-3 m-auto w-80 ">
         <div className="flex justify-center pb-12 "></div>
         <Card
           title={
