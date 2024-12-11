@@ -9,6 +9,10 @@ export default {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        spinner:
+          "0px -5px 20px 0px rgb(186, 66, 255), 0px 5px 20px 0px rgb(0, 225, 255)",
+      },
       animation: {
         "pulse-shadow": "pulseShadow 3s infinite",
       },
