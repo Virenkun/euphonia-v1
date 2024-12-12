@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { handleRequest } from "@/helpers/auth-helpers";
 import { signInWithPassword } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PasswordSignInProps {
   allowEmail: boolean;
@@ -23,13 +24,42 @@ export default function PasswordSignIn({
   const shouldRedirect = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const error = searchParams.get("error");
+  const error_description = searchParams.get("error_description");
+
+  useEffect(() => {
+    if (error) {
+      setTimeout(() =>
+        toast({
+          variant: "destructive",
+          title: error,
+          description: error_description,
+        })
+      );
+    }
+  }, [error, error_description, toast]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("====================================");
+    console.log(e, "form data");
+    console.log("====================================");
     e.preventDefault();
     await handleRequest(e, signInWithPassword, shouldRedirect ? router : null);
     await handleRequest(e, signInWithPassword, router);
     setIsSubmitting(false);
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Card className="w-full min-w-max">

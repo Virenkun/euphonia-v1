@@ -19,7 +19,11 @@ export default async function SignIn({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { disable_button: boolean };
+  searchParams: {
+    disable_button: boolean;
+    error: string;
+    error_description: string;
+  };
 }) {
   const { allowEmail, allowPassword } = getAuthTypes();
   const viewTypes = getViewTypes();

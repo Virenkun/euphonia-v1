@@ -11,7 +11,7 @@ export async function handleRequest(
   // Prevent default form submission refresh
   e.preventDefault();
 
-  const formData = new FormData(e.currentTarget);
+  const formData = new FormData(e?.currentTarget);
   const redirectUrl: string = await requestFunc(formData);
 
   if (router) {
