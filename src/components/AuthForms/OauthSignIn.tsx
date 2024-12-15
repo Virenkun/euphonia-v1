@@ -4,7 +4,7 @@ import { signInWithOAuth } from "@/helpers/auth-helpers";
 import { type Provider } from "@supabase/supabase-js";
 import { Github } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../button";
+import { Button } from "../ui/button";
 
 type OAuthProviders = {
   name: Provider;

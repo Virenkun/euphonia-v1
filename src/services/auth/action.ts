@@ -10,7 +10,7 @@ import {
 } from "@/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -362,6 +362,12 @@ export async function signUp(formData: FormData) {
       "There is already an account associated with this email address. Try resetting your password."
     );
   } else if (data.user) {
+    await supabase.from("user_info").insert([
+      {
+        is_onboarded: true,
+        auth_id: data.user.id,
+      },
+    ]);
     redirectPath = getStatusRedirect(
       "/",
       "Success!",
@@ -489,4 +495,16 @@ export async function updateName(formData: FormData) {
       "Your name could not be updated."
     );
   }
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("Error signing out:", error.message);
+    return null;
+  }
+
+  permanentRedirect("/signin");
 }

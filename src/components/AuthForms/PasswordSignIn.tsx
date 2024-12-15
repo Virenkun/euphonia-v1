@@ -48,13 +48,22 @@ export default function PasswordSignIn({
   }, [error, error_description, toast]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("====================================");
-    console.log(e, "form data");
-    console.log("====================================");
     e.preventDefault();
-    await handleRequest(e, signInWithPassword, shouldRedirect ? router : null);
-    await handleRequest(e, signInWithPassword, router);
-    setIsSubmitting(false);
+    e.persist(); // Persist the event object
+
+    setIsSubmitting(true); // Indicate loading state
+
+    try {
+      await handleRequest(
+        e,
+        signInWithPassword,
+        shouldRedirect ? router : null
+      );
+    } catch (error) {
+      console.error("Error during sign-in:", error);
+    } finally {
+      setIsSubmitting(false); // Reset loading state
+    }
   };
 
   if (!isMounted) {

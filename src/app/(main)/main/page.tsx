@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 import { LLM_PROMPT } from "@/constant/constants";
 import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const groq = new Groq({
   apiKey:
@@ -212,9 +213,9 @@ export default function ListeningInterface() {
   }, [assistantResponse]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-8 max-w-2xl mx-auto">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
       {!isSessionActive ? (
-        <Button onClick={beginSession}>Begin Session</Button>
+        <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
       ) : (
         <>
           <div className="text-neutral-800 text-lg h-6 mb-10">
