@@ -8,6 +8,7 @@ import Hero from "@/components/hero/Hero";
 import HowItWorks from "@/components/hero/HowItWorks";
 import Pricing from "@/components/hero/Pricing";
 import Testimonials from "@/components/hero/Testimonials";
+import WhatIsEuphonia from "@/components/hero/What";
 
 export default async function Home() {
   return (
@@ -17,6 +18,7 @@ export default async function Home() {
         <main>
           <Hero />
           <Features />
+          <WhatIsEuphonia />
           <HowItWorks />
           <AIDemo />
           <Testimonials />
