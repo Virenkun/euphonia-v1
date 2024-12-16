@@ -26,13 +26,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
+import { Upload } from "lucide-react";
 
 export function AccountModal({
   open,
   onOpenChange,
+  userInfo,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  userInfo: {
+    name?: string;
+    age?: number;
+    email?: string;
+    phone?: string;
+    location?: string;
+    communication_style?: string;
+    primary_goals?: string;
+    interest?: string;
+    avatar?: string;
+    sessions?: null;
+    subscription?: string;
+    is_onboarded?: boolean;
+    auth_id: string;
+  } | null;
 }) {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -49,7 +66,7 @@ export function AccountModal({
           defaultValue="profile"
           className="flex-1 flex flex-col overflow-hidden"
         >
-          <TabsList className="px-6 border-b">
+          <TabsList className="px-4 py-2 border-b justify-start">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="professional">Professional</TabsTrigger>
             <TabsTrigger value="preferences">Preferences</TabsTrigger>
@@ -60,31 +77,52 @@ export function AccountModal({
               <div className="px-6 py-4 space-y-6">
                 <TabsContent value="profile">
                   <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src="/placeholder.svg" />
-                        <AvatarFallback>VS</AvatarFallback>
+                    <div className="flex flex-col items-center space-y-4">
+                      <Avatar className="w-24 h-24">
+                        <AvatarImage src={userInfo?.avatar ?? undefined} />
+                        <AvatarFallback>
+                          <Upload className="w-8 h-8 text-muted-foreground" />
+                        </AvatarFallback>
                       </Avatar>
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-semibold">
-                          Profile Picture
-                        </h4>
-                        <Button variant="outline" size="sm">
-                          Change Avatar
-                        </Button>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          // onChange={handleImageUpload}
+                          className="hidden"
+                          id="picture-upload"
+                        />
+                        <label
+                          htmlFor="picture-upload"
+                          className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                        >
+                          {"Upload Picture"}
+                        </label>
+                        {/* {profilePicture && !isUploading && (
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            onClick={handleRemoveImage}
+                          >
+                            Remove
+                          </Button>
+                        )} */}
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Upload a profile picture
+                      </p>
                     </div>
                     <div className="grid gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" defaultValue="Viren Soni" />
+                        <Input id="name" defaultValue={userInfo?.name} />
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                           id="email"
                           type="email"
-                          defaultValue="virendrasonivs07@gmail.com"
+                          defaultValue={userInfo?.email}
                         />
                       </div>
                       <div className="grid gap-2">
@@ -92,12 +130,15 @@ export function AccountModal({
                         <Input
                           id="phone"
                           type="tel"
-                          defaultValue="+1 (555) 123-4567"
+                          defaultValue={userInfo?.phone}
                         />
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="location">Location</Label>
-                        <Input id="location" defaultValue="New York, NY" />
+                        <Input
+                          id="location"
+                          defaultValue={userInfo?.location}
+                        />
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="bio">Professional Bio</Label>

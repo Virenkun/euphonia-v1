@@ -12,7 +12,10 @@ export default async function Layout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const { data: userInfoArray } = await supabase.from("user_info").select("*");
+  const { data: userInfoArray } = await supabase
+    .from("user_info")
+    .select("*")
+    .eq("email", user?.email);
   const userInfo = userInfoArray ? userInfoArray[0] : null;
 
   return (

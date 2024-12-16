@@ -17,7 +17,6 @@ export const completeOnboarding = async ({
 }: {
   formObject: FormData;
 }) => {
-  console.log("formData", formObject);
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,21 +34,22 @@ export const completeOnboarding = async ({
   const authId = user.id;
 
   // Insert data into the user_info table
-  const { data, error } = await supabase.from("user_info").insert([
-    {
-      email: user.email,
-      name: formObject.name,
-      age: formObject.age,
-      communication_style: formObject.communicationStyle,
-      primary_goals: formObject.primaryGoals,
-      interest: formObject.interest,
-      avatar: formObject.avatar,
-      sessions: null,
-      subscription: "free",
-      is_onboarded: true,
-      auth_id: authId,
-    },
-  ]);
+  const { data, error } = await supabase
+    .from("user_info")
+    .update([
+      {
+        email: user.email,
+        name: formObject.name,
+        age: formObject.age,
+        communication_style: formObject.communicationStyle,
+        primary_goals: formObject.primaryGoals,
+        interest: formObject.interest,
+        avatar: formObject.avatar,
+        sessions: null,
+        subscription: "free",
+      },
+    ])
+    .eq("auth_id", authId);
 
   if (error) {
     console.error("Error inserting data:", error.message);

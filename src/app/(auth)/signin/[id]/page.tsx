@@ -83,14 +83,14 @@ export default async function SignIn({
             <EmailSignIn
               allowPassword={allowPassword}
               redirectMethod={redirectMethod}
-              disableButton={searchParams.disable_button}
+              disableButton={await searchParams.disable_button}
             />
           )}
           {viewProp === "forgot_password" && (
             <ForgotPassword
               allowEmail={allowEmail}
               redirectMethod={redirectMethod}
-              disableButton={searchParams.disable_button}
+              disableButton={await searchParams.disable_button}
             />
           )}
           {viewProp === "update_password" && (

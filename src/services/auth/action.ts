@@ -66,17 +66,30 @@ export async function confirmSignup(formData: FormData) {
   const email = formData.get("email") as string;
   const token = formData.get("token") as string;
 
-  const { error } = await supabase.auth.verifyOtp({
+  console.log("email", email, token);
+
+  const { data, error } = await supabase.auth.verifyOtp({
     email,
     token,
     type: "email",
   });
 
   if (error) {
+    console.error("Error confirming email:", error.message);
     return { error: "Invalid or expired confirmation code." };
+  } else {
+    if (data.user) {
+      await supabase.from("user_info").insert([
+        {
+          is_onboarded: true,
+          auth_id: data.user.id,
+          email: data.user.email,
+        },
+      ]);
+    }
   }
 
-  redirect("/main");
+  redirect("/onboarding-form");
 }
 
 export async function resendConfirmationEmail(formData: FormData) {
@@ -352,9 +365,9 @@ export async function signUp(formData: FormData) {
   } else if (data.session) {
     redirectPath = getStatusRedirect("/", "Success!", "You are now signed in.");
   } else if (
-    data.user &&
-    data.user.identities &&
-    data.user.identities.length == 0
+    data?.user &&
+    data?.user?.identities &&
+    data?.user?.identities.length == 0
   ) {
     redirectPath = getErrorRedirect(
       "/signin/signup",
@@ -362,14 +375,8 @@ export async function signUp(formData: FormData) {
       "There is already an account associated with this email address. Try resetting your password."
     );
   } else if (data.user) {
-    await supabase.from("user_info").insert([
-      {
-        is_onboarded: true,
-        auth_id: data.user.id,
-      },
-    ]);
     redirectPath = getStatusRedirect(
-      "/",
+      `/confirm?email=${email}&`,
       "Success!",
       "Please check your email for a confirmation link. You may now close this tab."
     );

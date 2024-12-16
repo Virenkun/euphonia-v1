@@ -213,6 +213,7 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
       <AccountModal
         open={isAccountModalOpen}
         onOpenChange={setIsAccountModalOpen}
+        userInfo={userInfo}
       />
       <NotificationModal
         open={isNotificationModalOpen}
