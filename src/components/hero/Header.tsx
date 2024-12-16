@@ -56,13 +56,17 @@ export default function Header() {
             </Link>
           </nav>
           <div className="hidden md:block">
-            <Button
-              variant="outline"
-              className="mr-4 px-8  bg-transparent border-black font-semibold h-10 hover:bg-transparent"
-            >
-              Log In
-            </Button>
-            <RainbowButton>Get Started</RainbowButton>
+            <Link href="/signin/password_signin">
+              <Button
+                variant="outline"
+                className="mr-4 px-8  bg-transparent border-black font-semibold h-10 hover:bg-transparent"
+              >
+                Log In
+              </Button>
+            </Link>
+            <Link href="/signin/signup">
+              <RainbowButton>Get Started</RainbowButton>
+            </Link>
           </div>
           <button
             className="md:hidden"

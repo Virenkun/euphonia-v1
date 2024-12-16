@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { RainbowButton } from "../ui/rainbow-button";
+import Link from "next/link";
 
 const steps = [
   {
@@ -42,10 +43,16 @@ export default function HowItWorks() {
       <div className="flex flex-col lg:flex-row items-center justify-between">
         <div className="lg:w-1/2 mb-10 lg:mb-0 lg:pr-16">
           {steps.map((step, index) => (
-            <div key={index} className="flex items-start mb-8">
-              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-lg mr-4">
+            <div key={index} className="relative flex items-start mb-8">
+              {/* Connector Line */}
+              {index !== steps.length - 1 && (
+                <div className="absolute left-5 top-10 h-full border-l-2 border-gray-300 z-0"></div>
+              )}
+              {/* Circle */}
+              <div className="relative flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-lg mr-4 z-10">
                 {index + 1}
               </div>
+              {/* Step Content */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   {step.title}
@@ -54,17 +61,20 @@ export default function HowItWorks() {
               </div>
             </div>
           ))}
-          <RainbowButton className="mt-6">Get Started Now</RainbowButton>
+
+          <Link href="/signin/signup">
+            <RainbowButton className="mt-6">Get Started Now</RainbowButton>
+          </Link>
         </div>
         <div className="lg:w-1/2">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full filter blur-3xl opacity-30"></div>
             <Image
-              src={"/hero2.jpg"}
+              src={"/Astronot.gif"}
               alt="How It Works Illustration"
               width={500}
               height={500}
-              className="relative rounded-lg shadow-2xl"
+              className="relative"
             />
           </div>
         </div>

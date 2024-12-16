@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -18,7 +19,9 @@ export default function Hero() {
             therapist. Compassionate, accessible, and always here for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <RainbowButton>Start Your Journey</RainbowButton>
+            <Link href="/signin/signup">
+              <RainbowButton>Start Your Journey</RainbowButton>
+            </Link>
             <Button
               size="lg"
               variant="outline"
