@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Volume2, Square, X, Mic } from "lucide-react";
+import {
+  Volume2,
+  Square,
+  X,
+  Mic,
+  MessageCircle,
+  Calendar,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UseSpeechToText } from "@/hooks/useSpeechToText";
 import { Groq } from "groq-sdk";
@@ -10,6 +18,7 @@ import { v4 as uuidv4 } from "uuid";
 import { LLM_PROMPT } from "@/constant/constants";
 import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
 import { RainbowButton } from "@/components/ui/rainbow-button";
+import Link from "next/link";
 
 const groq = new Groq({
   apiKey:
@@ -213,59 +222,84 @@ export default function ListeningInterface() {
   }, [assistantResponse]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-      {!isSessionActive ? (
-        <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
-      ) : (
-        <>
-          <div className="text-neutral-800 text-lg h-6 mb-10">
-            {isListening ? "listening..." : ""}
-          </div>
+    <div className="min-h-screen">
+      <nav className="flex items-center justify-between p-4 bg-white border-b shadow-sm">
+        <Link
+          href="/"
+          className="text-2xl font-bold text-slate-800 flex items-center"
+        >
+          Start the AI Therapy
+        </Link>
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm">
+            <MessageCircle className="h-5 w-5 mr-2" />
+            Chat
+          </Button>
+          <Button variant="ghost" size="sm">
+            <Calendar className="h-5 w-5 mr-2" />
+            Schedule
+          </Button>
+          <Button variant="ghost" size="sm">
+            <User className="h-5 w-5 mr-2" />
+            Profile
+          </Button>
+        </div>
+      </nav>
 
-          <div className="relative w-60 h-60 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 animate-spin blur-sm shadow-[0px_-5px_20px_0px_rgb(186,66,255),0px_5px_20px_0px_rgb(0,225,255)]">
-            <div className="absolute inset-0 bg-gray-900 rounded-full blur-xl"></div>
-          </div>
+      <div className="flex min-h-[90vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
+        {!isSessionActive ? (
+          <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
+        ) : (
+          <>
+            <div className="text-neutral-800 text-lg h-6 mb-10">
+              {isListening ? "listening..." : ""}
+            </div>
 
-          <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4">
-            {displayedResponse || "Assistant's response will appear here..."}
-          </div>
+            <div className="relative w-60 h-60 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 animate-spin blur-sm shadow-[0px_-5px_20px_0px_rgb(186,66,255),0px_5px_20px_0px_rgb(0,225,255)]">
+              <div className="absolute inset-0 bg-gray-900 rounded-full blur-xl"></div>
+            </div>
 
-          <div className="flex gap-8 mt-16">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
-              onClick={() => console.log("Toggle audio")}
-            >
-              <Volume2 className="w-6 h-6 dark:text-black" />
-              <span className="sr-only">Toggle audio</span>
-            </Button>
+            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4">
+              {displayedResponse || "Assistant's response will appear here..."}
+            </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
-              onClick={handleMicClick}
-            >
-              {isListening ? (
-                <Square className="w-8 h-8 text-white dark:text-black" />
-              ) : (
-                <Mic className="w-8 h-8 text-white dark:text-black" />
-              )}
-            </Button>
+            <div className="flex gap-8 mt-16">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
+                onClick={() => console.log("Toggle audio")}
+              >
+                <Volume2 className="w-6 h-6 dark:text-black" />
+                <span className="sr-only">Toggle audio</span>
+              </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
-              onClick={endSession}
-            >
-              <X className="w-6 h-6 dark:text-black" />
-              <span className="sr-only ark:text-black">End Session</span>
-            </Button>
-          </div>
-        </>
-      )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
+                onClick={handleMicClick}
+              >
+                {isListening ? (
+                  <Square className="w-8 h-8 text-white dark:text-black" />
+                ) : (
+                  <Mic className="w-8 h-8 text-white dark:text-black" />
+                )}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
+                onClick={endSession}
+              >
+                <X className="w-6 h-6 dark:text-black" />
+                <span className="sr-only ark:text-black">End Session</span>
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

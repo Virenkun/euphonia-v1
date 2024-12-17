@@ -6,7 +6,6 @@ import {
   BookOpen,
   Bot,
   ChevronsUpDown,
-  Command,
   CreditCard,
   LayoutDashboard,
   LifeBuoy,
@@ -20,6 +19,7 @@ import {
   SquareTerminal,
   AudioLines,
   TentTree,
+  MessageCircleMore,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +52,7 @@ import { AccountModal } from "../account/account-modal";
 import { signOut } from "@/services/auth/action";
 import { NotificationModal } from "../account/notification-modal";
 import { FeedbackModal } from "../account/feedback-modal";
+import Image from "next/image";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -181,26 +182,37 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
         name: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
+        isPremium: false,
       },
       {
         name: "Therapy Sessions",
         url: "/main",
         icon: MessageCircleHeart,
+        isPremium: false,
       },
       {
         name: "Mood Tracker",
         url: "#",
         icon: AudioLines,
+        isPremium: false,
+      },
+      {
+        name: "Chat History",
+        url: "/chat-history",
+        icon: MessageCircleMore,
+        isPremium: true,
       },
       {
         name: "Resources",
         url: "#",
         icon: TentTree,
+        isPremium: false,
       },
       {
         name: "AI Check-In",
         url: "#",
         icon: HandHeart,
+        isPremium: false,
       },
     ],
   };
@@ -229,8 +241,14 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
                 <a href="#">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <Command className="size-4" />
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-800 text-sidebar-primary-foreground">
+                    <Image
+                      src={"/Astronot.gif"}
+                      alt="shadcn"
+                      className="rounded-lg"
+                      width={48}
+                      height={48}
+                    />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">Euphonia</span>
@@ -291,6 +309,17 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
                     <Link href={item.url} className="font-medium">
                       <item.icon />
                       <span>{item.name}</span>
+                      {item.isPremium && (
+                        // <Image
+                        //   src={"/premium.png"}
+                        //   alt="Premium"
+                        //   height={22}
+                        //   width={22}
+                        // />
+                        <div className="flex-1 text-yellow-500 ml-2">
+                          premium
+                        </div>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

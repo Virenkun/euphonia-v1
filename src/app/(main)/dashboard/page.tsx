@@ -79,9 +79,7 @@ export default function Dashboard() {
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          AI Therapist Dashboard
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-800">Euphonic Dashboard</h1>
         <div className="flex items-center space-x-4">
           <Select value={timeFrame} onValueChange={setTimeFrame}>
             <SelectTrigger className="w-[180px] bg-white">
