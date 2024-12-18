@@ -1,11 +1,11 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import PasswordSignIn from "@/components/ui/AuthForms/PasswordSignIn";
-import EmailSignIn from "@/components/ui/AuthForms/EmailSignIn";
-import ForgotPassword from "@/components/ui/AuthForms/ForgotPassword";
-import UpdatePassword from "@/components/ui/AuthForms/UpdatePassword";
-import SignUp from "@/components/ui/AuthForms/Signup";
+import PasswordSignIn from "@/components/AuthForms/PasswordSignIn";
+import EmailSignIn from "@/components/AuthForms/EmailSignIn";
+import ForgotPassword from "@/components/AuthForms/ForgotPassword";
+import UpdatePassword from "@/components/AuthForms/UpdatePassword";
+import SignUp from "@/components/AuthForms/Signup";
 import {
   getAuthTypes,
   getDefaultSignInView,
@@ -18,8 +18,12 @@ export default async function SignIn({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams: { disable_button: boolean };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    disable_button: boolean;
+    error: string;
+    error_description: string;
+  }>;
 }) {
   const { allowEmail, allowPassword } = getAuthTypes();
   const viewTypes = getViewTypes();
@@ -29,8 +33,11 @@ export default async function SignIn({
   let viewProp: string;
 
   // Assign url id to 'viewProp' if it's a valid string and ViewTypes includes it
-  if (typeof params.id === "string" && viewTypes.includes(params.id)) {
-    viewProp = params.id;
+  if (
+    typeof (await params).id === "string" &&
+    viewTypes.includes((await params).id)
+  ) {
+    viewProp = (await params).id;
   } else {
     const preferredSignInView =
       (await cookies()).get("preferredSignInView")?.value || null;
@@ -76,14 +83,14 @@ export default async function SignIn({
             <EmailSignIn
               allowPassword={allowPassword}
               redirectMethod={redirectMethod}
-              disableButton={searchParams.disable_button}
+              disableButton={(await searchParams).disable_button}
             />
           )}
           {viewProp === "forgot_password" && (
             <ForgotPassword
               allowEmail={allowEmail}
               redirectMethod={redirectMethod}
-              disableButton={searchParams.disable_button}
+              disableButton={(await searchParams).disable_button}
             />
           )}
           {viewProp === "update_password" && (

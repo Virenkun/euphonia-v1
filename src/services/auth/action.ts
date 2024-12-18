@@ -10,7 +10,7 @@ import {
 } from "@/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -66,17 +66,30 @@ export async function confirmSignup(formData: FormData) {
   const email = formData.get("email") as string;
   const token = formData.get("token") as string;
 
-  const { error } = await supabase.auth.verifyOtp({
+  console.log("email", email, token);
+
+  const { data, error } = await supabase.auth.verifyOtp({
     email,
     token,
     type: "email",
   });
 
   if (error) {
+    console.error("Error confirming email:", error.message);
     return { error: "Invalid or expired confirmation code." };
+  } else {
+    if (data.user) {
+      await supabase.from("user_info").insert([
+        {
+          is_onboarded: true,
+          auth_id: data.user.id,
+          email: data.user.email,
+        },
+      ]);
+    }
   }
 
-  redirect("/main");
+  redirect("/onboarding-form");
 }
 
 export async function resendConfirmationEmail(formData: FormData) {
@@ -352,9 +365,9 @@ export async function signUp(formData: FormData) {
   } else if (data.session) {
     redirectPath = getStatusRedirect("/", "Success!", "You are now signed in.");
   } else if (
-    data.user &&
-    data.user.identities &&
-    data.user.identities.length == 0
+    data?.user &&
+    data?.user?.identities &&
+    data?.user?.identities.length == 0
   ) {
     redirectPath = getErrorRedirect(
       "/signin/signup",
@@ -363,7 +376,7 @@ export async function signUp(formData: FormData) {
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
-      "/",
+      `/confirm?email=${email}&`,
       "Success!",
       "Please check your email for a confirmation link. You may now close this tab."
     );
@@ -489,4 +502,16 @@ export async function updateName(formData: FormData) {
       "Your name could not be updated."
     );
   }
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("Error signing out:", error.message);
+    return null;
+  }
+
+  permanentRedirect("/signin");
 }
