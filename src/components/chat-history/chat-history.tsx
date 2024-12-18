@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Calendar, Lock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,71 +15,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Mock data for therapy sessions and messages
-const therapySessions = [
-  { id: 1, topic: "Stress Management", date: new Date(2023, 5, 1), unread: 2 },
-  { id: 2, topic: "Anxiety Coping Strategies", date: new Date(2023, 5, 8) },
-  { id: 3, topic: "Improving Sleep Habits", date: new Date(2023, 5, 15) },
-  { id: 4, topic: "Building Self-Esteem", date: new Date(2023, 5, 22) },
-  { id: 5, topic: "Managing Work-Life Balance", date: new Date(2023, 5, 29) },
-];
+interface Message {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+}
 
-const therapyMessages = [
-  {
-    id: 1,
-    sessionId: 1,
-    sender: "AI Therapist",
-    message: "Hello! How are you feeling today?",
-    timestamp: new Date(2023, 5, 1, 9, 0),
-  },
-  {
-    id: 2,
-    sessionId: 1,
-    sender: "You",
-    message: "I've been feeling overwhelmed with work lately.",
-    timestamp: new Date(2023, 5, 1, 9, 5),
-  },
-  {
-    id: 3,
-    sessionId: 1,
-    sender: "AI Therapist",
-    message:
-      "I understand. Let's explore some stress management techniques that might help you.",
-    timestamp: new Date(2023, 5, 1, 9, 7),
-  },
-  {
-    id: 4,
-    sessionId: 2,
-    sender: "AI Therapist",
-    message:
-      "Welcome back. Last time we discussed anxiety coping strategies. How have they been working for you?",
-    timestamp: new Date(2023, 5, 8, 14, 30),
-  },
-  {
-    id: 5,
-    sessionId: 2,
-    sender: "You",
-    message:
-      "The breathing exercises have been really helpful, but I still struggle in social situations.",
-    timestamp: new Date(2023, 5, 8, 14, 32),
-  },
-];
+interface ChatData {
+  [sessionId: string]: Message[];
+}
 
-export default function ChatHistory() {
-  const [selectedSession, setSelectedSession] = useState(therapySessions[0]);
+export default function ChatHistory({ chatData }: { chatData: ChatData }) {
+  // Extract unique sessions from the chat data
+  const sessions = Object.keys(chatData).map((sessionId) => ({
+    id: sessionId,
+    topic: "Therapy Session", // You might want to modify this
+    date: parseISO(chatData[sessionId][0].created_at),
+    unread: false, // You can implement unread logic if needed
+  }));
+
+  const [selectedSessionId, setSelectedSessionId] = useState(sessions[0].id);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");
 
-  const filteredSessions = therapySessions.filter(
+  // Filter sessions
+  const filteredSessions = sessions.filter(
     (session) =>
       session.topic.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (filterDate === "all" ||
         format(session.date, "yyyy-MM-dd") === filterDate)
   );
 
-  const sessionMessages = therapyMessages.filter(
-    (message) => message.sessionId === selectedSession.id
-  );
+  // Get messages for the selected session
+  const sessionMessages = chatData[selectedSessionId].map((message) => ({
+    id: message.id,
+    sender: message.role === "user" ? "You" : "AI",
+    message: message.content.trim(),
+    timestamp: parseISO(message.created_at),
+  }));
 
   return (
     <div className="flex h-full">
@@ -101,7 +75,7 @@ export default function ChatHistory() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All dates</SelectItem>
-              {therapySessions.map((session) => (
+              {sessions.map((session) => (
                 <SelectItem
                   key={session.id}
                   value={format(session.date, "yyyy-MM-dd")}
@@ -118,7 +92,7 @@ export default function ChatHistory() {
               key={session.id}
               variant="ghost"
               className="w-full justify-start px-4 py-3 h-auto text-left"
-              onClick={() => setSelectedSession(session)}
+              onClick={() => setSelectedSessionId(session.id)}
             >
               <div className="flex items-center w-full">
                 <Calendar className="h-5 w-5 mr-3 text-slate-500" />
@@ -143,10 +117,14 @@ export default function ChatHistory() {
       <div className="flex-1 flex flex-col bg-white">
         <div className="p-4 border-b">
           <h2 className="text-2xl font-semibold text-slate-800">
-            {selectedSession.topic}
+            {sessions.find((s) => s.id === selectedSessionId)?.topic}
           </h2>
           <p className="text-sm text-slate-500">
-            {format(selectedSession.date, "MMMM d, yyyy")}
+            {format(
+              sessions.find((s) => s.id === selectedSessionId)?.date ||
+                new Date(),
+              "MMMM d, yyyy"
+            )}
           </p>
         </div>
         <ScrollArea className="flex-1 p-4">
@@ -183,7 +161,7 @@ export default function ChatHistory() {
               </div>
               {message.sender === "You" && (
                 <Avatar className="ml-2">
-                  <AvatarImage src="/user-avatar.png" />
+                  <AvatarImage src={"/girl.png"} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>
               )}

@@ -20,12 +20,17 @@ export default function ForgotPassword({
   redirectMethod,
   disableButton,
 }: ForgotPasswordProps) {
-  const router = redirectMethod === "client" ? useRouter() : null;
+  const router = useRouter();
+  const shouldUseRouter = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    await handleRequest(
+      e,
+      requestPasswordUpdate,
+      shouldUseRouter ? router : null
+    );
     await handleRequest(e, requestPasswordUpdate, router);
     setIsSubmitting(false);
   };
@@ -81,7 +86,7 @@ export default function ForgotPassword({
             href="/signin/signup"
             className="block text-center text-sm text-gray-600 hover:underline"
           >
-            Don't have an account? Sign up
+            {`Don't have an account? Sign up`}
           </Link>
         </div>
         <div className="mt-6">
