@@ -79,7 +79,13 @@ export default function Dashboard() {
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Euphonic Dashboard</h1>
+        <nav className="flex flex-col items-start justify-between p-4 z-10">
+          <h1 className="text-2xl font-bold">Euphonic Dashboard</h1>
+          <p className="text-md text-muted-foreground">
+            Take a comprehensive moment to assess your mental well-being with
+            our advanced AI assistant
+          </p>
+        </nav>
         <div className="flex items-center space-x-4">
           <Select value={timeFrame} onValueChange={setTimeFrame}>
             <SelectTrigger className="w-[180px] bg-white">

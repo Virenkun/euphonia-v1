@@ -60,7 +60,7 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname === "privacy-policy")
   ) {
     const dashboardUrl = request.nextUrl.clone();
-    dashboardUrl.pathname = "/dashboard";
+    dashboardUrl.pathname = "/main";
     return NextResponse.redirect(dashboardUrl);
   }
 
