@@ -8,9 +8,11 @@ import {
   isValidEmail,
   isValidPhoneNumber,
 } from "@/helpers/helpers";
+import { sendMail } from "@/lib/send-mail";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { permanentRedirect, redirect } from "next/navigation";
+import { WelcomeTemplate } from "@/template/template";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -86,6 +88,13 @@ export async function confirmSignup(formData: FormData) {
           email: data.user.email,
         },
       ]);
+      await sendMail({
+        email: process.env.SMTP_SERVER_USERNAME || "",
+        sendTo: data.user.email,
+        subject: "Welcome to the site!",
+        text: "You have successfully signed up.",
+        html: WelcomeTemplate({ userName: data.user.email }),
+      });
     }
   }
 
