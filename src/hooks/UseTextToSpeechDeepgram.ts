@@ -22,11 +22,12 @@ export const UseTextToSpeechDeepgram = async (text: string) => {
 
     // The API returns audio data directly, we can now create an audio blob from the response
     const audioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBlob);
+    // const audioUrl = URL.createObjectURL(audioBlob);
 
     // Create an audio element and play the audio
-    const audioElement = new Audio(audioUrl);
-    await audioElement.play();
+    // const audioElement = new Audio(audioUrl);
+    // await audioElement.play();
+    return audioBlob;
   } catch (err) {
     console.error("Text-to-Speech Error:", err);
   }

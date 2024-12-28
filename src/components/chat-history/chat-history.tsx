@@ -137,7 +137,7 @@ export default function ChatHistory({ chatData }: { chatData: ChatData }) {
             >
               {message.sender !== "You" && (
                 <Avatar className="mr-2">
-                  <AvatarImage src="/ai-therapist-avatar.png" />
+                  <AvatarImage src="/happy.png" />
                   <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
               )}

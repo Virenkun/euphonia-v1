@@ -1,15 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import {
-  Volume2,
-  Square,
-  X,
-  Mic,
-  MessageCircle,
-  Calendar,
-  User,
-} from "lucide-react";
+import { Volume2, Square, X, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UseSpeechToText } from "@/hooks/useSpeechToText";
 import { Groq } from "groq-sdk";
@@ -18,7 +10,8 @@ import { v4 as uuidv4 } from "uuid";
 import { LLM_PROMPT } from "@/constant/constants";
 import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-import Link from "next/link";
+import { AudioVisualizer } from "@/components/audio-visulizer";
+import { useAsyncEffect } from "@/hooks/useAysncEffect";
 
 const groq = new Groq({
   apiKey:
@@ -30,6 +23,9 @@ const groq = new Groq({
 export default function ListeningInterface() {
   const [isListening, setIsListening] = useState(false);
   const [assistantResponse, setAssistantResponse] = useState<string>("");
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  // const [isPlaying, setIsPlaying] = useState(false);
   const [sessionId, setSessionId] = useState<string>(
     localStorage.getItem("sessionId") || uuidv4()
   );
@@ -44,6 +40,20 @@ export default function ListeningInterface() {
   useEffect(() => {
     localStorage.setItem("sessionId", sessionId);
   }, [sessionId]);
+
+  useAsyncEffect(async () => {
+    const blob = await UseTextToSpeechDeepgram(
+      "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today."
+    );
+    if (blob) {
+      setTimeout(() => {
+        setAudioBlob(blob);
+        typeResponse(
+          "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today"
+        );
+      }, 1000);
+    }
+  }, []);
 
   const handleMicClick = async () => {
     if (isListening) {
@@ -103,9 +113,13 @@ export default function ListeningInterface() {
     setAssistantResponse("");
 
     // Save user input to Supabase
-    const { error: userError } = await supabase
-      .from("messages")
-      .insert([{ role: "user", content: userInput, session_id: sessionId }]);
+    const { error: userError } = await supabase.from("messages").insert([
+      {
+        role: "user",
+        content: userInput,
+        session_id: sessionId,
+      },
+    ]);
 
     if (userError) {
       console.error("Error saving user message:", userError);
@@ -146,7 +160,10 @@ export default function ListeningInterface() {
         console.error("Error saving assistant message:", assistantError);
       }
 
-      UseTextToSpeechDeepgram(response);
+      const blob = await UseTextToSpeechDeepgram(response);
+      if (blob) {
+        setAudioBlob(blob);
+      }
     } catch (error) {
       console.error("Error fetching response from Groq:", error);
     }
@@ -222,31 +239,8 @@ export default function ListeningInterface() {
   }, [assistantResponse]);
 
   return (
-    <div className="min-h-screen">
-      <nav className="flex items-center justify-between p-4 bg-white border-b shadow-sm">
-        <Link
-          href="/"
-          className="text-2xl font-bold text-slate-800 flex items-center"
-        >
-          Start the AI Therapy
-        </Link>
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm">
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Chat
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Calendar className="h-5 w-5 mr-2" />
-            Schedule
-          </Button>
-          <Button variant="ghost" size="sm">
-            <User className="h-5 w-5 mr-2" />
-            Profile
-          </Button>
-        </div>
-      </nav>
-
-      <div className="flex min-h-[90vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
+    <div className="min-h-[88vh]">
+      <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
         {!isSessionActive ? (
           <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
         ) : (
@@ -254,13 +248,12 @@ export default function ListeningInterface() {
             <div className="text-neutral-800 text-lg h-6 mb-10">
               {isListening ? "listening..." : ""}
             </div>
-
-            <div className="relative w-60 h-60 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 animate-spin blur-sm shadow-[0px_-5px_20px_0px_rgb(186,66,255),0px_5px_20px_0px_rgb(0,225,255)]">
-              <div className="absolute inset-0 bg-gray-900 rounded-full blur-xl"></div>
-            </div>
-
-            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4">
-              {displayedResponse || "Assistant's response will appear here..."}
+            <AudioVisualizer
+              audioBlob={audioBlob}
+              onPlayingChange={setIsAudioPlaying}
+            />
+            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+              {displayedResponse}
             </div>
 
             <div className="flex gap-8 mt-16">
@@ -279,6 +272,7 @@ export default function ListeningInterface() {
                 size="icon"
                 className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
                 onClick={handleMicClick}
+                disabled={isAudioPlaying}
               >
                 {isListening ? (
                   <Square className="w-8 h-8 text-white dark:text-black" />

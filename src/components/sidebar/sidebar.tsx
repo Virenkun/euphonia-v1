@@ -11,7 +11,6 @@ import {
   LifeBuoy,
   LogOut,
   HandHeart,
-  MoreHorizontal,
   MessageCircleHeart,
   Send,
   Settings2,
@@ -179,20 +178,21 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
     ],
     projects: [
       {
-        name: "Dashboard",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-        isPremium: false,
-      },
-      {
         name: "Therapy Sessions",
         url: "/main",
         icon: MessageCircleHeart,
         isPremium: false,
       },
       {
+        name: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+        isPremium: false,
+      },
+
+      {
         name: "Mood Tracker",
-        url: "#",
+        url: "/mood-tracker",
         icon: AudioLines,
         isPremium: false,
       },
@@ -204,15 +204,15 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
       },
       {
         name: "Resources",
-        url: "#",
+        url: "/resources",
         icon: TentTree,
         isPremium: false,
       },
       {
         name: "AI Check-In",
-        url: "#",
+        url: "/ai-checkin",
         icon: HandHeart,
-        isPremium: false,
+        isPremium: true,
       },
     ],
   };
@@ -324,12 +324,12 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
+              {/* <SidebarMenuItem>
                 <SidebarMenuButton>
                   <MoreHorizontal />
                   <span>More</span>
                 </SidebarMenuButton>
-              </SidebarMenuItem>
+              </SidebarMenuItem> */}
             </SidebarMenu>
           </SidebarGroup>
           <SidebarGroup className="mt-auto">
