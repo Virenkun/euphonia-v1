@@ -32,9 +32,6 @@ const RequiredIndicator = () => (
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   age: Yup.string().required("Age is required"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
   primaryGoal: Yup.string().required("Primary goal is required"),
   phone: Yup.string().matches(/^[0-9-+()]*$/, "Invalid phone number format"),
   stressLevel: Yup.number()
@@ -61,7 +58,6 @@ export default function OnboardingForm() {
       age: undefined,
       gender: "",
       pronouns: "",
-      email: "",
       phone: "",
       communicationStyle: "",
       primaryGoals: "",
@@ -278,7 +274,7 @@ export default function OnboardingForm() {
         {/* Contact Information Section */}
         <div className="space-y-4">
           {/* Email Field */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="email">
               Email Address
               <RequiredIndicator />
@@ -293,7 +289,7 @@ export default function OnboardingForm() {
             {formik.touched.email && formik.errors.email && (
               <p className="text-xs text-red-500">{formik.errors.email}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Phone Field */}
           <div className="space-y-2">

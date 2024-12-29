@@ -13,6 +13,15 @@ import { RainbowButton } from "@/components/ui/rainbow-button";
 import { AudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
 import { getUserDetails } from "@/services/users/action";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const groq = new Groq({
   apiKey:
@@ -299,15 +308,32 @@ export default function ListeningInterface() {
                 )}
               </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
-                onClick={endSession}
-              >
-                <X className="w-6 h-6 dark:text-black" />
-                <span className="sr-only ark:text-black">End Session</span>
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
+                    // onClick={endSession}
+                  >
+                    <X className="w-6 h-6 dark:text-black" />
+                    <span className="sr-only ark:text-black">End Session</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>End the Session</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to end the session?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="destructive" onClick={endSession}>
+                      End Session
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           )}
         </>

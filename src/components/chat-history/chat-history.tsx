@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RainbowButton } from "../ui/rainbow-button";
 
 interface Message {
   id: string;
@@ -27,33 +28,62 @@ interface ChatData {
 }
 
 export default function ChatHistory({ chatData }: { chatData: ChatData }) {
-  // Extract unique sessions from the chat data
-  const sessions = Object.keys(chatData).map((sessionId) => ({
-    id: sessionId,
-    topic: "Therapy Session", // You might want to modify this
-    date: parseISO(chatData[sessionId][0].created_at),
-    unread: false, // You can implement unread logic if needed
-  }));
+  const chatsPresent = Object.keys(chatData).length > 0;
 
-  const [selectedSessionId, setSelectedSessionId] = useState(sessions[0].id);
+  // Extract unique sessions from the chat data
+  const sessions =
+    chatsPresent &&
+    Object.keys(chatData).map((sessionId) => ({
+      id: sessionId,
+      topic: "Therapy Session", // You might want to modify this
+      date: parseISO(chatData[sessionId][0].created_at),
+      unread: false, // You can implement unread logic if needed
+    }));
+
+  const [selectedSessionId, setSelectedSessionId] = useState(
+    sessions ? sessions[0]?.id : ""
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");
 
   // Filter sessions
-  const filteredSessions = sessions.filter(
-    (session) =>
-      session.topic.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (filterDate === "all" ||
-        format(session.date, "yyyy-MM-dd") === filterDate)
-  );
+  const filteredSessions =
+    chatsPresent &&
+    sessions &&
+    sessions.filter(
+      (session) =>
+        session.topic.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (filterDate === "all" ||
+          format(session.date, "yyyy-MM-dd") === filterDate)
+    );
 
   // Get messages for the selected session
-  const sessionMessages = chatData[selectedSessionId].map((message) => ({
-    id: message.id,
-    sender: message.role === "user" ? "You" : "AI",
-    message: message.content.trim(),
-    timestamp: parseISO(message.created_at),
-  }));
+  const sessionMessages =
+    chatsPresent &&
+    chatData[selectedSessionId].map((message) => ({
+      id: message.id,
+      sender: message.role === "user" ? "You" : "AI",
+      message: message.content.trim(),
+      timestamp: parseISO(message.created_at),
+    }));
+
+  if (!chatsPresent) {
+    return (
+      <div className="flex items-center justify-center min-h-[89vh] bg-white">
+        <div className="p-4 text-center">
+          <h2 className="text-2xl font-semibold text-slate-800">
+            No therapy sessions found
+          </h2>
+          <p className="text-slate-500">
+            Start a new session to view your chat history
+          </p>
+          <RainbowButton className="mt-6" onClick={() => {}}>
+            Start a new session
+          </RainbowButton>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full">
@@ -75,41 +105,43 @@ export default function ChatHistory({ chatData }: { chatData: ChatData }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All dates</SelectItem>
-              {sessions.map((session) => (
-                <SelectItem
-                  key={session.id}
-                  value={format(session.date, "yyyy-MM-dd")}
-                >
-                  {format(session.date, "MMMM d, yyyy")}
-                </SelectItem>
-              ))}
+              {sessions &&
+                sessions.map((session) => (
+                  <SelectItem
+                    key={session.id}
+                    value={format(session.date, "yyyy-MM-dd")}
+                  >
+                    {format(session.date, "MMMM d, yyyy")}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
         <ScrollArea className="h-[calc(100vh-8rem)]">
-          {filteredSessions.map((session) => (
-            <Button
-              key={session.id}
-              variant="ghost"
-              className="w-full justify-start px-4 py-3 h-auto text-left"
-              onClick={() => setSelectedSessionId(session.id)}
-            >
-              <div className="flex items-center w-full">
-                <Calendar className="h-5 w-5 mr-3 text-slate-500" />
-                <div className="flex-1 truncate">
-                  <div className="font-medium text-slate-700">
-                    {session.topic}
+          {filteredSessions &&
+            filteredSessions.map((session) => (
+              <Button
+                key={session.id}
+                variant="ghost"
+                className="w-full justify-start px-4 py-3 h-auto text-left"
+                onClick={() => setSelectedSessionId(session.id)}
+              >
+                <div className="flex items-center w-full">
+                  <Calendar className="h-5 w-5 mr-3 text-slate-500" />
+                  <div className="flex-1 truncate">
+                    <div className="font-medium text-slate-700">
+                      {session.topic}
+                    </div>
+                    <div className="text-sm text-slate-500">
+                      {format(session.date, "MMMM d, yyyy")}
+                    </div>
                   </div>
-                  <div className="text-sm text-slate-500">
-                    {format(session.date, "MMMM d, yyyy")}
-                  </div>
+                  {session.unread && (
+                    <div className="ml-2 h-2 w-2 bg-blue-500 rounded-full" />
+                  )}
                 </div>
-                {session.unread && (
-                  <div className="ml-2 h-2 w-2 bg-blue-500 rounded-full" />
-                )}
-              </div>
-            </Button>
-          ))}
+              </Button>
+            ))}
         </ScrollArea>
       </div>
 
@@ -117,56 +149,59 @@ export default function ChatHistory({ chatData }: { chatData: ChatData }) {
       <div className="flex-1 flex flex-col bg-white">
         <div className="p-4 border-b">
           <h2 className="text-2xl font-semibold text-slate-800">
-            {sessions.find((s) => s.id === selectedSessionId)?.topic}
+            {sessions &&
+              sessions.find((s) => s.id === selectedSessionId)?.topic}
           </h2>
           <p className="text-sm text-slate-500">
             {format(
-              sessions.find((s) => s.id === selectedSessionId)?.date ||
+              (sessions &&
+                sessions.find((s) => s.id === selectedSessionId)?.date) ||
                 new Date(),
               "MMMM d, yyyy"
             )}
           </p>
         </div>
         <ScrollArea className="flex-1 p-4">
-          {sessionMessages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex items-start mb-4 ${
-                message.sender === "You" ? "justify-end" : ""
-              }`}
-            >
-              {message.sender !== "You" && (
-                <Avatar className="mr-2">
-                  <AvatarImage src="/happy.png" />
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-              )}
+          {sessionMessages &&
+            sessionMessages.map((message) => (
               <div
-                className={`flex-1 max-w-[80%] ${
-                  message.sender === "You" ? "text-right" : ""
+                key={message.id}
+                className={`flex items-start mb-4 ${
+                  message.sender === "You" ? "justify-end" : ""
                 }`}
               >
+                {message.sender !== "You" && (
+                  <Avatar className="mr-2">
+                    <AvatarImage src="/happy.png" />
+                    <AvatarFallback>AI</AvatarFallback>
+                  </Avatar>
+                )}
                 <div
-                  className={`inline-block p-3 rounded-lg ${
-                    message.sender === "You"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-slate-100 text-slate-800"
+                  className={`flex-1 max-w-[80%] ${
+                    message.sender === "You" ? "text-right" : ""
                   }`}
                 >
-                  <p>{message.message}</p>
+                  <div
+                    className={`inline-block p-3 rounded-lg ${
+                      message.sender === "You"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    <p>{message.message}</p>
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    {format(message.timestamp, "h:mm a")}
+                  </div>
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
-                  {format(message.timestamp, "h:mm a")}
-                </div>
+                {message.sender === "You" && (
+                  <Avatar className="ml-2">
+                    <AvatarImage src={"/girl.png"} />
+                    <AvatarFallback>You</AvatarFallback>
+                  </Avatar>
+                )}
               </div>
-              {message.sender === "You" && (
-                <Avatar className="ml-2">
-                  <AvatarImage src={"/girl.png"} />
-                  <AvatarFallback>You</AvatarFallback>
-                </Avatar>
-              )}
-            </div>
-          ))}
+            ))}
         </ScrollArea>
         <div className="p-4 border-t bg-slate-50">
           <div className="flex items-center mt-2 text-sm text-slate-500">

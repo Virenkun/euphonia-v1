@@ -8,10 +8,9 @@ interface FormData {
   age?: number;
   gender?: string;
   pronouns?: string;
-  email?: string;
   phone?: string;
   communicationStyle?: string;
-  primaryGoals?: string;
+  primaryGoal?: string;
   interests?: string;
   sessionLength?: string;
   schedulingPreferences?: string;
@@ -57,13 +56,13 @@ export const completeOnboarding = async ({
     .from("user_info")
     .update([
       {
-        email: user.email,
+        name: formObject.name,
         age: formObject.age,
         gender: formObject.gender,
         pronouns: formObject.pronouns,
         phone: formObject.phone,
         communication_style: formObject.communicationStyle,
-        primary_goals: formObject.primaryGoals,
+        primary_goals: formObject.primaryGoal,
         interest: formObject.interests,
         session_length: formObject.sessionLength,
         scheduling_preferences: formObject.schedulingPreferences,
@@ -81,6 +80,7 @@ export const completeOnboarding = async ({
         terms_agreement: formObject.termsAgreement,
         sessions: null,
         subscription: "free",
+        is_onboarded: true,
       },
     ])
     .eq("auth_id", authId);

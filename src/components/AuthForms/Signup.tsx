@@ -65,6 +65,7 @@ export default function SignUp({ allowEmail, redirectMethod }: SignUpProps) {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setIsSubmitting(true);
     e.preventDefault();
     validateEmail(email);
     validatePassword(password);
@@ -237,7 +238,7 @@ export default function SignUp({ allowEmail, redirectMethod }: SignUpProps) {
                   !!confirmPasswordError
                 }
               >
-                {isSubmitting ? "Signing up..." : "Sign up"}
+                {isSubmitting ? "Setting Up Your Profile..." : "Sign up"}
               </Button>
             </form>
             <div className="mt-6">
