@@ -62,7 +62,7 @@ export default function ListeningInterface() {
           typeResponse(
             "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today"
           );
-        }, 1000);
+        });
       }
     }
   }, [isSessionActive]);

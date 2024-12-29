@@ -6,10 +6,27 @@ import { permanentRedirect } from "next/navigation";
 interface FormData {
   name?: string;
   age?: number;
+  gender?: string;
+  pronouns?: string;
+  email?: string;
+  phone?: string;
   communicationStyle?: string;
   primaryGoals?: string;
-  interest?: string;
+  interests?: string;
+  sessionLength?: string;
+  schedulingPreferences?: string;
+  emergencyContact?: string;
+  currentEmotionalState?: string;
+  mentalHealthHistory?: string;
+  currentChallenges?: string;
+  stressLevel?: string;
+  existingSupport?: string;
+  preferredLanguage?: string;
+  accessibilityNeeds?: string;
+  interactionPreference?: string;
   avatar?: string;
+  dataConsent?: boolean;
+  termsAgreement?: boolean;
 }
 
 export const completeOnboarding = async ({
@@ -39,12 +56,27 @@ export const completeOnboarding = async ({
     .update([
       {
         email: user.email,
-        name: formObject.name,
         age: formObject.age,
+        gender: formObject.gender,
+        pronouns: formObject.pronouns,
+        phone: formObject.phone,
         communication_style: formObject.communicationStyle,
         primary_goals: formObject.primaryGoals,
-        interest: formObject.interest,
+        interests: formObject.interests,
+        session_length: formObject.sessionLength,
+        scheduling_preferences: formObject.schedulingPreferences,
+        emergency_contact: formObject.emergencyContact,
+        current_emotional_state: formObject.currentEmotionalState,
+        mental_health_history: formObject.mentalHealthHistory,
+        current_challenges: formObject.currentChallenges,
+        stress_level: formObject.stressLevel,
+        existing_support: formObject.existingSupport,
+        preferred_language: formObject.preferredLanguage,
+        accessibility_needs: formObject.accessibilityNeeds,
+        interaction_preference: formObject.interactionPreference,
         avatar: formObject.avatar,
+        data_consent: formObject.dataConsent,
+        terms_agreement: formObject.termsAgreement,
         sessions: null,
         subscription: "free",
       },
