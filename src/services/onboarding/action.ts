@@ -50,6 +50,8 @@ export const completeOnboarding = async ({
 
   const authId = user.id;
 
+  console.log("Onboarding form data:", formObject);
+
   // Insert data into the user_info table
   const { data, error } = await supabase
     .from("user_info")
@@ -62,7 +64,7 @@ export const completeOnboarding = async ({
         phone: formObject.phone,
         communication_style: formObject.communicationStyle,
         primary_goals: formObject.primaryGoals,
-        interests: formObject.interests,
+        interest: formObject.interests,
         session_length: formObject.sessionLength,
         scheduling_preferences: formObject.schedulingPreferences,
         emergency_contact: formObject.emergencyContact,
