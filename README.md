@@ -24,7 +24,7 @@ Make sure you have the following installed:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/euphonia.git
+   git clone https://github.com/Virenkun/euphonia-v1.git
    cd euphonia
    ```
 2. Install dependencies:
@@ -57,25 +57,38 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to view th
 ## Configuration
 
 - **Supabase**: Add your Supabase credentials to the `.env.local` file:
+
   ```env
   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
   ```
-- **Azure OpenAI**: Add your Azure OpenAI credentials to the `.env.local` file:
+
+- **GROQ Cloud**: Add your GROQ credentials to the `.env.local` file:
+
   ```env
-  AZURE_OPENAI_ENDPOINT=your-endpoint
-  AZURE_OPENAI_KEY=your-key
+  NEXT_PUBLIC_GROQ_API_KEY="your-groq-api-key"
+  NEXT_PUBLIC_GROQ_MODEL="your-groq-model"
   ```
 
-## Deployment
+- **ElevenLabs**: Add your ElevenLabs API key to the `.env.local` file:
 
-The app is ready to be deployed to production. You can use platforms like [Vercel](https://vercel.com), [Azure](https://azure.microsoft.com/), or any hosting service of your choice.
+  ```env
+  NEXT_PUBLIC_ELEVENLABS_API_KEY="your-elevenlabs-api-key"
+  ```
 
-To deploy on Vercel:
+- **Site Configuration**: Add your site-specific configuration to the `.env.local` file:
 
-1. Push your code to GitHub or another Git repository.
-2. Go to [Vercel's Dashboard](https://vercel.com/new) and import your project.
-3. Follow the prompts to deploy your app.
+  ```env
+  NEXT_PUBLIC_SITE_URL=http://your-site-url
+  ```
+
+- **SMTP Server**: Add your SMTP server configuration to the `.env.local` file:
+  ```env
+  SMTP_SERVER_HOST=your-smtp-server-host
+  SMTP_SERVER_USERNAME=your-smtp-username
+  SMTP_SERVER_PASSWORD=your-smtp-password
+  SITE_MAIL_RECIEVER=your-mail-receiver
+  ```
 
 ## Learn More
 
