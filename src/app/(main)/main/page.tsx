@@ -12,11 +12,21 @@ import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { AudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
+import { getUserDetails } from "@/services/users/action";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const groq = new Groq({
   apiKey:
     process.env.GROQ_API_KEY ||
-    "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", // Update your GROQ API key here
+    "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",
   dangerouslyAllowBrowser: true,
 });
 
@@ -25,10 +35,7 @@ export default function ListeningInterface() {
   const [assistantResponse, setAssistantResponse] = useState<string>("");
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  // const [isPlaying, setIsPlaying] = useState(false);
-  const [sessionId, setSessionId] = useState<string>(
-    localStorage.getItem("sessionId") || uuidv4()
-  );
+  const [sessionId, setSessionId] = useState<string>("");
   const [isSessionActive, setIsSessionActive] = useState(false);
 
   const [displayedResponse, setDisplayedResponse] = useState<string>("");
@@ -38,22 +45,36 @@ export default function ListeningInterface() {
   const chunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
+    // Check if localStorage is available
+    const storedSessionId = localStorage.getItem("sessionId");
+    if (storedSessionId) {
+      setSessionId(storedSessionId);
+    } else {
+      const newSessionId = uuidv4();
+      localStorage.setItem("sessionId", newSessionId);
+      setSessionId(newSessionId);
+    }
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem("sessionId", sessionId);
   }, [sessionId]);
 
   useAsyncEffect(async () => {
-    const blob = await UseTextToSpeechDeepgram(
-      "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today."
-    );
-    if (blob) {
-      setTimeout(() => {
-        setAudioBlob(blob);
-        typeResponse(
-          "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today"
-        );
-      }, 1000);
+    if (isSessionActive) {
+      const blob = await UseTextToSpeechDeepgram(
+        "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today."
+      );
+      if (blob) {
+        setTimeout(() => {
+          setAudioBlob(blob);
+          typeResponse(
+            "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today"
+          );
+        });
+      }
     }
-  }, []);
+  }, [isSessionActive]);
 
   const handleMicClick = async () => {
     if (isListening) {
@@ -110,6 +131,7 @@ export default function ListeningInterface() {
   };
 
   const fetchChatResponse = async (userInput: string) => {
+    const { user } = await getUserDetails();
     setAssistantResponse("");
 
     // Save user input to Supabase
@@ -118,6 +140,7 @@ export default function ListeningInterface() {
         role: "user",
         content: userInput,
         session_id: sessionId,
+        user_id: user.id,
       },
     ]);
 
@@ -153,6 +176,7 @@ export default function ListeningInterface() {
           role: "assistant",
           content: response,
           session_id: sessionId,
+          user_id: user.id,
         },
       ]);
 
@@ -241,21 +265,24 @@ export default function ListeningInterface() {
   return (
     <div className="min-h-[88vh]">
       <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-        {!isSessionActive ? (
+        {/* {!isSessionActive ? (
           <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
-        ) : (
-          <>
-            <div className="text-neutral-800 text-lg h-6 mb-10">
-              {isListening ? "listening..." : ""}
-            </div>
-            <AudioVisualizer
-              audioBlob={audioBlob}
-              onPlayingChange={setIsAudioPlaying}
-            />
-            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
-              {displayedResponse}
-            </div>
+        ) : ( */}
+        <>
+          <div className="text-neutral-800 text-lg h-6 mb-10">
+            {isListening ? "listening..." : ""}
+          </div>
+          <AudioVisualizer
+            audioBlob={audioBlob}
+            onPlayingChange={setIsAudioPlaying}
+          />
+          <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+            {displayedResponse}
+          </div>
 
+          {!isSessionActive ? (
+            <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
+          ) : (
             <div className="flex gap-8 mt-16">
               <Button
                 variant="ghost"
@@ -281,18 +308,35 @@ export default function ListeningInterface() {
                 )}
               </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
-                onClick={endSession}
-              >
-                <X className="w-6 h-6 dark:text-black" />
-                <span className="sr-only ark:text-black">End Session</span>
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
+                    // onClick={endSession}
+                  >
+                    <X className="w-6 h-6 dark:text-black" />
+                    <span className="sr-only ark:text-black">End Session</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>End the Session</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to end the session?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="destructive" onClick={endSession}>
+                      End Session
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-          </>
-        )}
+          )}
+        </>
       </div>
     </div>
   );
