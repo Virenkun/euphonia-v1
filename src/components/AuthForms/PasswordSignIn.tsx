@@ -48,6 +48,7 @@ export default function PasswordSignIn({
   }, [error, error_description, toast]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setIsSubmitting(true);
     e.preventDefault();
     e.persist(); // Persist the event object
 

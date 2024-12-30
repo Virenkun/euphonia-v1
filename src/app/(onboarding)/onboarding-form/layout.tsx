@@ -1,5 +1,3 @@
-import AppSidebar from "@/components/sidebar/sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -19,17 +17,9 @@ export default async function Layout({
   const userInfo = userInfoArray ? userInfoArray[0] : null;
   const isOnboardingComplete = userInfo?.is_onboarded;
 
-  if (!isOnboardingComplete) {
-    redirect("/onboarding-form");
+  if (isOnboardingComplete) {
+    redirect("/main");
   }
 
-  return (
-    <SidebarProvider>
-      <AppSidebar email={user?.email} userInfo={userInfo} />
-      <main className="flex-1">
-        <SidebarTrigger />
-        <div>{children}</div>
-      </main>
-    </SidebarProvider>
-  );
+  return <div>{children}</div>;
 }

@@ -11,7 +11,7 @@ import {
 import { sendMail } from "@/lib/send-mail";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
-import { permanentRedirect, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { WelcomeTemplate } from "@/template/template";
 
 export async function login(formData: FormData) {
@@ -83,7 +83,7 @@ export async function confirmSignup(formData: FormData) {
     if (data.user) {
       await supabase.from("user_info").insert([
         {
-          is_onboarded: true,
+          is_onboarded: false,
           auth_id: data.user.id,
           email: data.user.email,
         },
@@ -521,6 +521,5 @@ export async function signOut() {
     console.error("Error signing out:", error.message);
     return null;
   }
-
-  permanentRedirect("/signin");
+  return redirect("/signin");
 }

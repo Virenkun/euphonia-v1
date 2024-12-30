@@ -426,7 +426,11 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await signOut();
+                    }}
+                  >
                     <LogOut />
                     Log out
                   </DropdownMenuItem>
