@@ -1,19 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useImperativeHandle } from "react";
 
 interface AudioVisualizerProps {
   audioBlob: Blob | null;
   onPlayingChange?: (isPlaying: boolean) => void;
 }
 
-export const AudioVisualizer = ({
-  audioBlob,
-  onPlayingChange,
-}: AudioVisualizerProps) => {
+export const AudioVisualizer = (
+  { audioBlob, onPlayingChange }: AudioVisualizerProps,
+  ref: React.Ref<{
+    stopAudio: () => void;
+  }>
+) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | OscillatorNode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    stopAudio: () => {
+      if (sourceRef.current) {
+        sourceRef.current.stop();
+      }
+      audioContext?.close();
+      setIsPlaying(false);
+      onPlayingChange?.(false);
+    },
+  }));
 
   useEffect(() => {
     const setupAudio = async () => {
@@ -120,3 +133,5 @@ export const AudioVisualizer = ({
     </div>
   );
 };
+
+export const ForwardedAudioVisualizer = React.forwardRef(AudioVisualizer);

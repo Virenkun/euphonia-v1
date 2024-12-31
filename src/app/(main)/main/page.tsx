@@ -7,9 +7,8 @@ import { UseSpeechToText } from "@/hooks/useSpeechToText";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 import { LLM_PROMPT } from "@/constant/constants";
-// import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-import { AudioVisualizer } from "@/components/audio-visulizer";
+import { ForwardedAudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
 import { getUserDetails } from "@/services/users/action";
 import Typewriter from "typewriter-effect";
@@ -37,6 +36,9 @@ export default function ListeningInterface() {
   const [sessionLength, setSessionLength] = useState<number>(0);
   const [deleteSpeed, setDeleteSpeed] = useState<number>(99999);
   const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<{
+    stopAudio: () => void;
+  }>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -251,6 +253,7 @@ export default function ListeningInterface() {
   };
 
   const endSession = async () => {
+    stopAudioHandler();
     setIsLoading(true);
     const { user } = await getUserDetails();
     setIsSessionActive(false);
@@ -298,6 +301,10 @@ export default function ListeningInterface() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, isSessionActive]);
 
+  const stopAudioHandler = () => {
+    audioRef.current?.stopAudio();
+  };
+
   return (
     <div className="min-h-[88vh]">
       <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
@@ -305,9 +312,10 @@ export default function ListeningInterface() {
           <div className="text-neutral-800 text-lg h-6 mb-10">
             {isListening ? "listening..." : ""}
           </div>
-          <AudioVisualizer
+          <ForwardedAudioVisualizer
             audioBlob={audioBlob}
             onPlayingChange={setIsAudioPlaying}
+            ref={audioRef}
           />
           {isSessionActive && !isLoading && (
             <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
