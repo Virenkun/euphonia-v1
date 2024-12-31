@@ -16,13 +16,17 @@ export const AudioVisualizer = (
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | OscillatorNode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isAudioContextClosed, setIsAudioContextClosed] = useState(false);
 
   useImperativeHandle(ref, () => ({
     stopAudio: () => {
       if (sourceRef.current) {
         sourceRef.current.stop();
       }
-      audioContext?.close();
+      if (audioContext && !isAudioContextClosed) {
+        audioContext.close();
+        setIsAudioContextClosed(true);
+      }
       setIsPlaying(false);
       onPlayingChange?.(false);
     },
@@ -33,6 +37,7 @@ export const AudioVisualizer = (
       if (audioBlob) {
         try {
           const context = new AudioContext();
+          setIsAudioContextClosed(false);
           const analyserNode = context.createAnalyser();
           analyserNode.fftSize = 256;
 
@@ -61,15 +66,21 @@ export const AudioVisualizer = (
           console.error("Error setting up audio:", error);
         }
       } else {
-        setIsPlaying(true);
+        setIsPlaying(false);
       }
     };
 
     setupAudio();
 
     return () => {
-      sourceRef.current?.stop();
-      audioContext?.close();
+      if (sourceRef.current) {
+        sourceRef.current.stop();
+        sourceRef.current = null;
+      }
+      if (audioContext && !isAudioContextClosed) {
+        audioContext.close();
+        setIsAudioContextClosed(true);
+      }
       setIsPlaying(false);
       onPlayingChange?.(false);
     };
