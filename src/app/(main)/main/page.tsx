@@ -4,11 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import { Volume2, Square, X, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UseSpeechToText } from "@/hooks/useSpeechToText";
-import { Groq } from "groq-sdk";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 import { LLM_PROMPT } from "@/constant/constants";
-import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
+// import { UseTextToSpeechDeepgram } from "@/hooks/UseTextToSpeechDeepgram";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { AudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
@@ -22,13 +21,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-const groq = new Groq({
-  apiKey:
-    process.env.GROQ_API_KEY ||
-    "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",
-  dangerouslyAllowBrowser: true,
-});
+import { groq } from "@/utils/groq/client";
+import { synthesizeSpeech } from "@/utils/aws/polly";
 
 export default function ListeningInterface() {
   const [isListening, setIsListening] = useState(false);
@@ -37,12 +31,36 @@ export default function ListeningInterface() {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [sessionId, setSessionId] = useState<string>("");
   const [isSessionActive, setIsSessionActive] = useState(false);
-
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [sessionLength, setSessionLength] = useState<number>(0);
   const [displayedResponse, setDisplayedResponse] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
   const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isSessionActive) {
+      setStartTime((prev) => prev || Date.now());
+
+      timer = setInterval(() => {
+        setSessionLength((prev) =>
+          startTime ? Math.floor((Date.now() - startTime) / 1000) : prev
+        );
+      }, 1000);
+    } else {
+      if (startTime) {
+        const finalLength = Math.floor((Date.now() - startTime) / 1000);
+        setSessionLength(finalLength);
+        setStartTime(null);
+      }
+    }
+
+    return () => clearInterval(timer);
+  }, [isSessionActive, startTime]);
 
   useEffect(() => {
     // Check if localStorage is available
@@ -62,8 +80,8 @@ export default function ListeningInterface() {
 
   useAsyncEffect(async () => {
     if (isSessionActive) {
-      const blob = await UseTextToSpeechDeepgram(
-        "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today."
+      const blob = await synthesizeSpeech(
+        "hmm Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, umm let’s talk about how you’re feeling today."
       );
       if (blob) {
         setTimeout(() => {
@@ -184,7 +202,8 @@ export default function ListeningInterface() {
         console.error("Error saving assistant message:", assistantError);
       }
 
-      const blob = await UseTextToSpeechDeepgram(response);
+      // const blob = await UseTextToSpeechDeepgram(response);
+      const blob = await synthesizeSpeech(response);
       if (blob) {
         setAudioBlob(blob);
       }
@@ -193,19 +212,58 @@ export default function ListeningInterface() {
     }
   };
 
-  const beginSession = () => {
+  const beginSession = async () => {
+    setIsLoading(true);
+    const { user } = await getUserDetails();
     const newSessionId = uuidv4();
     setSessionId(newSessionId);
     localStorage.setItem("sessionId", newSessionId);
     setIsSessionActive(true);
+    const { data, error } = await supabase
+      .from("user_info")
+      .select("sessions")
+      .eq("email", user?.email)
+      .single();
+
+    if (data) {
+      const updatedSessions = [...(data.sessions || []), newSessionId];
+
+      const { error: updateError } = await supabase
+        .from("user_info")
+        .update({
+          sessions: updatedSessions,
+        })
+        .eq("email", user?.email);
+
+      if (updateError) {
+        console.error("Error updating sessions:", updateError);
+      } else {
+      }
+    } else {
+      console.error("Error fetching sessions:", error);
+    }
+    setIsLoading(false);
   };
 
-  const endSession = () => {
+  const endSession = async () => {
+    setIsLoading(true);
+    const { user } = await getUserDetails();
     setIsSessionActive(false);
     setSessionId("");
     localStorage.removeItem("sessionId");
     setAssistantResponse("");
     setDisplayedResponse("");
+    const { error } = await supabase.from("session").insert([
+      {
+        id: sessionId,
+        user_id: user.id,
+        length: sessionLength,
+      },
+    ]);
+    if (error) {
+      console.error("Error saving session:", error.message);
+    }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -281,7 +339,9 @@ export default function ListeningInterface() {
           </div>
 
           {!isSessionActive ? (
-            <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
+            <RainbowButton onClick={beginSession}>
+              {isLoading ? "Settings Things..." : "Begin Session"}
+            </RainbowButton>
           ) : (
             <div className="flex gap-8 mt-16">
               <Button
@@ -329,7 +389,7 @@ export default function ListeningInterface() {
                   </DialogHeader>
                   <DialogFooter>
                     <Button variant="destructive" onClick={endSession}>
-                      End Session
+                      {isLoading ? "Ending..." : "End Session"}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
