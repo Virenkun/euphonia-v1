@@ -57,7 +57,8 @@ export async function updateSession(request: NextRequest) {
   if (
     user &&
     (request.nextUrl.pathname === "/" ||
-      request.nextUrl.pathname === "privacy-policy")
+      request.nextUrl.pathname === "privacy-policy" ||
+      request.nextUrl.pathname === "/sitemap.xml")
   ) {
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = "/main";
