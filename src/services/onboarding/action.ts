@@ -79,7 +79,6 @@ export const completeOnboarding = async ({
         data_consent: formObject.dataConsent,
         terms_agreement: formObject.termsAgreement,
         sessions: null,
-        subscription: "free",
         is_onboarded: true,
       },
     ])
