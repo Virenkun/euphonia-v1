@@ -12,6 +12,8 @@ import { RainbowButton } from "@/components/ui/rainbow-button";
 import { AudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
 import { getUserDetails } from "@/services/users/action";
+import Typewriter from "typewriter-effect";
+
 import {
   Dialog,
   DialogContent,
@@ -33,9 +35,8 @@ export default function ListeningInterface() {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [sessionLength, setSessionLength] = useState<number>(0);
-  const [displayedResponse, setDisplayedResponse] = useState<string>("");
+  const [deleteSpeed, setDeleteSpeed] = useState<number>(99999);
   const [isLoading, setIsLoading] = useState(false);
-  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -79,6 +80,7 @@ export default function ListeningInterface() {
   }, [sessionId]);
 
   useAsyncEffect(async () => {
+    setIsLoading(true);
     if (isSessionActive) {
       const blob = await synthesizeSpeech(
         "hmm Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, umm let’s talk about how you’re feeling today."
@@ -86,12 +88,13 @@ export default function ListeningInterface() {
       if (blob) {
         setTimeout(() => {
           setAudioBlob(blob);
-          typeResponse(
+          setAssistantResponse(
             "Welcome, it’s good to have you here. This is your space to share, reflect, and be heard. Take a deep breath, and when you’re ready, let’s talk about how you’re feeling today"
           );
         });
       }
     }
+    setIsLoading(false);
   }, [isSessionActive]);
 
   const handleMicClick = async () => {
@@ -117,6 +120,8 @@ export default function ListeningInterface() {
 
         // Handle stop event
         mediaRecorder.onstop = async () => {
+          setDeleteSpeed(50);
+          setAssistantResponse("");
           const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
           chunksRef.current = [];
           const transcription = await UseSpeechToText(audioBlob);
@@ -149,6 +154,7 @@ export default function ListeningInterface() {
   };
 
   const fetchChatResponse = async (userInput: string) => {
+    setDeleteSpeed(99999);
     const { user } = await getUserDetails();
     setAssistantResponse("");
 
@@ -208,7 +214,7 @@ export default function ListeningInterface() {
         setAudioBlob(blob);
       }
     } catch (error) {
-      console.error("Error fetching response from Groq:", error);
+      console.error("Error:", error);
     }
   };
 
@@ -242,7 +248,6 @@ export default function ListeningInterface() {
     } else {
       console.error("Error fetching sessions:", error);
     }
-    setIsLoading(false);
   };
 
   const endSession = async () => {
@@ -252,7 +257,6 @@ export default function ListeningInterface() {
     setSessionId("");
     localStorage.removeItem("sessionId");
     setAssistantResponse("");
-    setDisplayedResponse("");
     const { error } = await supabase.from("session").insert([
       {
         id: sessionId,
@@ -294,38 +298,9 @@ export default function ListeningInterface() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, isSessionActive]);
 
-  const typeResponse = (response: string) => {
-    let index = 0;
-
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-    }
-
-    setDisplayedResponse(""); // Ensure displayedResponse starts fresh
-
-    typingIntervalRef.current = setInterval(() => {
-      setDisplayedResponse((prev) => prev + response[index]);
-      index++;
-
-      if (index >= response.length - 1) {
-        clearInterval(typingIntervalRef.current!);
-        typingIntervalRef.current = null;
-      }
-    }, 50); // Typing speed in milliseconds
-  };
-
-  useEffect(() => {
-    if (assistantResponse) {
-      typeResponse(assistantResponse);
-    }
-  }, [assistantResponse]);
-
   return (
     <div className="min-h-[88vh]">
       <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-        {/* {!isSessionActive ? (
-          <RainbowButton onClick={beginSession}>Begin Session</RainbowButton>
-        ) : ( */}
         <>
           <div className="text-neutral-800 text-lg h-6 mb-10">
             {isListening ? "listening..." : ""}
@@ -334,11 +309,20 @@ export default function ListeningInterface() {
             audioBlob={audioBlob}
             onPlayingChange={setIsAudioPlaying}
           />
-          <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
-            {displayedResponse}
-          </div>
+          {isSessionActive && !isLoading && (
+            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+              <Typewriter
+                options={{
+                  strings: [assistantResponse],
+                  autoStart: true,
+                  delay: 50,
+                  deleteSpeed: deleteSpeed,
+                }}
+              />
+            </div>
+          )}
 
-          {!isSessionActive ? (
+          {!isSessionActive || isLoading ? (
             <RainbowButton onClick={beginSession}>
               {isLoading ? "Settings Things..." : "Begin Session"}
             </RainbowButton>
@@ -374,7 +358,6 @@ export default function ListeningInterface() {
                     variant="ghost"
                     size="icon"
                     className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
-                    // onClick={endSession}
                   >
                     <X className="w-6 h-6 dark:text-black" />
                     <span className="sr-only ark:text-black">End Session</span>
