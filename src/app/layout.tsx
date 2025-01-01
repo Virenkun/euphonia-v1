@@ -21,6 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="canonical" href="https://euphonia.me/" />
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         <NextTopLoader
           color="#000"
