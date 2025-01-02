@@ -185,7 +185,7 @@ export async function signInWithEmail(formData: FormData) {
   let redirectPath: string;
 
   if (!isValidEmail(email)) {
-    redirectPath = getErrorRedirect(
+    getErrorRedirect(
       "/signin/email_signin",
       "Invalid email address.",
       "Please try again."
@@ -207,6 +207,7 @@ export async function signInWithEmail(formData: FormData) {
   });
 
   if (error) {
+    console.log(error);
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
       "You could not be signed in.",
