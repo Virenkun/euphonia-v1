@@ -101,6 +101,28 @@ export async function confirmSignup(formData: FormData) {
   redirect("/onboarding-form");
 }
 
+export async function confirmOtpSignin(formData: FormData) {
+  const supabase = await createClient();
+
+  const email = formData.get("email") as string;
+  const token = formData.get("token") as string;
+
+  console.log("email", email, token);
+
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "email",
+  });
+
+  if (error) {
+    console.error("Error confirming email:", error.message);
+    return { error: "Invalid or expired confirmation code." };
+  } else {
+    redirect("/main");
+  }
+}
+
 export async function resendConfirmationEmail(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
@@ -163,7 +185,7 @@ export async function signInWithEmail(formData: FormData) {
   let redirectPath: string;
 
   if (!isValidEmail(email)) {
-    redirectPath = getErrorRedirect(
+    getErrorRedirect(
       "/signin/email_signin",
       "Invalid email address.",
       "Please try again."
@@ -185,6 +207,7 @@ export async function signInWithEmail(formData: FormData) {
   });
 
   if (error) {
+    console.log(error);
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
       "You could not be signed in.",
@@ -193,7 +216,7 @@ export async function signInWithEmail(formData: FormData) {
   } else if (data) {
     cookieStore.set("preferredSignInView", "email_signin", { path: "/" });
     redirectPath = getStatusRedirect(
-      `/confirm?email=${email}&`,
+      `/confirm?email=${email}&isMagicLink=true&`,
       "Success!",
       "Please check your email for a magic link. You may now close this tab.",
       true

@@ -13,7 +13,11 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { confirmSignup, resendConfirmationEmail } from "@/services/auth/action";
+import {
+  confirmOtpSignin,
+  confirmSignup,
+  resendConfirmationEmail,
+} from "@/services/auth/action";
 import {
   InputOTP,
   InputOTPGroup,
@@ -27,16 +31,25 @@ export default function ConfirmPage() {
   const [isResending, setIsResending] = useState(false);
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const isMagicLink = searchParams.get("isMagicLink");
 
   const handleConfirm = async (formData: FormData) => {
     setError(null);
     setSuccess(null);
     setIsLoading(true);
     formData.append("email", email || "");
-    const result = await confirmSignup(formData);
-    setIsLoading(false);
-    if (result?.error) {
-      setError(result.error);
+    if (isMagicLink !== "true") {
+      const result = await confirmSignup(formData);
+      setIsLoading(false);
+      if (result?.error) {
+        setError(result.error);
+      }
+    } else {
+      const result = await confirmOtpSignin(formData);
+      setIsLoading(false);
+      if (result?.error) {
+        setError(result.error);
+      }
     }
   };
 
