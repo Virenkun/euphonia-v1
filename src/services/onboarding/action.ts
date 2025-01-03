@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { permanentRedirect } from "next/navigation";
+import { updateCurrentUserPhone } from "../auth/action";
 
 interface FormData {
   name?: string;
@@ -83,6 +84,10 @@ export const completeOnboarding = async ({
       },
     ])
     .eq("auth_id", authId);
+
+  if (formObject.phone) {
+    await updateCurrentUserPhone(formObject.phone);
+  }
 
   if (error) {
     console.error("Error inserting data:", error.message);

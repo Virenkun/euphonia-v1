@@ -1,11 +1,7 @@
 "use server";
 
 import { getAuthTypes } from "@/helpers/auth-helpers";
-import {
-  EmailOtpType,
-  MobileOtpType,
-  type Provider,
-} from "@supabase/supabase-js";
+import { type Provider } from "@supabase/supabase-js";
 import {
   getErrorRedirect,
   getStatusRedirect,
@@ -115,13 +111,7 @@ export async function confirmOtpSignin(formData: FormData) {
   console.log("phone", phone, token);
 
   let error;
-  if (email) {
-    ({ error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "email",
-    }));
-  } else if (phone) {
+  if (phone) {
     ({ error } = await supabase.auth.verifyOtp({
       phone,
       token,
@@ -130,7 +120,7 @@ export async function confirmOtpSignin(formData: FormData) {
   }
 
   if (error) {
-    console.error("Error confirming email:", error.message);
+    console.error("Error confirming email:", error);
     return { error: "Invalid or expired confirmation code." };
   } else {
     redirect("/main");
@@ -560,5 +550,41 @@ export async function updateName(formData: FormData) {
       "Hmm... Something went wrong.",
       "Your name could not be updated."
     );
+  }
+}
+
+export const updateCurrentUserPhone = async (phone: string) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.updateUser({
+    phone,
+  });
+
+  if (error) {
+    console.error("Error updating phone number:", error.message);
+    return { error: error.message };
+  } else {
+    console.log("Phone number updated successfully:", data);
+  }
+};
+
+export async function confirmPhoneChange(formData: FormData) {
+  const supabase = await createClient();
+
+  const phone = formData.get("phone") as string;
+  const token = formData.get("token") as string;
+
+  console.log("phone", phone, token);
+
+  const { error } = await supabase.auth.verifyOtp({
+    phone,
+    token,
+    type: "phone_change",
+  });
+
+  if (error) {
+    console.error("Error confirming email:", error);
+    return { error: "Invalid or expired confirmation code." };
+  } else {
+    redirect("/main");
   }
 }

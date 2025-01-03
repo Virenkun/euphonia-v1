@@ -60,7 +60,7 @@ export default function ConfirmPage() {
     setSuccess(null);
     setIsResending(true);
     const formData = new FormData();
-    formData.append("email", email || "");
+    formData.append("email", email ?? "");
     const result = await resendConfirmationEmail(formData);
     setIsResending(false);
     if (result?.error) {
