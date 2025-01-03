@@ -33,10 +33,10 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section id="how-it-works" className="py-20">
-      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 text-center">
+      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 text-center">
         How to <span className="text-indigo-600">Start</span>?
       </h2>
-      <p className="text-xl text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+      <p className="text-xl text-center text-gray-600 dark:text-white mb-12 max-w-3xl mx-auto">
         Getting started with AITherapist is easy. Follow these simple steps to
         begin your journey to better mental health.
       </p>
@@ -54,10 +54,12 @@ export default function HowItWorks() {
               </div>
               {/* Step Content */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                   {step.title}
                 </h3>
-                <p className="text-gray-600">{step.description}</p>
+                <p className="text-gray-600 dark:text-white">
+                  {step.description}
+                </p>
               </div>
             </div>
           ))}

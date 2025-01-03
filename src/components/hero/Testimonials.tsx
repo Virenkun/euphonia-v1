@@ -28,14 +28,14 @@ const testimonials = [
 export default function Testimonials() {
   return (
     <section id="testimonials" className="py-20">
-      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-16 text-center">
+      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-16 text-center">
         What Our <span className="text-indigo-600">Users</span> Say
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {testimonials.map((testimonial, index) => (
           <Card
             key={index}
-            className="bg-white/50 backdrop-blur-sm border-indigo-100 hover:border-indigo-300 transition-colors"
+            className="bg-white/50 dark:bg-black/50 backdrop-blur-sm border-indigo-100 hover:border-indigo-300 transition-colors"
           >
             <CardHeader>
               <div className="flex items-center space-x-4">
@@ -47,12 +47,16 @@ export default function Testimonials() {
                 </Avatar>
                 <div>
                   <CardTitle>{testimonial.name}</CardTitle>
-                  <p className="text-sm text-gray-600">{testimonial.title}</p>
+                  <p className="text-sm text-gray-600 dark:text-white">
+                    {testimonial.title}
+                  </p>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 italic">{testimonial.quote}</p>
+              <p className="text-gray-700 dark:text-white italic">
+                {testimonial.quote}
+              </p>
             </CardContent>
           </Card>
         ))}

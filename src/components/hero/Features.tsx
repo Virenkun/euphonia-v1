@@ -43,10 +43,10 @@ const features = [
 export default function Features() {
   return (
     <section id="features" className="py-20">
-      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 text-center">
+      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 text-center">
         Why Choose <span className="text-indigo-600">Euphonia</span>?
       </h2>
-      <p className="text-xl text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+      <p className="text-xl text-center text-gray-600 dark:text-white mb-12 max-w-3xl mx-auto">
         Discover the unique benefits of our AI-powered therapy platform that
         sets us apart from traditional methods.
       </p>
@@ -54,16 +54,18 @@ export default function Features() {
         {features.map((feature, index) => (
           <Card
             key={index}
-            className="bg-white/50 backdrop-blur-sm border-indigo-100 hover:border-indigo-300 transition-all duration-300 hover:shadow-lg"
+            className="bg-white/50 dark:bg-black/50 backdrop-blur-sm border-indigo-100 hover:border-indigo-300 transition-all duration-300 hover:shadow-lg"
           >
             <CardHeader>
               <feature.icon className="h-12 w-12 text-indigo-600 mb-4" />
-              <CardTitle className="text-2xl font-semibold text-gray-900">
+              <CardTitle className="text-2xl font-semibold text-gray-900 dark:text-white">
                 {feature.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">{feature.description}</p>
+              <p className="text-gray-600 dark:text-white">
+                {feature.description}
+              </p>
             </CardContent>
           </Card>
         ))}

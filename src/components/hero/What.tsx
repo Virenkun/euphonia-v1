@@ -20,11 +20,11 @@ export default function WhatIsEuphonia() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 dark:text-white">
             What Is Meaning of <span className="text-indigo-600">Euphonia</span>
             ?
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-white max-w-3xl mx-auto">
             Discover the AI-powered platform that brings harmony to
             conversations and promotes well-being through words.
           </p>

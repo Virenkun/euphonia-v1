@@ -12,7 +12,7 @@ import WhatIsEuphonia from "@/components/hero/What";
 
 export default async function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 transition-colors duration-500">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         <main>

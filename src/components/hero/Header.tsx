@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
+import { ThemeSwitcher } from "@/theme/theme-switcher";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -21,7 +22,9 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/80 backdrop-blur-md shadow-md" : ""
+        scrolled
+          ? "bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-md"
+          : ""
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,25 +35,25 @@ export default function Header() {
           <nav className="hidden md:flex space-x-8">
             <Link
               href="#features"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 dark:text-white hover:text-indigo-600 transition-colors"
             >
               Features
             </Link>
             <Link
               href="#how-it-works"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 dark:text-white hover:text-indigo-600 transition-colors"
             >
               How It Works
             </Link>
             <Link
               href="#pricing"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 dark:text-white hover:text-indigo-600 transition-colors"
             >
               Pricing
             </Link>
             <Link
               href="#faq"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 dark:text-white hover:text-indigo-600 transition-colors"
             >
               FAQ
             </Link>
@@ -59,14 +62,15 @@ export default function Header() {
             <Link href="/signin/password_signin">
               <Button
                 variant="outline"
-                className="mr-4 px-8  bg-transparent border-black font-semibold h-10 hover:bg-transparent"
+                className="mr-4 px-8  bg-transparent border-black dark:border-white font-semibold h-10 hover:bg-transparent"
               >
                 Log In
               </Button>
             </Link>
-            <Link href="/signin/signup">
+            <Link href="/signin/signup" className="mr-4">
               <RainbowButton>Get Started</RainbowButton>
             </Link>
+            <ThemeSwitcher />
           </div>
           <button
             className="md:hidden"
