@@ -48,10 +48,11 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { AccountModal } from "../account/account-modal";
-import { signOut } from "@/services/auth/action";
 import { NotificationModal } from "../account/notification-modal";
 import { FeedbackModal } from "../account/feedback-modal";
 import Image from "next/image";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -219,6 +220,18 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Error signing out:", error.message);
+      return null;
+    }
+    router.push("/signin");
+  };
 
   return (
     <>
@@ -428,7 +441,7 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={async () => {
-                      await signOut();
+                      handleSignOut();
                     }}
                   >
                     <LogOut />

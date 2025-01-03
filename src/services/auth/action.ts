@@ -2,6 +2,11 @@
 
 import { getAuthTypes } from "@/helpers/auth-helpers";
 import {
+  EmailOtpType,
+  MobileOtpType,
+  type Provider,
+} from "@supabase/supabase-js";
+import {
   getErrorRedirect,
   getStatusRedirect,
   getURL,
@@ -79,23 +84,21 @@ export async function confirmSignup(formData: FormData) {
   if (error) {
     console.error("Error confirming email:", error.message);
     return { error: "Invalid or expired confirmation code." };
-  } else {
-    if (data.user) {
-      await supabase.from("user_info").insert([
-        {
-          is_onboarded: false,
-          auth_id: data.user.id,
-          email: data.user.email,
-        },
-      ]);
-      await sendMail({
-        email: process.env.SMTP_SERVER_USERNAME || "",
-        sendTo: data.user.email,
-        subject: "Welcome to the site!",
-        text: "You have successfully signed up.",
-        html: WelcomeTemplate({ userName: data.user.email }),
-      });
-    }
+  } else if (data.user) {
+    await supabase.from("user_info").insert([
+      {
+        is_onboarded: false,
+        auth_id: data.user.id,
+        email: data.user.email,
+      },
+    ]);
+    await sendMail({
+      email: process.env.SMTP_SERVER_USERNAME ?? "",
+      sendTo: data.user.email,
+      subject: "Welcome to the site!",
+      text: "You have successfully signed up.",
+      html: WelcomeTemplate({ userName: data.user.email }),
+    });
   }
 
   redirect("/onboarding-form");
@@ -105,15 +108,26 @@ export async function confirmOtpSignin(formData: FormData) {
   const supabase = await createClient();
 
   const email = formData.get("email") as string;
+  const phone = formData.get("phone") as string;
   const token = formData.get("token") as string;
 
   console.log("email", email, token);
+  console.log("phone", phone, token);
 
-  const { error } = await supabase.auth.verifyOtp({
-    email,
-    token,
-    type: "email",
-  });
+  let error;
+  if (email) {
+    ({ error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "email",
+    }));
+  } else if (phone) {
+    ({ error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: "sms",
+    }));
+  }
 
   if (error) {
     console.error("Error confirming email:", error.message);
@@ -139,6 +153,22 @@ export async function resendConfirmationEmail(formData: FormData) {
   return { success: "Confirmation email resent. Please check your inbox." };
 }
 
+export async function signInWithOAuth(provider: Provider) {
+  const supabase = await createClient();
+  const redirectURL = getURL("/auth/callback");
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: provider,
+    options: {
+      redirectTo: redirectURL,
+    },
+  });
+
+  console.log(data, error);
+  if (data?.url) {
+    redirect(data.url);
+  }
+}
+
 export async function signInWithGoogle() {
   const supabase = await createClient();
 
@@ -146,7 +176,6 @@ export async function signInWithGoogle() {
     provider: "google",
     options: {
       queryParams: {
-        access_type: "offline",
         prompt: "consent",
         redirectTo: "http://localhost:3000/main",
       },
@@ -241,7 +270,7 @@ export async function signInWithPhone(formData: FormData) {
   let redirectPath: string;
 
   if (!isValidPhoneNumber(phoneNumber)) {
-    redirectPath = getErrorRedirect(
+    getErrorRedirect(
       "/signin/email_signin",
       "Invalid phone number.",
       "Please try again."
@@ -254,15 +283,17 @@ export async function signInWithPhone(formData: FormData) {
     shouldCreateUser: true,
   };
 
-  // // If allowPassword is false, do not create a new user
-  // const { allowPassword } = getAuthTypes();
-  // if (allowPassword) options.shouldCreateUser = false;
+  console.log("phone", phoneNumber, options);
+
   const { data, error } = await supabase.auth.signInWithOtp({
     phone: phoneNumber,
     options: options,
   });
 
+  console.log("data", data, error);
+
   if (error) {
+    console.log("phonesignIn faled", error);
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
       `You could not be signed in. ${phoneNumber}`,
@@ -271,7 +302,7 @@ export async function signInWithPhone(formData: FormData) {
   } else if (data) {
     cookieStore.set("preferredSignInView", "email_signin", { path: "/" });
     redirectPath = getStatusRedirect(
-      `/confirm?email=${phoneNumber}&`,
+      `/confirm?phone=${phoneNumber}&isMagicLink=true&`,
       "Success!",
       "Please check your email for a magic link. You may now close this tab.",
       true
@@ -295,7 +326,7 @@ export async function requestPasswordUpdate(formData: FormData) {
   let redirectPath: string;
 
   if (!isValidEmail(email)) {
-    redirectPath = getErrorRedirect(
+    getErrorRedirect(
       "/signin/forgot_password",
       "Invalid email address.",
       "Please try again."
@@ -372,7 +403,7 @@ export async function signUp(formData: FormData) {
   let redirectPath: string;
 
   if (!isValidEmail(email)) {
-    redirectPath = getErrorRedirect(
+    getErrorRedirect(
       "/signin/signup",
       "Invalid email address.",
       "Please try again."
@@ -396,11 +427,7 @@ export async function signUp(formData: FormData) {
     );
   } else if (data.session) {
     redirectPath = getStatusRedirect("/", "Success!", "You are now signed in.");
-  } else if (
-    data?.user &&
-    data?.user?.identities &&
-    data?.user?.identities.length == 0
-  ) {
+  } else if (data?.user?.identities && data?.user?.identities.length == 0) {
     redirectPath = getErrorRedirect(
       "/signin/signup",
       "Sign up failed.",
@@ -430,7 +457,7 @@ export async function updatePassword(formData: FormData) {
 
   // Check that the password and confirmation match
   if (password !== passwordConfirm) {
-    redirectPath = getErrorRedirect(
+    getErrorRedirect(
       "/signin/update_password",
       "Your password could not be updated.",
       "Passwords do not match."
@@ -534,15 +561,4 @@ export async function updateName(formData: FormData) {
       "Your name could not be updated."
     );
   }
-}
-
-export async function signOut() {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    console.error("Error signing out:", error.message);
-    return null;
-  }
-  return redirect("/signin");
 }
