@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Upload, Loader2 } from "lucide-react";
+import { X, Upload, Loader2, Check } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -22,6 +22,16 @@ import {
   uploadProfilePicture,
 } from "@/services/uploader/action";
 import { completeOnboarding } from "@/services/onboarding/action";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  confirmPhoneChange,
+  updateCurrentUserPhone,
+} from "@/services/auth/action";
 
 const RequiredIndicator = () => (
   <span className="text-red-500 ml-1" aria-hidden="true">
@@ -47,6 +57,11 @@ export default function OnboardingForm() {
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   const [isMounted, setIsMounted] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
@@ -126,6 +141,34 @@ export default function OnboardingForm() {
   if (!isMounted) {
     return null;
   }
+
+  const handleVerifyClick = async () => {
+    setIsVerifying(true);
+    try {
+      const result = await updateCurrentUserPhone(formik.values.phone);
+      if (result?.error) {
+        setError(result.error);
+        setIsVerifying(false);
+        return;
+      }
+      setShowOtpDialog(true);
+    } catch (error) {
+      console.error("Error verifying phone number:", error);
+    }
+    setIsVerifying(false);
+  };
+  const handleOtpSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("token", otp);
+      formData.append("phone", formik.values.phone);
+      await confirmPhoneChange(formData);
+      setIsVerified(true);
+      setShowOtpDialog(false);
+    } catch (error) {
+      console.error("Error verifying phone number:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
@@ -273,39 +316,47 @@ export default function OnboardingForm() {
 
         {/* Contact Information Section */}
         <div className="space-y-4">
-          {/* Email Field */}
-          {/* <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="email">
-              Email Address
-              <RequiredIndicator />
-            </label>
-            <Input
-              id="email"
-              type="email"
-              {...formik.getFieldProps("email")}
-              disabled={formik.isSubmitting}
-              placeholder="Enter your email address"
-            />
-            {formik.touched.email && formik.errors.email && (
-              <p className="text-xs text-red-500">{formik.errors.email}</p>
-            )}
-          </div> */}
-
           {/* Phone Field */}
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="phone">
               Phone Number (optional)
             </label>
-            <Input
-              id="phone"
-              type="tel"
-              {...formik.getFieldProps("phone")}
-              disabled={formik.isSubmitting}
-              placeholder="Enter your phone number"
-            />
+            <div className="flex items-center space-x-2">
+              <Input
+                id="phone"
+                type="tel"
+                {...formik.getFieldProps("phone")}
+                disabled={formik.isSubmitting || isVerified}
+                placeholder="Enter your phone number"
+                className="flex-grow"
+              />
+              <Button
+                onClick={handleVerifyClick}
+                disabled={
+                  !formik.values.phone ||
+                  isVerifying ||
+                  isVerified ||
+                  formik.isSubmitting
+                }
+              >
+                {(() => {
+                  if (isVerifying)
+                    return <Loader2 className="h-4 w-4 animate-spin" />;
+                  if (isVerified)
+                    return <Check className="h-4 w-4 text-green-500" />;
+                  return "Verify";
+                })()}
+              </Button>
+            </div>
             {formik.touched.phone && formik.errors.phone && (
               <p className="text-xs text-red-500">{formik.errors.phone}</p>
             )}
+            {isVerified && (
+              <p className="text-xs text-green-500">
+                Phone number verified successfully!
+              </p>
+            )}
+            {error && <p className="text-xs text-red-500">{error}</p>}
           </div>
         </div>
 
@@ -349,7 +400,7 @@ export default function OnboardingForm() {
 
           {/* Chat Tone Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <label className="text-sm font-medium" htmlFor="chatTone">
               Preferred Communication Style
             </label>
             <Select
@@ -400,13 +451,16 @@ export default function OnboardingForm() {
 
         {/* Interests Section */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Areas of Interest</label>
+          <label className="text-sm font-medium " htmlFor="interest">
+            Areas of Interest
+          </label>
           <div className="flex gap-2">
             <Input
+              id="interest"
               placeholder="Add an interest"
               value={newInterest}
               onChange={(e) => setNewInterest(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && e.preventDefault()}
+              onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
               disabled={formik.isSubmitting}
             />
             <Button
@@ -676,17 +730,24 @@ export default function OnboardingForm() {
               "Start Your Journey"
             )}
           </Button>
-          {/* <Button
-            variant="outline"
-            className="w-full"
-            size="lg"
-            type="button"
-            disabled={formik.isSubmitting}
-          >
-            Skip for Now
-          </Button> */}
         </div>
       </div>
+      <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter OTP</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+            <Button onClick={handleOtpSubmit}>Submit OTP</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

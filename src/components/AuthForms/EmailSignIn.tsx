@@ -44,8 +44,8 @@ export default function EmailSignIn({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log(e.target);
     e.preventDefault();
-    console.log(email);
-    console.log(phone);
+    console.log("email", email);
+    console.log("phone", phone);
     if (email !== "")
       await handleRequest(e, signInWithEmail, shouldRedirect ? router : null);
     if (phone !== "")

@@ -31,13 +31,15 @@ export default function ConfirmPage() {
   const [isResending, setIsResending] = useState(false);
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const phone = searchParams.get("phone");
   const isMagicLink = searchParams.get("isMagicLink");
 
   const handleConfirm = async (formData: FormData) => {
     setError(null);
     setSuccess(null);
     setIsLoading(true);
-    formData.append("email", email || "");
+    formData.append("email", email ?? "");
+    formData.append("phone", phone ?? "");
     if (isMagicLink !== "true") {
       const result = await confirmSignup(formData);
       setIsLoading(false);
@@ -58,7 +60,7 @@ export default function ConfirmPage() {
     setSuccess(null);
     setIsResending(true);
     const formData = new FormData();
-    formData.append("email", email || "");
+    formData.append("email", email ?? "");
     const result = await resendConfirmationEmail(formData);
     setIsResending(false);
     if (result?.error) {
