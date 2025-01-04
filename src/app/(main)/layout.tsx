@@ -1,5 +1,5 @@
 import AppSidebar from "@/components/sidebar/sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -27,7 +27,7 @@ export default async function Layout({
     <SidebarProvider>
       <AppSidebar email={user?.email} userInfo={userInfo} />
       <main className="flex-1">
-        <SidebarTrigger />
+        {/* <SidebarTrigger /> */}
         <div>{children}</div>
       </main>
     </SidebarProvider>

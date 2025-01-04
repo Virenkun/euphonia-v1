@@ -19,6 +19,7 @@ import {
   AudioLines,
   TentTree,
   MessageCircleMore,
+  GraduationCap,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -198,10 +199,10 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
         isPremium: false,
       },
       {
-        name: "Chat History",
-        url: "/chat-history",
-        icon: MessageCircleMore,
-        isPremium: true,
+        name: "Professional Therapist",
+        url: "/professional-therapist",
+        icon: GraduationCap,
+        isPremium: false,
       },
       {
         name: "Resources",
@@ -209,6 +210,13 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
         icon: TentTree,
         isPremium: false,
       },
+      {
+        name: "Chat History",
+        url: "/chat-history",
+        icon: MessageCircleMore,
+        isPremium: true,
+      },
+
       {
         name: "AI Check-In",
         url: "/ai-checkin",
