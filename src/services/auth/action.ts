@@ -147,7 +147,9 @@ export async function signInWithOAuth(provider: Provider) {
   const headersList = await headers();
   const host = headersList.get("host");
   const supabase = await createClient();
-  const redirectURL = `${host}/auth/callback`;
+  const protocol = headersList.get("x-forwarded-proto");
+
+  const redirectURL = `${protocol}://${host}/auth/callback`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: provider,
     options: {
