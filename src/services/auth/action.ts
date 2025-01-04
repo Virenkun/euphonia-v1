@@ -11,7 +11,7 @@ import {
 } from "@/helpers/helpers";
 import { sendMail } from "@/lib/send-mail";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { WelcomeTemplate } from "@/template/template";
 
@@ -144,8 +144,10 @@ export async function resendConfirmationEmail(formData: FormData) {
 }
 
 export async function signInWithOAuth(provider: Provider) {
+  const headersList = await headers();
+  const host = headersList.get("host");
   const supabase = await createClient();
-  const redirectURL = getURL("/auth/callback");
+  const redirectURL = `${host}/auth/callback`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: provider,
     options: {
@@ -157,26 +159,6 @@ export async function signInWithOAuth(provider: Provider) {
   if (data?.url) {
     redirect(data.url);
   }
-}
-
-export async function signInWithGoogle() {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      queryParams: {
-        prompt: "consent",
-        redirectTo: "http://localhost:3000/main",
-      },
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  return { url: data.url };
 }
 
 export async function SignOut(formData: FormData) {
