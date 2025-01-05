@@ -47,19 +47,17 @@ export default function ListeningInterface() {
     let timer: NodeJS.Timeout;
 
     if (isSessionActive) {
-      setStartTime((prev) => prev || Date.now());
+      setStartTime((prev) => prev ?? Date.now());
 
       timer = setInterval(() => {
         setSessionLength((prev) =>
           startTime ? Math.floor((Date.now() - startTime) / 1000) : prev
         );
       }, 1000);
-    } else {
-      if (startTime) {
-        const finalLength = Math.floor((Date.now() - startTime) / 1000);
-        setSessionLength(finalLength);
-        setStartTime(null);
-      }
+    } else if (startTime) {
+      const finalLength = Math.floor((Date.now() - startTime) / 1000);
+      setSessionLength(finalLength);
+      setStartTime(null);
     }
 
     return () => clearInterval(timer);
@@ -195,7 +193,7 @@ export default function ListeningInterface() {
         stream: false,
       });
 
-      const response = chatCompletion.choices[0]?.message?.content || "";
+      const response = chatCompletion.choices[0]?.message?.content ?? "";
 
       const { error: assistantError } = await supabase.from("messages").insert([
         {
@@ -210,7 +208,6 @@ export default function ListeningInterface() {
         console.error("Error saving assistant message:", assistantError);
       }
 
-      // const blob = await UseTextToSpeechDeepgram(response);
       const blob = await synthesizeSpeech(response);
       if (blob) {
         setAudioBlob(blob);
@@ -245,7 +242,6 @@ export default function ListeningInterface() {
 
       if (updateError) {
         console.error("Error updating sessions:", updateError);
-      } else {
       }
     } else {
       console.error("Error fetching sessions:", error);
@@ -308,86 +304,84 @@ export default function ListeningInterface() {
   return (
     <div className="min-h-[88vh]">
       <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-        <>
-          <div className="text-neutral-800 text-lg h-6 mb-10">
-            {isListening ? "listening..." : ""}
+        <div className="text-neutral-800 text-lg h-6 mb-10">
+          {isListening ? "listening..." : ""}
+        </div>
+        <ForwardedAudioVisualizer
+          audioBlob={audioBlob}
+          onPlayingChange={setIsAudioPlaying}
+          ref={audioRef}
+        />
+        {isSessionActive && !isLoading && (
+          <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+            <Typewriter
+              options={{
+                strings: [assistantResponse],
+                autoStart: true,
+                delay: 50,
+                deleteSpeed: deleteSpeed,
+              }}
+            />
           </div>
-          <ForwardedAudioVisualizer
-            audioBlob={audioBlob}
-            onPlayingChange={setIsAudioPlaying}
-            ref={audioRef}
-          />
-          {isSessionActive && !isLoading && (
-            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
-              <Typewriter
-                options={{
-                  strings: [assistantResponse],
-                  autoStart: true,
-                  delay: 50,
-                  deleteSpeed: deleteSpeed,
-                }}
-              />
-            </div>
-          )}
+        )}
 
-          {!isSessionActive || isLoading ? (
-            <RainbowButton onClick={beginSession}>
-              {isLoading ? "Settings Things..." : "Begin Session"}
-            </RainbowButton>
-          ) : (
-            <div className="flex gap-8 mt-16">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
-                onClick={() => console.log("Toggle audio")}
-              >
-                <Volume2 className="w-6 h-6 dark:text-black" />
-                <span className="sr-only">Toggle audio</span>
-              </Button>
+        {!isSessionActive || isLoading ? (
+          <RainbowButton onClick={beginSession}>
+            {isLoading ? "Settings Things..." : "Begin Session"}
+          </RainbowButton>
+        ) : (
+          <div className="flex gap-8 mt-16">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
+              onClick={() => console.log("Toggle audio")}
+            >
+              <Volume2 className="w-6 h-6 dark:text-black" />
+              <span className="sr-only">Toggle audio</span>
+            </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
-                onClick={handleMicClick}
-                disabled={isAudioPlaying}
-              >
-                {isListening ? (
-                  <Square className="w-8 h-8 text-white dark:text-black" />
-                ) : (
-                  <Mic className="w-8 h-8 text-white dark:text-black" />
-                )}
-              </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
+              onClick={handleMicClick}
+              disabled={isAudioPlaying}
+            >
+              {isListening ? (
+                <Square className="w-8 h-8 text-white dark:text-black" />
+              ) : (
+                <Mic className="w-8 h-8 text-white dark:text-black" />
+              )}
+            </Button>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
-                  >
-                    <X className="w-6 h-6 dark:text-black" />
-                    <span className="sr-only ark:text-black">End Session</span>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
+                >
+                  <X className="w-6 h-6 dark:text-black" />
+                  <span className="sr-only ark:text-black">End Session</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>End the Session</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to end the session?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="destructive" onClick={endSession}>
+                    {isLoading ? "Ending..." : "End Session"}
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>End the Session</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to end the session?
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="destructive" onClick={endSession}>
-                      {isLoading ? "Ending..." : "End Session"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          )}
-        </>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
     </div>
   );
