@@ -34,12 +34,19 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { groq } from "@/utils/groq/client";
+import { useAsyncEffect } from "@/hooks/useAysncEffect";
+import { RESOURCE_PROMPT } from "@/constant/constants";
+import Spinner from "@/components/spinner";
 
-// export const metadata = {
-//   title: "Resources | Euphonia",
-//   description:
-//     "Explore AI-powered resources to support your mental health journey.",
-// };
+interface Resource {
+  title: string;
+  description: string;
+  icon: string;
+  tags: string[];
+  link: string;
+  category: string;
+}
 
 const categories = [
   { id: "all", name: "All Resources" },
@@ -49,191 +56,40 @@ const categories = [
   { id: "lifestyle", name: "Lifestyle" },
 ];
 
-const resources = [
-  {
-    title: "AI-Guided Meditation",
-    description:
-      "Experience personalized meditation sessions tailored by our AI to your current emotional state.",
-    icon: <Brain className="w-6 h-6" />,
-    tags: ["Meditation", "AI", "Personalized"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Interactive CBT Workbook",
-    description:
-      "Engage with our AI-powered Cognitive Behavioral Therapy workbook for practical exercises and insights.",
-    icon: <Book className="w-6 h-6" />,
-    tags: ["CBT", "Interactive", "Self-help"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Virtual Reality Therapy",
-    description:
-      "Immerse yourself in AI-generated environments designed to help you face and overcome specific challenges.",
-    icon: <Video className="w-6 h-6" />,
-    tags: ["VR", "Immersive", "Exposure Therapy"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "AI Mood Music",
-    description:
-      "Listen to AI-composed music that adapts in real-time to your mood and helps regulate your emotions.",
-    icon: <Headphones className="w-6 h-6" />,
-    tags: ["Music Therapy", "Adaptive", "Mood Regulation"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Peer Support Network",
-    description:
-      "Connect with others on similar journeys, with AI-facilitated matching and conversation starters.",
-    icon: <Users className="w-6 h-6" />,
-    tags: ["Community", "Support", "AI-Matched"],
-    link: "#",
-    category: "community",
-  },
-  {
-    title: "AI Therapist Training",
-    description:
-      "Learn about the AI technologies powering Euphonia and how they complement human therapy.",
-    icon: <Robot className="w-6 h-6" />,
-    tags: ["Education", "AI", "Therapy"],
-    link: "#",
-    category: "content",
-  },
-  {
-    title: "Personalized Goal Tracker",
-    description:
-      "Set and track your mental health goals with AI-powered insights and recommendations.",
-    icon: <Zap className="w-6 h-6" />,
-    tags: ["Goals", "Progress", "AI-Insights"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "AI-Powered Journal",
-    description:
-      "Write freely while our AI analyzes your entries to provide emotional insights and track your progress.",
-    icon: <Book className="w-6 h-6" />,
-    tags: ["Journaling", "Analysis", "Self-reflection"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Mental Health Webinars",
-    description:
-      "Attend live and recorded webinars featuring AI and human experts on various mental health topics.",
-    icon: <Video className="w-6 h-6" />,
-    tags: ["Education", "Expert Talks", "Live Sessions"],
-    link: "#",
-    category: "content",
-  },
-  {
-    title: "AI Scheduling Assistant",
-    description:
-      "Optimize your daily routine for better mental health with our AI scheduling tool.",
-    icon: <Calendar className="w-6 h-6" />,
-    tags: ["Productivity", "Routine", "Work-life Balance"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Emotion Recognition Training",
-    description:
-      "Improve your emotional intelligence with our AI-powered facial and vocal emotion recognition exercises.",
-    icon: <Sparkles className="w-6 h-6" />,
-    tags: ["EQ", "Recognition", "Social Skills"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "AI Research Digest",
-    description:
-      "Stay updated with the latest mental health research, summarized and explained by our AI.",
-    icon: <Lightbulb className="w-6 h-6" />,
-    tags: ["Research", "Updates", "Education"],
-    link: "#",
-    category: "content",
-  },
-  {
-    title: "Cognitive Games",
-    description:
-      "Engage in AI-generated puzzles and games designed to improve cognitive function and reduce stress.",
-    icon: <Puzzle className="w-6 h-6" />,
-    tags: ["Games", "Cognitive Training", "Stress Relief"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Community Challenges",
-    description:
-      "Join AI-curated group challenges to build healthy habits and connect with others.",
-    icon: <Users className="w-6 h-6" />,
-    tags: ["Challenges", "Community", "Habit Building"],
-    link: "#",
-    category: "community",
-  },
-  {
-    title: "AI-Powered Nutrition Planner",
-    description:
-      "Get personalized meal plans and nutrition advice to support your mental health through diet.",
-    icon: <Coffee className="w-6 h-6" />,
-    tags: ["Nutrition", "Personalized", "Wellness"],
-    link: "#",
-    category: "lifestyle",
-  },
-  {
-    title: "Virtual Nature Walks",
-    description:
-      "Experience AI-generated nature scenes and guided walks for relaxation and stress relief.",
-    icon: <Leaf className="w-6 h-6" />,
-    tags: ["Nature", "Relaxation", "Virtual Reality"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Relationship Harmony AI",
-    description:
-      "Receive AI-powered insights and advice to improve your relationships and communication skills.",
-    icon: <Heart className="w-6 h-6" />,
-    tags: ["Relationships", "Communication", "AI-Advice"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "Sleep Optimization Program",
-    description:
-      "Improve your sleep quality with AI-generated soundscapes, schedules, and relaxation techniques.",
-    icon: <Moon className="w-6 h-6" />,
-    tags: ["Sleep", "Relaxation", "Wellness"],
-    link: "#",
-    category: "lifestyle",
-  },
-  {
-    title: "Mindful Breathing Coach",
-    description:
-      "Learn and practice breathing techniques with real-time AI feedback for stress reduction.",
-    icon: <Sun className="w-6 h-6" />,
-    tags: ["Breathing", "Mindfulness", "Stress Relief"],
-    link: "#",
-    category: "tools",
-  },
-  {
-    title: "AI Art Therapy",
-    description:
-      "Express yourself through AI-assisted art creation, with emotional analysis and guided sessions.",
-    icon: <Palette className="w-6 h-6" />,
-    tags: ["Art Therapy", "Creativity", "Emotional Expression"],
-    link: "#",
-    category: "tools",
-  },
-];
-
 export default function ResourcesPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useAsyncEffect(async () => {
+    setLoading(true);
+    const response = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: RESOURCE_PROMPT,
+        },
+
+        {
+          role: "user",
+          content: "Generate a list of resources focused on mental health.",
+        },
+      ],
+      model: "llama-3.1-70b-versatile",
+      temperature: 1,
+      max_tokens: 2024,
+      top_p: 1,
+      stream: false,
+    });
+    const content = response.choices[0]?.message?.content;
+    if (content) {
+      console.log(JSON.parse(content));
+      setResources(JSON.parse(content));
+    } else {
+      console.error("Content is null");
+    }
+    setLoading(false);
+  }, []);
 
   const filteredResources = resources.filter(
     (resource) =>
@@ -275,44 +131,65 @@ export default function ResourcesPage() {
         {categories.map((category) => (
           <TabsContent key={category.id} value={category.id}>
             <ScrollArea className="h-[600px] rounded-md border p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredResources
-                  .filter(
-                    (resource) =>
-                      category.id === "all" || resource.category === category.id
-                  )
-                  .map((resource, index) => (
-                    <Card key={index} className="flex flex-col h-full">
-                      <CardHeader>
-                        <div className="flex items-center space-x-4">
-                          <div className="bg-primary/10 p-2 rounded-full">
-                            {resource.icon}
+              {loading ? (
+                <div className="flex flex-col flex-1 justify-center items-center min-h-[600px]">
+                  <Spinner />
+
+                  <p className="text-sm font-normal mt-4">
+                    Please wait preparing resources for you...
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredResources
+                    .filter(
+                      (resource) =>
+                        category.id === "all" ||
+                        resource.category === category.id
+                    )
+                    .map((resource, index) => (
+                      <Card
+                        key={`${resource.title}-${index}`}
+                        className="flex flex-col h-full"
+                      >
+                        <CardHeader>
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-primary/10 p-2 rounded-full">
+                              {renderIcon(resource.icon)}
+                            </div>
+                            <CardTitle>{resource.title}</CardTitle>
                           </div>
-                          <CardTitle>{resource.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                          <CardDescription className="mb-4">
+                            {resource.description}
+                          </CardDescription>
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {resource.tags.map((tag, tagIndex) => (
+                              <Badge
+                                key={`${tag}-${tagIndex}`}
+                                variant="secondary"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                        <div className="px-6 pb-6">
+                          <Button className="w-full" asChild>
+                            <a
+                              href={resource.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Explore <ArrowRight className="ml-2 h-4 w-4" />
+                            </a>
+                          </Button>
                         </div>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <CardDescription className="mb-4">
-                          {resource.description}
-                        </CardDescription>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {resource.tags.map((tag, tagIndex) => (
-                            <Badge key={tagIndex} variant="secondary">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <div className="px-6 pb-6">
-                        <Button className="w-full" asChild>
-                          <a href={resource.link}>
-                            Explore <ArrowRight className="ml-2 h-4 w-4" />
-                          </a>
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
-              </div>
+                      </Card>
+                    ))}
+                </div>
+              )}
             </ScrollArea>
           </TabsContent>
         ))}
@@ -359,4 +236,37 @@ export default function ResourcesPage() {
       </div>
     </div>
   );
+}
+
+const iconComponents = {
+  Brain,
+  Book,
+  Video,
+  Headphones,
+  Users,
+  Robot,
+  Zap,
+  Calendar,
+  Sparkles,
+  Lightbulb,
+  Puzzle,
+  Heart,
+  Leaf,
+  Coffee,
+  Moon,
+  Sun,
+  Palette,
+};
+
+function renderIcon(iconString: string) {
+  const match = /<(\w+)\s/.exec(iconString);
+  const componentName = match ? match[1] : null;
+
+  if (componentName && componentName in iconComponents) {
+    const Component =
+      iconComponents[componentName as keyof typeof iconComponents];
+    return <Component className="w-6 h-6" />;
+  }
+
+  return null; // Fallback if the icon is not found
 }
