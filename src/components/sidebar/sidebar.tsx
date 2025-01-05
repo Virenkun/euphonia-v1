@@ -69,9 +69,14 @@ interface AppSidebarProps {
     is_onboarded?: boolean;
     auth_id: string;
   } | null;
+  avatar: string | undefined;
 }
 
-export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
+export default function AppSidebar({
+  email,
+  userInfo,
+  avatar,
+}: Readonly<AppSidebarProps>) {
   const data = {
     user: {
       name: "shadcn",
@@ -405,7 +410,7 @@ export default function AppSidebar({ email, userInfo }: AppSidebarProps) {
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarImage
-                          src={userInfo?.avatar}
+                          src={avatar ?? userInfo?.avatar}
                           alt={userInfo?.name}
                         />
                         <AvatarFallback className="rounded-lg">

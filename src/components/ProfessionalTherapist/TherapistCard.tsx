@@ -8,8 +8,9 @@ import {
   MessageCircle,
   Calendar,
   Star,
-  DollarSign,
+  Banknote,
   Shield,
+  Contact,
 } from "lucide-react";
 import Image from "next/image";
 import ScheduleDialog from "./ScheduleDialog";
@@ -62,15 +63,19 @@ export default function TherapistCard({
         </div>
         <div className="space-y-2">
           <p className="text-sm flex items-center">
-            <Star className="w-4 h-4 text-yellow-400 mr-1" />
-            {therapist.rating} • {therapist.experience} experience
+            <Star className="w-4 h-4 text-yellow-400 mr-2" />
+            {therapist.rating}
           </p>
           <p className="text-sm flex items-center">
-            <DollarSign className="w-4 h-4 text-green-600 mr-1" />
+            <Contact className="w-4 h-4 text-blue-600 mr-2" />
+            {therapist.experience} experience
+          </p>
+          <p className="text-sm flex items-center">
+            <Banknote className="w-4 h-4 text-green-600 mr-2" />
             {therapist.price}
           </p>
           <div className="flex items-center text-sm">
-            <Shield className="w-4 h-4 text-blue-500 mr-1" />
+            <Shield className="w-4 h-4 text-blue-500 mr-2" />
             <span className="mr-1">Insurance:</span>
             <span className="text-gray-600">
               {therapist.insurance.slice(0, 2).join(", ")}
@@ -84,7 +89,11 @@ export default function TherapistCard({
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {therapist.tags.map((tag, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
+            <Badge
+              key={`${tag}-${index}`}
+              variant="secondary"
+              className="text-xs"
+            >
               {tag}
             </Badge>
           ))}
