@@ -23,9 +23,16 @@ export default async function Layout({
     redirect("/onboarding-form");
   }
 
+  console.log("userInfo", userInfo);
+  console.log("usesssssssr", user);
+
   return (
     <SidebarProvider>
-      <AppSidebar email={user?.email} userInfo={userInfo} />
+      <AppSidebar
+        email={user?.email}
+        avatar={user?.user_metadata?.avatar_url}
+        userInfo={userInfo}
+      />
       <main className="flex-1">
         {/* <SidebarTrigger /> */}
         <div>{children}</div>
