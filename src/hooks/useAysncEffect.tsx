@@ -11,11 +11,7 @@ export const useAsyncEffect = (
 ) => {
   useEffect(() => {
     const runEffect = async () => {
-      try {
-        await effect();
-      } catch (error) {
-        console.error("Error in useAsyncEffect:", error);
-      }
+      await effect();
     };
 
     runEffect();
