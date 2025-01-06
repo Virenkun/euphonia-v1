@@ -59,10 +59,10 @@ export default async function SignIn({
   }
 
   return (
-    <div className="flex justify-center items-center  min-h-screen">
-      <div className="flex flex-col justify-between items-center max-w-lg p-3 m-auto w-80 ">
-        <div className="flex justify-center pb-12 "></div>
-        <Card
+    <div className="">
+      {/* <div className="flex flex-col items-center">
+        <div className="flex justify-center pb-12 "></div> */}
+      {/* <Card
           title={
             viewProp === "forgot_password"
               ? "Reset Password"
@@ -72,35 +72,35 @@ export default async function SignIn({
               ? "Sign Up"
               : "Sign In"
           }
-        >
-          {viewProp === "password_signin" && (
-            <PasswordSignIn
-              allowEmail={allowEmail}
-              redirectMethod={redirectMethod}
-            />
-          )}
-          {viewProp === "email_signin" && (
-            <EmailSignIn
-              allowPassword={allowPassword}
-              redirectMethod={redirectMethod}
-              disableButton={(await searchParams).disable_button}
-            />
-          )}
-          {viewProp === "forgot_password" && (
-            <ForgotPassword
-              allowEmail={allowEmail}
-              redirectMethod={redirectMethod}
-              disableButton={(await searchParams).disable_button}
-            />
-          )}
-          {viewProp === "update_password" && (
-            <UpdatePassword redirectMethod={redirectMethod} />
-          )}
-          {viewProp === "signup" && (
-            <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
-          )}
-        </Card>
-      </div>
+        > */}
+      {viewProp === "password_signin" && (
+        <PasswordSignIn
+          allowEmail={allowEmail}
+          redirectMethod={redirectMethod}
+        />
+      )}
+      {viewProp === "email_signin" && (
+        <EmailSignIn
+          allowPassword={allowPassword}
+          redirectMethod={redirectMethod}
+          disableButton={(await searchParams).disable_button}
+        />
+      )}
+      {viewProp === "forgot_password" && (
+        <ForgotPassword
+          allowEmail={allowEmail}
+          redirectMethod={redirectMethod}
+          disableButton={(await searchParams).disable_button}
+        />
+      )}
+      {viewProp === "update_password" && (
+        <UpdatePassword redirectMethod={redirectMethod} />
+      )}
+      {viewProp === "signup" && (
+        <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
+      )}
+      {/* </Card> */}
     </div>
+    // </div>
   );
 }

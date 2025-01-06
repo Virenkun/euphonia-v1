@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/theme/theme-provider";
 import NextTopLoader from "nextjs-toploader";
@@ -7,7 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { Toaster } from "@/components/ui/toaster";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const quicksand = Nunito({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "Euphonia",
@@ -24,7 +24,7 @@ export default function RootLayout({
       <head>
         <link rel="canonical" href="https://euphonia.me/" />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={quicksand.className} suppressHydrationWarning>
         <NextTopLoader
           color="#000"
           initialPosition={0.08}
