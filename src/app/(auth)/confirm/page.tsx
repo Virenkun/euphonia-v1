@@ -1,17 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   confirmOtpSignin,
@@ -23,16 +14,27 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 export default function ConfirmPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [resendTimeout, setResendTimeout] = useState(60);
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const phone = searchParams.get("phone");
   const isMagicLink = searchParams.get("isMagicLink");
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendTimeout > 0) {
+      timer = setTimeout(() => setResendTimeout(resendTimeout - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimeout]);
 
   const handleConfirm = async (formData: FormData) => {
     setError(null);
@@ -67,65 +69,85 @@ export default function ConfirmPage() {
       setError(result.error);
     } else if (result?.success) {
       setSuccess(result.success);
+      setResendTimeout(60);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Confirm Your Email</CardTitle>
-          <CardDescription>
-            Enter the confirmation code sent to your email
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={handleConfirm}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="token">Confirmation Code</Label>
-                <div className="space-y-2 flex align-middle justify-center">
-                  <InputOTP maxLength={6} id="token" name="token" required>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                    </InputOTPGroup>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
+    <div className="min-h-screen bg-[#4B4ACF] flex items-center justify-center">
+      <div className="w-full max-w-md">
+        <div className="absolute left-2 top-2 p-4 rounded-full">
+          <Link href="/" className="text-white hover:text-white/80">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white bg-black bg-opacity-20 font-bold hover:bg-white/10 hover:text-white rounded-full"
+            >
+              <ChevronLeft
+                strokeWidth={5}
+                size={100}
+                className="font-bold text-xl"
+              />
+            </Button>
+          </Link>
+        </div>
+        <main className="flex flex-col self-center justify-center items-center px-6 gap-4">
+          <h2 className="text-3xl font-bold text-center mb-6 text-white">
+            Confirm Your Account
+          </h2>
+          <form action={handleConfirm} className="space-y-6">
+            <div className="space-y-2">
+              <p className="text-lg font-medium text-white">
+                Enter confirmation code
+              </p>
+              <div className="flex justify-center">
+                <InputOTP maxLength={6} id="token" name="token" required>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
             </div>
             {error && (
-              <Alert variant="destructive" className="mt-4">
+              <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert variant="default" className="mt-4">
+              <Alert variant="default">
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" className="w-full mt-4" disabled={isLoading}>
-              {isLoading ? "Confirming..." : "Confirm Email"}
+            <Button
+              type="submit"
+              className="w-full h-[50px] bg-white rounded-[14px] text-[16px] text-[#4B4ACF] font-semibold hover:bg-white/90 transition-colors"
+              disabled={isLoading}
+            >
+              {isLoading ? "Confirming..." : "Confirm"}
             </Button>
           </form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center">
-          <p className="text-sm text-gray-600 mb-2">Didnt receive the email?</p>
-          <Button
-            variant="outline"
-            onClick={handleResendEmail}
-            disabled={isResending}
-          >
-            {isResending ? "Resending..." : "Resend Confirmation Email"}
-          </Button>
-        </CardFooter>
-      </Card>
+          <div className="mt-8 text-center">
+            <p className="text-lg text-white mb-4">Didn’t receive the email?</p>
+            <Button
+              variant="outline"
+              onClick={handleResendEmail}
+              disabled={isResending || resendTimeout > 0}
+              className="h-[50px] px-6 bg-transparent border-2 border-white rounded-[14px] text-[16px] text-white font-medium hover:bg-white hover:text-[#4B4ACF] transition-colors"
+            >
+              {isResending
+                ? "Resending..."
+                : resendTimeout > 0
+                ? `Resend in ${resendTimeout}s`
+                : "Resend Confirmation Email"}
+            </Button>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

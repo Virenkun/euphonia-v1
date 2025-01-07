@@ -20,7 +20,7 @@ export default function WhatIsEuphonia() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-[700] text-gray-900 mb-4">
             What Is Meaning of <span className="text-indigo-600">Euphonia</span>
             ?
           </h2>

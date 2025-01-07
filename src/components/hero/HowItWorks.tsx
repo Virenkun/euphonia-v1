@@ -33,7 +33,7 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section id="how-it-works" className="py-20">
-      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 text-center">
+      <h2 className="text-4xl md:text-5xl font-[700] text-gray-900 mb-4 text-center">
         How to <span className="text-indigo-600">Start</span>?
       </h2>
       <p className="text-xl text-center text-gray-600 mb-12 max-w-3xl mx-auto">

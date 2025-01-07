@@ -1,7 +1,7 @@
-import AIDemo from "@/components/hero/AIDemo";
 import CTA from "@/components/hero/CTA";
 import FAQ from "@/components/hero/FAQ";
 import Features from "@/components/hero/Features";
+import { FeaturesSection } from "@/components/hero/FeaturesSection";
 import Footer from "@/components/hero/Footer";
 import Header from "@/components/hero/Header";
 import Hero from "@/components/hero/Hero";
@@ -22,7 +22,7 @@ export default async function Home() {
           <Features />
           <WhatIsEuphonia />
           <HowItWorks />
-          <AIDemo />
+          <FeaturesSection />
           <Testimonials />
           <Pricing />
           <FAQ />
