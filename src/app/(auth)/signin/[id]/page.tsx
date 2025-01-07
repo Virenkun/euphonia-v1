@@ -12,17 +12,16 @@ import {
   getRedirectMethod,
   getViewTypes,
 } from "@/helpers/auth-helpers";
-import { Card } from "@/components/ui/card";
 
 export default async function SignIn({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{
-    disable_button: boolean;
-    error: string;
-    error_description: string;
+  readonly params: Promise<{ readonly id: string }>;
+  readonly searchParams: Promise<{
+    readonly disable_button: boolean;
+    readonly error: string;
+    readonly error_description: string;
   }>;
 }) {
   const { allowEmail, allowPassword } = getAuthTypes();
@@ -40,7 +39,7 @@ export default async function SignIn({
     viewProp = (await params).id;
   } else {
     const preferredSignInView =
-      (await cookies()).get("preferredSignInView")?.value || null;
+      (await cookies()).get("preferredSignInView")?.value ?? null;
     viewProp = getDefaultSignInView(preferredSignInView);
     return redirect(`/signin/${viewProp}`);
   }
@@ -59,10 +58,10 @@ export default async function SignIn({
   }
 
   return (
-    <div className="flex justify-center items-center  min-h-screen">
-      <div className="flex flex-col justify-between items-center max-w-lg p-3 m-auto w-80 ">
-        <div className="flex justify-center pb-12 "></div>
-        <Card
+    <div className="">
+      {/* <div className="flex flex-col items-center">
+        <div className="flex justify-center pb-12 "></div> */}
+      {/* <Card
           title={
             viewProp === "forgot_password"
               ? "Reset Password"
@@ -72,35 +71,32 @@ export default async function SignIn({
               ? "Sign Up"
               : "Sign In"
           }
-        >
-          {viewProp === "password_signin" && (
-            <PasswordSignIn
-              allowEmail={allowEmail}
-              redirectMethod={redirectMethod}
-            />
-          )}
-          {viewProp === "email_signin" && (
-            <EmailSignIn
-              allowPassword={allowPassword}
-              redirectMethod={redirectMethod}
-              disableButton={(await searchParams).disable_button}
-            />
-          )}
-          {viewProp === "forgot_password" && (
-            <ForgotPassword
-              allowEmail={allowEmail}
-              redirectMethod={redirectMethod}
-              disableButton={(await searchParams).disable_button}
-            />
-          )}
-          {viewProp === "update_password" && (
-            <UpdatePassword redirectMethod={redirectMethod} />
-          )}
-          {viewProp === "signup" && (
-            <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
-          )}
-        </Card>
-      </div>
+        > */}
+      {viewProp === "password_signin" && (
+        <PasswordSignIn redirectMethod={redirectMethod} />
+      )}
+      {viewProp === "email_signin" && (
+        <EmailSignIn
+          allowPassword={allowPassword}
+          redirectMethod={redirectMethod}
+          disableButton={(await searchParams).disable_button}
+        />
+      )}
+      {viewProp === "forgot_password" && (
+        <ForgotPassword
+          allowEmail={allowEmail}
+          redirectMethod={redirectMethod}
+          disableButton={(await searchParams).disable_button}
+        />
+      )}
+      {viewProp === "update_password" && (
+        <UpdatePassword redirectMethod={redirectMethod} />
+      )}
+      {viewProp === "signup" && (
+        <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
+      )}
+      {/* </Card> */}
     </div>
+    // </div>
   );
 }

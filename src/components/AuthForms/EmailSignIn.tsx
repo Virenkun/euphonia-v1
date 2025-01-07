@@ -7,12 +7,12 @@ import { handleRequest } from "@/helpers/auth-helpers";
 import { signInWithEmail, signInWithPhone } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChevronLeft } from "lucide-react";
 
 interface EmailSignInProps {
-  allowPassword: boolean;
-  redirectMethod: string;
-  disableButton?: boolean;
+  readonly allowPassword: boolean;
+  readonly redirectMethod: string;
+  readonly disableButton?: boolean;
 }
 
 export default function EmailSignIn({
@@ -30,14 +30,14 @@ export default function EmailSignIn({
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     if (e.target.value.trim()) {
-      setPhone(""); // Clear phone field if email is entered
+      setPhone("");
     }
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhone(e.target.value);
     if (e.target.value.trim()) {
-      setEmail(""); // Clear email field if phone is entered
+      setEmail("");
     }
   };
 
@@ -54,92 +54,110 @@ export default function EmailSignIn({
   };
 
   return (
-    <Card className="w-full min-w-max">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">
-          Sign in to your account
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form noValidate onSubmit={handleSubmit} className="space-y-2">
-          <div className="space-y-2 mb-4">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              name="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              value={email}
-              onChange={handleEmailChange}
-              className="w-full"
-            />
-          </div>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">OR</span>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium">
-              Phone
-            </label>
-            <Input
-              id="phone"
-              placeholder="+917408070150"
-              type="tel"
-              name="phone"
-              autoCapitalize="none"
-              autoComplete="tel"
-              autoCorrect="off"
-              value={phone}
-              onChange={handlePhoneChange}
-              className="w-full"
-            />
-          </div>
+    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+      <div className="p-4">
+        <Link href="/" className="text-white hover:text-white/80">
           <Button
-            type="submit"
-            className="w-full bg-black text-white "
-            disabled={isSubmitting || disableButton}
+            variant="ghost"
+            size="icon"
+            className="text-white bg-black bg-opacity-20 font-bold hover:bg-white/10 hover:text-white rounded-full m-4"
           >
-            {isSubmitting ? "Signing in..." : "Sign in"}
+            <ChevronLeft
+              strokeWidth={5}
+              size={100}
+              className="font-bold text-xl"
+            />
           </Button>
-        </form>
-        {allowPassword && (
-          <div className="mt-4 space-y-2">
-            <Link
-              href="/signin/password_signin"
-              className="block text-center text-sm text-blue-600 hover:underline"
-            >
-              Sign in with email and password
-            </Link>
-            <Link
-              href="/signin/signup"
-              className="block text-center text-sm text-blue-600 hover:underline"
-            >
-              Dont have an account? Sign up
-            </Link>
+        </Link>
+      </div>
+
+      <main className="flex flex-col items-center px-6">
+        <div className="w-full max-w-[400px] space-y-16">
+          <div className="flex justify-center text-[38px] font-[700] text-white"></div>
+
+          <div className="space-y-6">
+            <h1 className="text-[28px] text-center font-[700] text-white">
+              Continue with Email or Phone
+            </h1>
+
+            <div className="space-y-3">
+              {allowPassword && (
+                <Link href="/signin/email_signin">
+                  <Button className="w-full h-[52px] bg-white rounded-[14px] flex items-center justify-center space-x-2 hover:bg-white/95 transition-colors">
+                    <span className="text-[16px] font-[700] text-[#1A1A1A]">
+                      Sign in with Email and Password
+                    </span>
+                  </Button>
+                </Link>
+              )}
+              <div className="relative py-2"></div>
+              <form noValidate onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <div className="space-y-2">
+                      <Input
+                        id="email"
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        autoCorrect="off"
+                        placeholder="name@example.com"
+                        type="email"
+                        name="email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-[#4B4ACF] px-4 text-[16px] font-[700] text-white">
+                      or
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Input
+                          id="phone"
+                          placeholder="+917408070150"
+                          type="tel"
+                          name="phone"
+                          autoCapitalize="none"
+                          autoComplete="tel"
+                          autoCorrect="off"
+                          value={phone}
+                          onChange={handlePhoneChange}
+                          className={`w-full pr-10 h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || disableButton}
+                  className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
+                >
+                  {isSubmitting ? "Setting Up Your Profile..." : "Continue"}
+                </Button>
+              </form>
+
+              <p className="text-[18px] font-[700] text-center text-white pt-1">
+                Do not have an account?{" "}
+                <Link
+                  href="/signin/signup"
+                  className="text-white hover:text-white/80"
+                >
+                  Regsiter
+                </Link>
+              </p>
+            </div>
           </div>
-        )}
-        <p className="mt-6 text-center text-xs text-gray-600">
-          By continuing, you agree to our{" "}
-          <Link href="/terms" className="underline">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="underline">
-            Privacy Policy
-          </Link>
-          .
-        </p>
-      </CardContent>
-    </Card>
+        </div>
+      </main>
+    </div>
   );
 }

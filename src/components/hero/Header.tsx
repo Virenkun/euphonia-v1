@@ -26,31 +26,31 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-bold text-indigo-600">
+          <Link href="/" className="text-2xl font-[900] text-indigo-600">
             Euphonia
           </Link>
           <nav className="hidden md:flex space-x-8">
             <Link
               href="#features"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
             >
               Features
             </Link>
             <Link
               href="#how-it-works"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
             >
               How It Works
             </Link>
             <Link
               href="#pricing"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
             >
               Pricing
             </Link>
             <Link
               href="#faq"
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
             >
               FAQ
             </Link>
@@ -59,13 +59,15 @@ export default function Header() {
             <Link href="/signin/password_signin">
               <Button
                 variant="outline"
-                className="mr-4 px-8  bg-transparent border-black font-semibold h-10 hover:bg-transparent"
+                className="mr-4 px-8  bg-transparent border-black text-md font-[600] h-10 hover:bg-transparent"
               >
                 Log In
               </Button>
             </Link>
             <Link href="/signin/signup">
-              <RainbowButton>Get Started</RainbowButton>
+              <RainbowButton className="text-md font-[700]">
+                Get Started
+              </RainbowButton>
             </Link>
           </div>
           <button
