@@ -28,8 +28,8 @@ export default async function Home() {
           <FAQ />
           <CTA />
         </main>
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }
