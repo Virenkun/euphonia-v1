@@ -26,6 +26,7 @@ export default function ForgotPassword({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.persist();
     await handleRequest(
       e,
       requestPasswordUpdate,
