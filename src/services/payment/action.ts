@@ -1,4 +1,5 @@
 "use server";
+import { headers } from "next/headers";
 import Stripe from "stripe";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -7,40 +8,34 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function CheckoutSession({
-  planId,
+  priceId,
   userId,
+  planId,
 }: {
+  priceId: string;
   planId: string;
   userId: string;
 }) {
+  const headersList = await headers();
+  const host = headersList.get("host");
+  const protocol = headersList.get("x-forwarded-proto");
   try {
-    let priceId;
-
-    // Map planId to Stripe price IDs
-    switch (planId) {
-      case "Melody":
-        priceId = "price_1QextqRvCtMaecfigyPOSkpO"; // Replace with your Stripe price ID for "Melody"
-        break;
-      case "Symphony":
-        priceId = "price_1QextqRvCtMaecfigyPOSkpO"; // Replace with your Stripe price ID for "Symphony"
-        break;
-      default:
-        return { error: "Invalid plan" };
-    }
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      mode: "subscription",
+      mode: "payment",
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      success_url: `http://locahost:3000/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://locahost:3000/cancel`,
+      success_url: `${protocol}://${host}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${protocol}://${host}/payment/failed`,
       metadata: {
-        userId, // Include user ID for post-payment handling
+        userId,
+        name: "euphonia",
+        planId,
+        productName: planId,
       },
     });
 
@@ -50,5 +45,40 @@ export async function CheckoutSession({
   } catch (error) {
     console.error(error);
     return { error: "Failed to create session" };
+  }
+}
+
+export async function GetSubscriptionDetails({
+  sessionId,
+}: {
+  sessionId: string;
+}) {
+  if (!sessionId) {
+    return { error: "Session ID is required" };
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (!session.payment_intent) {
+      return { error: "No subscription found for session" };
+    }
+
+    const subscription = await stripe.paymentIntents.retrieve(
+      session.payment_intent as string
+    );
+
+    if (!session.metadata) {
+      return { error: "Session metadata is missing" };
+    }
+    const productName = session.metadata.productName;
+    const amountPaid = subscription.amount_received;
+
+    return {
+      productName,
+      amountPaid,
+    };
+  } catch (error: unknown) {
+    return { error: (error as Error).message };
   }
 }
