@@ -117,6 +117,12 @@ export async function confirmOtpSignin(formData: FormData) {
       token,
       type: "sms",
     }));
+  } else {
+    ({ error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "email",
+    }));
   }
 
   if (error) {
