@@ -83,7 +83,6 @@ export default function ResourcesPage() {
     });
     const content = response.choices[0]?.message?.content;
     if (content) {
-      console.log(JSON.parse(content));
       setResources(JSON.parse(content));
     } else {
       console.error("Content is null");

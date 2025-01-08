@@ -57,7 +57,6 @@ export async function getChatsBySession(): Promise<GroupedMessages> {
       {} as GroupedMessages
     );
 
-    console.log("Grouped messages:", groupedMessages);
     return groupedMessages;
   } catch (err) {
     console.error("Error fetching messages:", err);
