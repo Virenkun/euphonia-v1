@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    console.log("callback", data);
 
     const userInfo = await supabase
       .from("user_info")
@@ -22,7 +21,6 @@ export async function GET(request: NextRequest) {
       .eq("email", data?.user?.email);
     const isFirstTimeUser = userInfo.data && userInfo.data.length === 0;
     if (isFirstTimeUser && data.user) {
-      console.log("Inserting user info in callback");
       await supabase.from("user_info").insert([
         {
           is_onboarded: false,

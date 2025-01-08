@@ -34,8 +34,6 @@ export default function SessionsTab() {
     setIsLoading(false);
   }, []);
 
-  console.log(sessions);
-
   const upcomingSessions = sessions?.filter(
     (session) => session.status === "upcoming"
   );

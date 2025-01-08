@@ -122,12 +122,14 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
             </h1>
 
             <div className="space-y-3">
-              <Button className="w-full h-[52px] bg-white rounded-[14px] flex items-center justify-center space-x-2 hover:bg-white/95 transition-colors">
-                <Mail className="h-8 w-8 text-black" />
-                <span className="text-[16px] font-[700] text-[#1A1A1A]">
-                  Continue with OTP
-                </span>
-              </Button>
+              <Link href="/signin/email_signin">
+                <Button className="w-full h-[52px] bg-white rounded-[14px] flex items-center justify-center space-x-2 hover:bg-white/95 transition-colors">
+                  <Mail className="h-8 w-8 text-black" />
+                  <span className="text-[16px] font-[700] text-[#1A1A1A]">
+                    Continue with OTP
+                  </span>
+                </Button>
+              </Link>
 
               <Button
                 className="w-full h-[52px] bg-white rounded-[14px] flex items-center justify-center space-x-3 hover:bg-white/95 transition-colors"

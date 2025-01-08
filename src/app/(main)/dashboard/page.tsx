@@ -109,8 +109,6 @@ export default function Dashboard() {
     setDashboardData(response);
   }, []);
 
-  console.log(dashboardData);
-
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-8">

@@ -335,7 +335,7 @@ export default function ListeningInterface() {
               variant="ghost"
               size="icon"
               className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
-              onClick={() => console.log("Toggle audio")}
+              // onClick={() => console.log("Toggle audio")}
             >
               <Volume2 className="w-6 h-6 dark:text-black" />
               <span className="sr-only">Toggle audio</span>

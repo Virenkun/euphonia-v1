@@ -9,12 +9,12 @@ export default function Hero() {
     <section className="py-28">
       <div className="flex flex-col lg:flex-row items-center justify-between">
         <div className="lg:w-1/2 mb-10 lg:mb-0">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-[800] text-gray-900 mb-6 leading-tight">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-[700] text-gray-900 mb-6 leading-tight">
             AI-Powered Therapy
             <br />
             <span className="text-indigo-600">For Your Mind</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 font-[600]">
+          <p className="text-xl text-gray-800 mb-8 font-[500]">
             Experience the future of mental wellness with our AI voice
             therapist. Compassionate, accessible, and always here for you.
           </p>
@@ -33,15 +33,15 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-        <div className="mr-8 lg:w-1/2">
+        <div className="mr-2 lg:w-1/2">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full filter blur-3xl opacity-30"></div>
             <Image
-              src={"/hero_one.svg"}
+              src="/main.png"
               alt="AI Therapist Illustration"
-              width={500}
-              height={500}
-              className="relative"
+              width={900}
+              height={900}
+              className="relative rounded-2xl border-[8px] border-indigo-500"
             />
           </div>
         </div>

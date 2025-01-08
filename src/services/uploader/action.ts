@@ -23,7 +23,7 @@ export const uploadProfilePicture = async (
   const { data: publicUrl, error: signedUrlError } = await supabase.storage
     .from("euphonia")
     .createSignedUrl(fileName, 36000);
-  console.log("Public URL", publicUrl);
+
   if (publicUrl) {
     return { signedUrl: publicUrl.signedUrl, fileName };
   } else {

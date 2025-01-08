@@ -26,31 +26,31 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-[900] text-indigo-600">
+          <Link href="/" className="text-2xl font-[700] text-indigo-600">
             Euphonia
           </Link>
           <nav className="hidden md:flex space-x-8">
             <Link
               href="#features"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               Features
             </Link>
             <Link
               href="#how-it-works"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               How It Works
             </Link>
             <Link
               href="#pricing"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               Pricing
             </Link>
             <Link
               href="#faq"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[700]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               FAQ
             </Link>

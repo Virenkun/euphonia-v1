@@ -102,8 +102,6 @@ export default function OnboardingForm() {
     },
   });
 
-  console.log(formik);
-
   const addInterest = () => {
     if (newInterest && interests.length < 5) {
       setInterests([...interests, newInterest]);
