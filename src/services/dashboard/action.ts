@@ -67,7 +67,6 @@ export async function GetDashboardData() {
   const averageUserWordCount = totalUserWordCount / sessions.length;
   const averageAssistantWordCount = totalAssistantWordCount / sessions.length;
 
-  console.log("sessions", sessions);
   return {
     session_count: session_count,
     sessions: sessions,

@@ -69,8 +69,6 @@ export async function confirmSignup(formData: FormData) {
   const email = formData.get("email") as string;
   const token = formData.get("token") as string;
 
-  console.log("email", email, token);
-
   const { data, error } = await supabase.auth.verifyOtp({
     email,
     token,
@@ -106,9 +104,6 @@ export async function confirmOtpSignin(formData: FormData) {
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
   const token = formData.get("token") as string;
-
-  console.log("email", email, token);
-  console.log("phone", phone, token);
 
   let error;
   if (phone) {
@@ -163,7 +158,14 @@ export async function signInWithOAuth(provider: Provider) {
     },
   });
 
-  console.log(data, error);
+  if (error) {
+    console.error("Error signing in with OAuth:", error.message);
+    return getErrorRedirect(
+      "/signin",
+      "Sign in failed.",
+      error.message ?? "Please try again."
+    );
+  }
   if (data?.url) {
     redirect(data.url);
   }
@@ -246,7 +248,7 @@ export async function signInWithPhone(formData: FormData) {
   const callbackURL = getURL("/auth/callback");
 
   const phoneNumber = String(formData.get("phone")).trim();
-  console.log(phoneNumber, "phone");
+
   let redirectPath: string;
 
   if (!isValidPhoneNumber(phoneNumber)) {
@@ -262,8 +264,6 @@ export async function signInWithPhone(formData: FormData) {
     emailRedirectTo: callbackURL,
     shouldCreateUser: true,
   };
-
-  console.log("phone", phoneNumber, options);
 
   const { data, error } = await supabase.auth.signInWithOtp({
     phone: phoneNumber,
