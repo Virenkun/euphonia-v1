@@ -457,7 +457,7 @@ export async function updatePassword(formData: FormData) {
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
-      "/",
+      "/main",
       "Success!",
       "Your password has been updated."
     );
