@@ -3,39 +3,39 @@ import { Brain, Heart, Clock, Shield, Zap, Sparkles } from "lucide-react";
 
 const features = [
   {
-    title: "AI-Powered Insights",
+    title: "Personalized AI Care",
     description:
-      "Advanced algorithms provide personalized therapeutic support tailored to your unique needs.",
+      "Euphonia’s advanced AI delivers tailored therapeutic insights designed to meet your unique emotional needs.",
     icon: Brain,
   },
   {
-    title: "Empathetic Conversations",
+    title: "Compassionate Conversations",
     description:
-      "Natural language processing for compassionate, human-like interactions that understand context and emotion.",
+      "Engage in empathetic, human-like dialogues that understand your emotions and provide meaningful support.",
     icon: Heart,
   },
   {
-    title: "24/7 Availability",
+    title: "Always Here for You",
     description:
-      "Access support whenever you need it, day or night, without scheduling or waiting.",
+      "Access therapy anytime, day or night, without the need for appointments or wait times.",
     icon: Clock,
   },
   {
-    title: "Secure & Confidential",
+    title: "Your Privacy, Guaranteed",
     description:
-      "Your privacy is our top priority with end-to-end encryption and anonymous sessions.",
+      "Enjoy secure, anonymous sessions backed by state-of-the-art encryption to ensure your trust.",
     icon: Shield,
   },
   {
-    title: "Rapid Response",
+    title: "Instant Support",
     description:
-      "Get immediate support and answers to your concerns without delay.",
+      "Experience real-time responses and solutions to your concerns, whenever you need them most.",
     icon: Zap,
   },
   {
-    title: "Continuous Learning",
+    title: "Evolving to Support You Better",
     description:
-      "Our AI constantly improves, learning from interactions to provide better support over time.",
+      "Euphonia’s AI continuously learns and grows, refining its ability to provide meaningful and effective care.",
     icon: Sparkles,
   },
 ];
