@@ -54,6 +54,7 @@ import { FeedbackModal } from "../account/feedback-modal";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { Progress } from "../ui/progress";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -70,12 +71,18 @@ interface AppSidebarProps {
     auth_id: string;
   } | null;
   avatar: string | undefined;
+  planName: string | undefined;
+  allotedSessions: number | undefined;
+  usedSessions: number;
 }
 
 export default function AppSidebar({
   email,
   userInfo,
   avatar,
+  planName,
+  allotedSessions,
+  usedSessions,
 }: Readonly<AppSidebarProps>) {
   const data = {
     user: {
@@ -462,6 +469,22 @@ export default function AppSidebar({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <div className="border-t py-4 mt-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-[500] bg-[#4B4ACF] py-1 px-4 rounded-lg text-white text-sidebar-secondary-foreground">
+                    {planName}
+                  </p>
+                  <p className="text-sm font-[500]">
+                    {usedSessions}/{allotedSessions} Sessions
+                  </p>
+                </div>
+                <Progress
+                  value={(usedSessions / (allotedSessions ?? 1)) * 100}
+                  className="h-3 mt-2"
+                />
+              </div>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
