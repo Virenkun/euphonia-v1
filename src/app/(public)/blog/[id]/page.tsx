@@ -8,7 +8,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 
-export default async function BlogPost({ params }: { params: { id: string } }) {
+export default async function BlogPost({
+  params,
+}: {
+  params: Promise<{ readonly id: string }>;
+}) {
   const supabase = await createClient();
   const { data: post, error } = await supabase
     .from("blogs")
