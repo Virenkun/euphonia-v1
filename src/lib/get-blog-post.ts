@@ -15,7 +15,7 @@ interface BlogPost {
   }[];
 }
 
-export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+export async function getBlogPost(): Promise<BlogPost | null> {
   // In a real application, you would fetch this data from an API or database
   const post: BlogPost = {
     slug: "how-ai-is-revolutionizing-speech-therapy",
