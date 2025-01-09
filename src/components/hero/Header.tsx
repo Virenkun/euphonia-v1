@@ -43,7 +43,7 @@ export default function Header() {
               How It Works
             </Link>
             <Link
-              href="#pricing"
+              href="/blog"
               className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               Blogs
