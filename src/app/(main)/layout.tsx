@@ -14,9 +14,20 @@ export default async function Layout({
   } = await supabase.auth.getUser();
   const { data: userInfoArray } = await supabase
     .from("user_info")
-    .select("*")
+    .select(`*,plan(*)`)
     .eq("email", user?.email);
   const userInfo = userInfoArray ? userInfoArray[0] : null;
+  const { data: session_count, error } = await supabase.rpc(
+    "count_unique_sessions",
+    {
+      input_user_id: userInfo?.auth_id,
+    }
+  );
+
+  if (error) {
+    console.error("Error While Getting Session Count", error);
+  }
+
   const isOnboardingComplete = userInfo?.is_onboarded;
 
   if (!isOnboardingComplete) {
@@ -29,6 +40,9 @@ export default async function Layout({
         email={user?.email}
         avatar={user?.user_metadata?.avatar_url}
         userInfo={userInfo}
+        planName={userInfo?.plan?.name}
+        allotedSessions={userInfo?.plan?.features?.sessions}
+        usedSessions={session_count}
       />
       <main className="flex-1">
         {/* <SidebarTrigger /> */}

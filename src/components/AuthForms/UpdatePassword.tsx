@@ -6,7 +6,6 @@ import { handleRequest } from "@/helpers/auth-helpers";
 import { updatePassword } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 interface UpdatePasswordProps {
@@ -30,88 +29,98 @@ export default function UpdatePassword({
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Update Password
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form noValidate onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                New Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  placeholder="New Password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  autoComplete="new-password"
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+      <main className="flex flex-col items-center px-6">
+        <div className="w-full max-w-[400px] space-y-16">
+          <div className="flex justify-center text-[38px] font-[700] text-white"></div>
+
+          <div className="space-y-6">
+            <h1 className="text-[32px] text-center font-[700] text-white">
+              Sign in with Password
+            </h1>
+
+            <div className="space-y-3">
+              <div className="relative py-2"></div>
+              <form noValidate onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          placeholder="Password"
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          autoComplete="password"
+                          className={`w-full pr-10 h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
+                        >
+                          {showPassword ? (
+                            <EyeOffIcon className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <EyeIcon className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          placeholder="Confirm Password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          name="confirmPassword"
+                          autoComplete="new-password"
+                          className={`w-full pr-10 h-[52px] bg-[#4342B9] border-0 border-white rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none" : ""
+                          }`}
+                          required
+                          aria-describedby="confirm-password-error"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide confirm password"
+                              : "Show confirm password"
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOffIcon className="h-4 w-4 text-gray-100" />
+                          ) : (
+                            <EyeIcon className="h-4 w-4 text-gray-100" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
                 >
-                  {showPassword ? (
-                    <EyeOffIcon className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <EyeIcon className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
+                  {isSubmitting ? "Updating..." : "Update Password"}
+                </Button>
+              </form>
             </div>
-            <div className="space-y-2">
-              <label htmlFor="passwordConfirm" className="text-sm font-medium">
-                Confirm New Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="passwordConfirm"
-                  placeholder="Confirm New Password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="passwordConfirm"
-                  autoComplete="new-password"
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOffIcon className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <EyeIcon className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-            <Button
-              type="submit"
-              className="w-full bg-black text-white"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Updating..." : "Update Password"}
-            </Button>
-          </form>
-          <p className="mt-6 text-center text-xs text-gray-600">
-            By updating your password, you agree to our{" "}
-            <a href="/terms" className="underline">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="underline">
-              Privacy Policy
-            </a>
-            .
-          </p>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

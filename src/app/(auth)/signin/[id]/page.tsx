@@ -58,20 +58,7 @@ export default async function SignIn({
   }
 
   return (
-    <div className="">
-      {/* <div className="flex flex-col items-center">
-        <div className="flex justify-center pb-12 "></div> */}
-      {/* <Card
-          title={
-            viewProp === "forgot_password"
-              ? "Reset Password"
-              : viewProp === "update_password"
-              ? "Update Password"
-              : viewProp === "signup"
-              ? "Sign Up"
-              : "Sign In"
-          }
-        > */}
+    <div>
       {viewProp === "password_signin" && (
         <PasswordSignIn redirectMethod={redirectMethod} />
       )}
@@ -95,8 +82,9 @@ export default async function SignIn({
       {viewProp === "signup" && (
         <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
       )}
-      {/* </Card> */}
+      {viewProp === "update_password" && (
+        <UpdatePassword redirectMethod={redirectMethod} />
+      )}
     </div>
-    // </div>
   );
 }
