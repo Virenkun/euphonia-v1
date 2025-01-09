@@ -47,7 +47,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname !== "/privacy-policy" &&
     request.nextUrl.pathname !== "/auth/callback" &&
     request.nextUrl.pathname !== "/sitemap.xml" &&
-    request.nextUrl.pathname !== "/auth/reset_password"
+    request.nextUrl.pathname !== "/auth/reset_password" &&
+    !request.nextUrl.pathname.startsWith("/blog")
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
