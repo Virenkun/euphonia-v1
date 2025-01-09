@@ -55,6 +55,7 @@ import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Progress } from "../ui/progress";
+import { Button } from "../ui/button";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -485,6 +486,9 @@ export default function AppSidebar({
                   className="h-3 mt-2"
                 />
               </div>
+              <Link href="/checkout">
+                <Button className="w-full">Upgrade</Button>
+              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
