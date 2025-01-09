@@ -6,7 +6,6 @@ import Footer from "@/components/hero/Footer";
 import Header from "@/components/hero/Header";
 import Hero from "@/components/hero/Hero";
 import HowItWorks from "@/components/hero/HowItWorks";
-import Pricing from "@/components/hero/Pricing";
 import Testimonials from "@/components/hero/Testimonials";
 import WhatIsEuphonia from "@/components/hero/What";
 import ScrollProgress from "@/components/ui/scroll-progress";
@@ -24,7 +23,6 @@ export default async function Home() {
           <HowItWorks />
           <FeaturesSection />
           <Testimonials />
-          <Pricing />
           <FAQ />
           <CTA />
         </main>
