@@ -448,10 +448,12 @@ export default function AppSidebar({
                       <BadgeCheck />
                       Account
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <CreditCard />
-                      Billing
-                    </DropdownMenuItem>
+                    <Link href="/billing">
+                      <DropdownMenuItem>
+                        <CreditCard />
+                        Billing
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem
                       onClick={() => setIsNotificationModalOpen(true)}
                     >
