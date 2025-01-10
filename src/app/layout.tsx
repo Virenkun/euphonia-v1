@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/theme/theme-provider";
 import NextTopLoader from "nextjs-toploader";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 import { Toaster } from "@/components/ui/toaster";
 
@@ -51,6 +52,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Analytics />
           <SpeedInsights />
           <Toaster />
         </ThemeProvider>
