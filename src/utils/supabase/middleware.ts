@@ -48,6 +48,12 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname !== "/auth/callback" &&
     request.nextUrl.pathname !== "/sitemap.xml" &&
     request.nextUrl.pathname !== "/auth/reset_password" &&
+    request.nextUrl.pathname !== "/terms-of-services" &&
+    request.nextUrl.pathname !== "/disclaimer" &&
+    request.nextUrl.pathname !== "/cookie-policy" &&
+    request.nextUrl.pathname !== "/team" &&
+    request.nextUrl.pathname !== "/our-mission" &&
+    request.nextUrl.pathname !== "/why-euphonia" &&
     !request.nextUrl.pathname.startsWith("/blog")
   ) {
     // no user, potentially respond by redirecting the user to the login page
