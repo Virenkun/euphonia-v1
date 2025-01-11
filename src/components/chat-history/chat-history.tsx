@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { Calendar, Lock } from "lucide-react";
+import {
+  Calendar,
+  Lock,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+  Trash2,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +23,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RainbowButton } from "../ui/rainbow-button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Message {
   id: string;
@@ -27,57 +53,91 @@ interface ChatData {
   [sessionId: string]: Message[];
 }
 
-export default function ChatHistory({ chatData }: { chatData: ChatData }) {
+export default function ChatHistory({
+  chatData: initialChatData,
+}: {
+  chatData: ChatData;
+}) {
+  const [chatData, setChatData] = useState(initialChatData);
   const chatsPresent = Object.keys(chatData).length > 0;
 
-  // Extract unique sessions from the chat data
-  const sessions =
-    chatsPresent &&
-    Object.keys(chatData).map((sessionId) => ({
+  const sessions = useMemo(() => {
+    if (!chatsPresent) return [];
+    return Object.keys(chatData).map((sessionId) => ({
       id: sessionId,
       topic: "Therapy Session", // You might want to modify this
       date: parseISO(chatData[sessionId][0].created_at),
       unread: false, // You can implement unread logic if needed
+      messageCount: chatData[sessionId].length,
     }));
+  }, [chatData, chatsPresent]);
 
   const [selectedSessionId, setSelectedSessionId] = useState(
-    sessions ? sessions[0]?.id : ""
+    sessions[0]?.id || ""
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Filter sessions
-  const filteredSessions =
-    chatsPresent &&
-    sessions &&
-    sessions.filter(
+  const filteredSessions = useMemo(() => {
+    if (!chatsPresent || !sessions) return [];
+    return sessions.filter(
       (session) =>
         session.topic.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (filterDate === "all" ||
           format(session.date, "yyyy-MM-dd") === filterDate)
     );
+  }, [chatsPresent, sessions, searchTerm, filterDate]);
 
-  // Get messages for the selected session
-  const sessionMessages =
-    chatsPresent &&
-    chatData[selectedSessionId].map((message) => ({
+  const sessionMessages = useMemo(() => {
+    if (!chatsPresent || !selectedSessionId) return [];
+    return chatData[selectedSessionId].map((message) => ({
       id: message.id,
       sender: message.role === "user" ? "You" : "AI",
       message: message.content.trim(),
       timestamp: parseISO(message.created_at),
     }));
+  }, [chatsPresent, selectedSessionId, chatData]);
+
+  const handleDeleteMessage = (messageId: string) => {
+    if (selectedSessionId) {
+      const updatedMessages = chatData[selectedSessionId].filter(
+        (message) => message.id !== messageId
+      );
+      setChatData((prevChatData) => ({
+        ...prevChatData,
+        [selectedSessionId]: updatedMessages,
+      }));
+    }
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    setChatData((prevChatData) => {
+      const newChatData = { ...prevChatData };
+      delete newChatData[sessionId];
+      return newChatData;
+    });
+
+    if (selectedSessionId === sessionId) {
+      const remainingSessions = Object.keys(chatData).filter(
+        (id) => id !== sessionId
+      );
+      setSelectedSessionId(remainingSessions[0] || "");
+    }
+  };
 
   if (!chatsPresent) {
     return (
-      <div className="flex items-center justify-center min-h-[89vh] bg-white">
-        <div className="p-4 text-center">
-          <h2 className="text-2xl font-semibold text-slate-800">
+      <div className="flex items-center justify-center min-h-[89vh] bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="p-8 bg-white rounded-lg shadow-lg text-center">
+          <MessageSquare className="w-16 h-16 mx-auto mb-4 text-indigo-500" />
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
             No therapy sessions found
           </h2>
-          <p className="text-slate-500">
-            Start a new session to view your chat history
+          <p className="text-gray-600 mb-6">
+            Start a new session to begin your journey
           </p>
-          <RainbowButton className="mt-6" onClick={() => {}}>
+          <RainbowButton className="text-lg py-3 px-6" onClick={() => {}}>
             Start a new session
           </RainbowButton>
         </div>
@@ -86,27 +146,44 @@ export default function ChatHistory({ chatData }: { chatData: ChatData }) {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-80 border-r bg-white shadow-sm">
-        <div className="p-4 space-y-4">
-          <h2 className="text-2xl font-semibold text-slate-800">
-            Therapy Sessions
-          </h2>
-          <Input
-            placeholder="Search sessions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-          <Select value={filterDate} onValueChange={setFilterDate}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter by date" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All dates</SelectItem>
-              {sessions &&
-                sessions.map((session) => (
+      <div
+        className={`bg-white shadow-lg transition-all duration-300 ease-in-out ${
+          sidebarCollapsed ? "w-16" : "w-80"
+        }`}
+      >
+        <div className="p-4 flex items-center justify-between">
+          {!sidebarCollapsed && (
+            <h2 className="text-2xl font-bold text-gray-800">Sessions</h2>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            {sidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
+          </Button>
+        </div>
+        {!sidebarCollapsed && (
+          <div className="p-4 space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search sessions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full"
+              />
+            </div>
+            <Select value={filterDate} onValueChange={setFilterDate}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter by date" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All dates</SelectItem>
+                {sessions.slice(0, 10).map((session) => (
                   <SelectItem
                     key={session.id}
                     value={format(session.date, "yyyy-MM-dd")}
@@ -114,97 +191,158 @@ export default function ChatHistory({ chatData }: { chatData: ChatData }) {
                     {format(session.date, "MMMM d, yyyy")}
                   </SelectItem>
                 ))}
-            </SelectContent>
-          </Select>
-        </div>
+                {sessions.length > 10 && (
+                  <SelectItem value="more">
+                    And {sessions.length - 10} more...
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <ScrollArea className="h-[calc(100vh-8rem)]">
-          {filteredSessions &&
-            filteredSessions.map((session) => (
+          {filteredSessions.map((session) => (
+            <div key={session.id} className="flex items-center">
               <Button
-                key={session.id}
                 variant="ghost"
-                className="w-full justify-start px-4 py-3 h-auto text-left"
+                className={`flex-grow justify-start px-4 py-3 h-auto text-left ${
+                  selectedSessionId === session.id ? "bg-blue-50" : ""
+                }`}
                 onClick={() => setSelectedSessionId(session.id)}
               >
-                <div className="flex items-center w-full">
-                  <Calendar className="h-5 w-5 mr-3 text-slate-500" />
-                  <div className="flex-1 truncate">
-                    <div className="font-medium text-slate-700">
-                      {session.topic}
+                {sidebarCollapsed ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Calendar className="h-6 w-6 text-gray-500" />
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p>{format(session.date, "MMMM d, yyyy")}</p>
+                        <p>{session.topic}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <div className="flex items-center w-full">
+                    <Calendar className="h-5 w-5 mr-3 text-gray-500" />
+                    <div className="flex-1 truncate">
+                      <div className="font-medium text-gray-700">
+                        {session.topic}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {format(session.date, "MMMM d, yyyy")}
+                      </div>
                     </div>
-                    <div className="text-sm text-slate-500">
-                      {format(session.date, "MMMM d, yyyy")}
-                    </div>
+                    <Badge variant="secondary" className="ml-2">
+                      {session.messageCount}
+                    </Badge>
                   </div>
-                  {session.unread && (
-                    <div className="ml-2 h-2 w-2 bg-blue-500 rounded-full" />
-                  )}
-                </div>
+                )}
               </Button>
-            ))}
+              {!sidebarCollapsed && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="mr-2 text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete session</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete the session and all its messages.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteSession(session.id)}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+          ))}
         </ScrollArea>
       </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col bg-white">
-        <div className="p-4 border-b">
-          <h2 className="text-2xl font-semibold text-slate-800">
-            {sessions &&
-              sessions.find((s) => s.id === selectedSessionId)?.topic}
+        <div className="p-6 border-b bg-gray-50">
+          <h2 className="text-3xl font-bold text-gray-800">
+            {sessions.find((s) => s.id === selectedSessionId)?.topic}
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-gray-500 mt-1">
             {format(
-              (sessions &&
-                sessions.find((s) => s.id === selectedSessionId)?.date) ||
+              sessions.find((s) => s.id === selectedSessionId)?.date ||
                 new Date(),
               "MMMM d, yyyy"
             )}
           </p>
         </div>
-        <ScrollArea className="flex-1 p-4">
-          {sessionMessages &&
-            sessionMessages.map((message) => (
+        <ScrollArea className="flex-1 p-6">
+          {sessionMessages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex items-start mb-6 ${
+                message.sender === "You" ? "justify-end" : ""
+              }`}
+            >
+              {message.sender !== "You" && (
+                <Avatar className="mr-4">
+                  <AvatarImage src="/happy.png" />
+                  <AvatarFallback>AI</AvatarFallback>
+                </Avatar>
+              )}
               <div
-                key={message.id}
-                className={`flex items-start mb-4 ${
-                  message.sender === "You" ? "justify-end" : ""
+                className={`flex-1 max-w-[70%] ${
+                  message.sender === "You" ? "text-right" : ""
                 }`}
               >
-                {message.sender !== "You" && (
-                  <Avatar className="mr-2">
-                    <AvatarImage src="/happy.png" />
-                    <AvatarFallback>AI</AvatarFallback>
-                  </Avatar>
-                )}
                 <div
-                  className={`flex-1 max-w-[80%] ${
-                    message.sender === "You" ? "text-right" : ""
+                  className={`inline-block p-4 rounded-lg shadow ${
+                    message.sender === "You"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  <div
-                    className={`inline-block p-3 rounded-lg ${
-                      message.sender === "You"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-slate-100 text-slate-800"
-                    }`}
-                  >
-                    <p>{message.message}</p>
-                  </div>
-                  <div className="mt-1 text-xs text-slate-500">
-                    {format(message.timestamp, "h:mm a")}
-                  </div>
+                  <p className="text-sm">{message.message}</p>
                 </div>
-                {message.sender === "You" && (
-                  <Avatar className="ml-2">
-                    <AvatarImage src={"/girl.png"} />
-                    <AvatarFallback>You</AvatarFallback>
-                  </Avatar>
-                )}
+                <div className="mt-2 text-xs text-gray-500 flex items-center justify-end">
+                  <span>{format(message.timestamp, "h:mm a")}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteMessage(message.id)}
+                    className="ml-2 text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete message</span>
+                  </Button>
+                </div>
               </div>
-            ))}
+              {message.sender === "You" && (
+                <Avatar className="ml-4">
+                  <AvatarImage src="/girl.png" />
+                  <AvatarFallback>You</AvatarFallback>
+                </Avatar>
+              )}
+            </div>
+          ))}
         </ScrollArea>
-        <div className="p-4 border-t bg-slate-50">
-          <div className="flex items-center mt-2 text-sm text-slate-500">
+        <div className="p-4 border-t bg-gray-50">
+          <div className="flex items-center justify-center text-sm text-gray-500">
             <Lock className="h-4 w-4 mr-2" />
             <span>Your conversations are private and secure</span>
           </div>
