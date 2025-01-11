@@ -1,17 +1,33 @@
-import Footer from "@/components/hero/Footer";
-import Header from "@/components/hero/Header";
-import ScrollProgress from "@/components/ui/scroll-progress";
-import { ReactNode } from "react";
+import type { Metadata } from "next";
 
-export default async function Home({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-blue-50">
-      <ScrollProgress className="top-[65px]" />
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
-        <main>{children}</main>
-      </div>
-      <Footer />
-    </div>
-  );
+export const metadata: Metadata = {
+  title:
+    "Euphonia Blog - AI Therapy, Mental Health, and Emotional Support Insights",
+  description:
+    "Explore the Euphonia blog for expert articles, tips, and news on AI-driven therapy, mental health advancements, emotional well-being, and innovative therapeutic solutions.",
+  keywords: [
+    "Euphonia blog",
+    "AI therapy blog",
+    "mental health blog",
+    "emotional support articles",
+    "AI mental health assistant",
+    "mental health technology",
+    "mental health tips",
+    "AI in therapy",
+    "therapy innovations",
+    "emotional well-being",
+    "mental health awareness",
+    "therapy chatbot",
+    "mental health news",
+    "AI therapy insights",
+  ],
+  robots: "index, follow",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return <div>{children}</div>;
 }
