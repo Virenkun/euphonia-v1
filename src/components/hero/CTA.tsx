@@ -11,7 +11,7 @@ export default function CTA() {
           No fees, no wait times, no downloads—just instant, hassle-free therapy
           with an empathetic AI, available whenever and wherever you need it.
         </p>
-        <InteractiveHoverButton text="Begin Your Free Trial" />
+        <InteractiveHoverButton text="Let’s Begin the Conversation" />
       </div>
     </section>
   );
