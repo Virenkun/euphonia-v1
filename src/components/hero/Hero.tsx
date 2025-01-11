@@ -9,10 +9,12 @@ export default function Hero() {
     <section className="py-28">
       <div className="flex flex-col lg:flex-row items-center justify-between">
         <div className="lg:w-1/2 mb-10 lg:mb-0">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-[700] text-gray-900 mb-6 leading-tight">
-            AI-Powered Therapy
+          <h1 className="text-xl sm:text-4xl lg:text-5xl font-[700] text-gray-900 mb-6 lg:leading-tight">
+            experience a new kind of therapy—talk openly
             <br />
-            <span className="text-indigo-600">For Your Mind</span>
+            <span className="text-indigo-600 sm:text-2xl lg:text-4xl">
+              feel heard, and find balance with AI guidance
+            </span>
           </h1>
           <p className="text-xl text-gray-800 mb-8 font-[500]">
             Experience the future of mental wellness with our AI voice
@@ -33,7 +35,7 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-        <div className="mr-2 lg:w-1/2">
+        <div className="mr-5 lg:w-1/2">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full filter blur-3xl opacity-30"></div>
             <Image

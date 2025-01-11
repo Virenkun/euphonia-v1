@@ -51,7 +51,6 @@ import { useState } from "react";
 import { AccountModal } from "../account/account-modal";
 import { NotificationModal } from "../account/notification-modal";
 import { FeedbackModal } from "../account/feedback-modal";
-import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Progress } from "../ui/progress";
@@ -275,18 +274,11 @@ export default function AppSidebar({
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
                 <a href="#">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-800 text-sidebar-primary-foreground">
-                    <Image
-                      src={"/Astronot.gif"}
-                      alt="shadcn"
-                      className="rounded-lg"
-                      width={48}
-                      height={48}
-                    />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">Euphonia</span>
-                    <span className="truncate text-xs">An AI Theripist</span>
+                  <div className="grid flex-1 text-left ml-1">
+                    <span className="truncate font-bold text-xl text-[#4342B9]">
+                      euphonia
+                    </span>
+                    {/* <span className="truncate text-xs">your ai therapist</span> */}
                   </div>
                 </a>
               </SidebarMenuButton>
