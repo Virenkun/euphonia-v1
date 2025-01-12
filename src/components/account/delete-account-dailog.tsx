@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { AlertTriangle } from "lucide-react";
 import { deleteUser } from "@/services/users/action";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const deleteReasons = [
   { value: "no-longer-needed", label: "No longer needed" },
@@ -41,7 +41,7 @@ export default function DeleteAccountDialog() {
     console.log(`Account deleted. Reason: ${reason}`);
     setIsOpen(false);
     await deleteUser();
-    router.push("/");
+    router.push("/?status=account_deleted");
   };
 
   return (
