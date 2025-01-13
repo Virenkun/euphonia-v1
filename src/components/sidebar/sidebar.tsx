@@ -16,7 +16,6 @@ import {
   Settings2,
   Sparkles,
   SquareTerminal,
-  AudioLines,
   TentTree,
   MessageCircleMore,
   GraduationCap,
@@ -201,13 +200,6 @@ export default function AppSidebar({
         name: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
-        isPremium: false,
-      },
-
-      {
-        name: "Mood Tracker",
-        url: "/mood-tracker",
-        icon: AudioLines,
         isPremium: false,
       },
       {
