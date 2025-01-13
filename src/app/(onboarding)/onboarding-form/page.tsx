@@ -41,8 +41,12 @@ const RequiredIndicator = () => (
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  age: Yup.string().required("Age is required"),
-  primaryGoal: Yup.string().required("Primary goal is required"),
+  age: Yup.number()
+    .required("Age is required")
+    .positive("Age must be a positive number")
+    .integer("Age must be an integer")
+    .min(14, "Age must be at least 18")
+    .max(100, "Age must be no more than 100"),
   phone: Yup.string().matches(/^[0-9-+()]*$/, "Invalid phone number format"),
   stressLevel: Yup.number()
     .min(1, "Minimum stress level is 1")
@@ -70,7 +74,7 @@ export default function OnboardingForm() {
   const formik = useFormik({
     initialValues: {
       name: "",
-      age: undefined,
+      age: "",
       gender: "",
       pronouns: "",
       phone: "",
@@ -169,12 +173,12 @@ export default function OnboardingForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#4B4ACF] min-w-max">
+      <div className="space-y-2 text-center mb-2">
+        <h1 className="text-4xl font-bold tracking-tight text-white">
           Welcome to Euphonia
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-white">
           Help us personalize your therapeutic experience
         </p>
       </div>
@@ -199,7 +203,7 @@ export default function OnboardingForm() {
             />
             <label
               htmlFor="picture-upload"
-              className={`cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ${
+              className={`cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-normal ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ${
                 formik.isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -216,7 +220,7 @@ export default function OnboardingForm() {
               </Button>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white">
             Optional: Upload a profile picture
           </p>
         </div>
@@ -225,15 +229,23 @@ export default function OnboardingForm() {
         <div className="space-y-4">
           {/* Name Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="name">
-              Your name
+            <label className="text-sm font-normal text-white" htmlFor="name">
+              {`What's your name?`}
               <RequiredIndicator />
             </label>
             <Input
               id="name"
               {...formik.getFieldProps("name")}
+              onChange={(e) => {
+                const value = e.target.value;
+                const formattedValue =
+                  value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+                formik.setFieldValue("name", formattedValue);
+              }}
               disabled={formik.isSubmitting}
+              spellCheck="false"
               placeholder="Enter your name"
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
             {formik.touched.name && formik.errors.name && (
               <p className="text-xs text-red-500">{formik.errors.name}</p>
@@ -242,26 +254,17 @@ export default function OnboardingForm() {
 
           {/* Age Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="age">
-              Age
+            <label className="text-sm font-normal text-white" htmlFor="age">
+              Can I know your age?
               <RequiredIndicator />
             </label>
-            <Select
-              name="age"
-              onValueChange={(value) => formik.setFieldValue("age", value)}
+            <Input
+              id="age"
+              {...formik.getFieldProps("age")}
               disabled={formik.isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select your age" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 150 }, (_, i) => (
-                  <SelectItem key={i + 13} value={(i + 13).toString()}>
-                    {i + 13} years
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder="Enter your age"
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
+            />
             {formik.touched.age && formik.errors.age && (
               <p className="text-xs text-red-500">{formik.errors.age}</p>
             )}
@@ -269,7 +272,7 @@ export default function OnboardingForm() {
 
           {/* Gender Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="gender">
+            <label className="text-sm font-normal text-white" htmlFor="gender">
               Gender (optional)
             </label>
             <Select
@@ -277,10 +280,12 @@ export default function OnboardingForm() {
               onValueChange={(value) => formik.setFieldValue("gender", value)}
               disabled={formik.isSubmitting}
             >
-              <SelectTrigger>
+              <SelectTrigger
+                className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-gray-400 px-4 focus-visible:ring-1 focus-visible:ring-white focus:ring-white focus-visible:border-transparent focus-visible:outline-none`}
+              >
                 <SelectValue placeholder="Select your gender" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-black/40 text-white backdrop-blur-md rounded-lg border border-white/20 shadow-lg">
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="non-binary">Non-binary</SelectItem>
@@ -300,14 +305,18 @@ export default function OnboardingForm() {
 
           {/* Pronouns Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="pronouns">
-              Preferred Pronouns
+            <label
+              className="text-sm font-normal text-white"
+              htmlFor="pronouns"
+            >
+              What pronouns do you use?
             </label>
             <Input
               id="pronouns"
               {...formik.getFieldProps("pronouns")}
               disabled={formik.isSubmitting}
               placeholder="e.g., she/her, he/him, they/them"
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
           </div>
         </div>
@@ -316,8 +325,8 @@ export default function OnboardingForm() {
         <div className="space-y-4">
           {/* Phone Field */}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="phone">
-              Phone Number (optional)
+            <label className="text-sm font-normal text-white" htmlFor="phone">
+              Can I have your phone number to keep you updated?
             </label>
             <div className="flex items-center space-x-2">
               <Input
@@ -326,7 +335,7 @@ export default function OnboardingForm() {
                 {...formik.getFieldProps("phone")}
                 disabled={formik.isSubmitting || isVerified}
                 placeholder="Enter your phone number"
-                className="flex-grow"
+                className={`flex-grow w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
               />
               <Button
                 onClick={handleVerifyClick}
@@ -336,6 +345,7 @@ export default function OnboardingForm() {
                   isVerified ||
                   formik.isSubmitting
                 }
+                className="h-[50px] rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {(() => {
                   if (isVerifying)
@@ -358,108 +368,21 @@ export default function OnboardingForm() {
           </div>
         </div>
 
-        {/* Therapy Preferences Section */}
-        <div className="space-y-4">
-          {/* Primary Goal Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Primary Goals
-              <RequiredIndicator />
-            </label>
-            <Select
-              name="primaryGoal"
-              onValueChange={(value) =>
-                formik.setFieldValue("primaryGoal", value)
-              }
-              disabled={formik.isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select your main goal" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="anxiety">Managing Anxiety</SelectItem>
-                <SelectItem value="depression">
-                  Dealing with Depression
-                </SelectItem>
-                <SelectItem value="stress">Stress Management</SelectItem>
-                <SelectItem value="relationships">
-                  Relationship Issues
-                </SelectItem>
-                <SelectItem value="self-growth">Personal Growth</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            {formik.touched.primaryGoals && formik.errors.primaryGoals && (
-              <p className="text-xs text-red-500">
-                {formik.errors.primaryGoals}
-              </p>
-            )}
-          </div>
-
-          {/* Chat Tone Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="chatTone">
-              Preferred Communication Style
-            </label>
-            <Select
-              name="chatTone"
-              onValueChange={(value) => formik.setFieldValue("chatTone", value)}
-              disabled={formik.isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose communication style" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="direct">
-                  Direct and Straightforward
-                </SelectItem>
-                <SelectItem value="empathetic">Warm and Empathetic</SelectItem>
-                <SelectItem value="casual">Casual and Friendly</SelectItem>
-                <SelectItem value="professional">
-                  Professional and Formal
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Session Length Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="sessionLength">
-              Preferred Session Length
-            </label>
-            <Select
-              name="sessionLength"
-              onValueChange={(value) =>
-                formik.setFieldValue("sessionLength", value)
-              }
-              disabled={formik.isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose session length" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="15">15 minutes</SelectItem>
-                <SelectItem value="30">30 minutes</SelectItem>
-                <SelectItem value="45">45 minutes</SelectItem>
-                <SelectItem value="60">60 minutes</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
         {/* Interests Section */}
         <div className="space-y-2">
-          <label className="text-sm font-medium " htmlFor="interest">
-            Areas of Interest
+          <label className="text-sm font-normal text-white" htmlFor="interest">
+            What topics would you like to focus on?
           </label>
           <div className="flex gap-2">
             <Input
               id="interest"
-              placeholder="Add an interest"
+              placeholder="(e.g., Mental Health,
+            Personal Growth, Stress Relief, Motivation)"
               value={newInterest}
               onChange={(e) => setNewInterest(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
               disabled={formik.isSubmitting}
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
             <Button
               onClick={(e) => {
@@ -468,6 +391,7 @@ export default function OnboardingForm() {
               }}
               disabled={interests.length >= 5 || formik.isSubmitting}
               type="button"
+              className="h-[50px] rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Add
             </Button>
@@ -486,87 +410,18 @@ export default function OnboardingForm() {
               </Badge>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white">
             {`Add up to 5 topics you'd like to explore (e.g., meditation, mindfulness, work-life balance)`}
           </p>
-        </div>
-
-        {/* Scheduling and Emergency Contact */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label
-              className="text-sm font-medium"
-              htmlFor="schedulingPreferences"
-            >
-              Scheduling Preferences
-            </label>
-            <Input
-              id="schedulingPreferences"
-              {...formik.getFieldProps("schedulingPreferences")}
-              disabled={formik.isSubmitting}
-              placeholder="e.g., weekday evenings, weekends"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="emergencyContact">
-              Emergency Contact (optional)
-            </label>
-            <Input
-              id="emergencyContact"
-              {...formik.getFieldProps("emergencyContact")}
-              disabled={formik.isSubmitting}
-              placeholder="Enter your emergency contact"
-            />
-          </div>
         </div>
 
         {/* Mental Health Information */}
         <div className="space-y-4">
           <div className="space-y-2">
             <label
-              className="text-sm font-medium"
-              htmlFor="currentEmotionalState"
+              className="text-sm font-normal text-white"
+              htmlFor="currentChallenges"
             >
-              Current Emotional State
-            </label>
-            <Select
-              name="currentEmotionalState"
-              onValueChange={(value) =>
-                formik.setFieldValue("currentEmotionalState", value)
-              }
-              disabled={formik.isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="How are you feeling?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="happy">Happy</SelectItem>
-                <SelectItem value="stressed">Stressed</SelectItem>
-                <SelectItem value="anxious">Anxious</SelectItem>
-                <SelectItem value="sad">Sad</SelectItem>
-                <SelectItem value="neutral">Neutral</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label
-              className="text-sm font-medium"
-              htmlFor="mentalHealthHistory"
-            >
-              Mental Health History (optional)
-            </label>
-            <Textarea
-              id="mentalHealthHistory"
-              {...formik.getFieldProps("mentalHealthHistory")}
-              disabled={formik.isSubmitting}
-              placeholder="Briefly describe your mental health history"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="currentChallenges">
               Current Challenges
             </label>
             <Textarea
@@ -574,31 +429,15 @@ export default function OnboardingForm() {
               {...formik.getFieldProps("currentChallenges")}
               disabled={formik.isSubmitting}
               placeholder="What challenges are you facing right now?"
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="stressLevel">
-              Stress Level (1-10)
-            </label>
-            <Input
-              id="stressLevel"
-              type="number"
-              min="1"
-              max="10"
-              {...formik.getFieldProps("stressLevel")}
-              disabled={formik.isSubmitting}
-              placeholder="Enter your stress level"
-            />
-            {formik.touched.stressLevel && formik.errors.stressLevel && (
-              <p className="text-xs text-red-500">
-                {formik.errors.stressLevel}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="existingSupport">
+            <label
+              className="text-sm font-normal text-white"
+              htmlFor="existingSupport"
+            >
               Existing Support System
             </label>
             <Textarea
@@ -606,6 +445,7 @@ export default function OnboardingForm() {
               {...formik.getFieldProps("existingSupport")}
               disabled={formik.isSubmitting}
               placeholder="Describe your existing support system"
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
           </div>
         </div>
@@ -613,7 +453,10 @@ export default function OnboardingForm() {
         {/* Additional Preferences */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="preferredLanguage">
+            <label
+              className="text-sm font-normal text-white"
+              htmlFor="preferredLanguage"
+            >
               Preferred Language
             </label>
             <Input
@@ -621,44 +464,8 @@ export default function OnboardingForm() {
               {...formik.getFieldProps("preferredLanguage")}
               disabled={formik.isSubmitting}
               placeholder="Enter your preferred language"
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="accessibilityNeeds">
-              Accessibility Needs (optional)
-            </label>
-            <Input
-              id="accessibilityNeeds"
-              {...formik.getFieldProps("accessibilityNeeds")}
-              disabled={formik.isSubmitting}
-              placeholder="Describe your accessibility needs"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              className="text-sm font-medium"
-              htmlFor="interactionPreference"
-            >
-              Voice or Text Interaction Preference
-            </label>
-            <Select
-              name="interactionPreference"
-              onValueChange={(value) =>
-                formik.setFieldValue("interactionPreference", value)
-              }
-              disabled={formik.isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose interaction preference" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="voice">Voice</SelectItem>
-                <SelectItem value="text">Text</SelectItem>
-                <SelectItem value="both">Both</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
@@ -673,7 +480,10 @@ export default function OnboardingForm() {
               }
               disabled={formik.isSubmitting}
             />
-            <label htmlFor="dataConsent" className="text-sm font-medium ml-2">
+            <label
+              htmlFor="dataConsent"
+              className="text-sm font-normal ml-2 text-white"
+            >
               I consent to the use of my data for improving AI and personalized
               therapy
               <RequiredIndicator />
@@ -694,7 +504,7 @@ export default function OnboardingForm() {
             />
             <label
               htmlFor="termsAgreement"
-              className="text-sm font-medium ml-2"
+              className="text-sm font-normal ml-2 text-white"
             >
               I agree to the Terms and Conditions
               <RequiredIndicator />
@@ -707,17 +517,17 @@ export default function OnboardingForm() {
           )}
         </div>
 
-        <p className="text-sm text-muted-foreground mt-4">
+        <p className="text-sm text-white mt-4">
           Fields marked with an asterisk (*) are required.
         </p>
 
         {/* Submit Buttons */}
-        <div className="space-y-4">
+        <div className="space-y-4 mb-20">
           <Button
-            className="w-full"
             size="lg"
             disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
             onClick={formik.submitForm}
+            className="w-full h-[50px] rounded-2xl bg-white text-[#4342B9] font-semibold text-md hover:bg-primary/90"
           >
             {formik.isSubmitting ? (
               <>
@@ -741,6 +551,7 @@ export default function OnboardingForm() {
               placeholder="Enter OTP"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
+              className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
             />
             <Button onClick={handleOtpSubmit}>Submit OTP</Button>
           </div>

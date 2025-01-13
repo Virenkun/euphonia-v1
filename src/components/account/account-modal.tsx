@@ -24,9 +24,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
 import { Upload } from "lucide-react";
+import { Separator } from "../ui/separator";
+import DeleteAccountDialog from "./delete-account-dailog";
 
 export function AccountModal({
   open,
@@ -51,8 +51,7 @@ export function AccountModal({
     auth_id: string;
   } | null;
 }) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
+  const [activeTab, setActiveTab] = useState("profile");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0">
@@ -65,12 +64,15 @@ export function AccountModal({
         <Tabs
           defaultValue="profile"
           className="flex-1 flex flex-col overflow-hidden"
+          onValueChange={(value) => setActiveTab(value)}
         >
           <TabsList className="px-4 py-2 border-b justify-start">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="professional">Professional</TabsTrigger>
             <TabsTrigger value="preferences">Preferences</TabsTrigger>
-            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+            <TabsTrigger value="danger" className="text-red-500">
+              Delete Zone
+            </TabsTrigger>
           </TabsList>
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
@@ -282,55 +284,30 @@ Licensed Clinical Psychologist (License #12345)"
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="schedule">
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">Availability Calendar</h4>
-                      <Button variant="outline" size="sm">
-                        Set Recurring Availability
-                      </Button>
+                <TabsContent value="danger">
+                  <div className="flex flex-col gap-3 border border-red-500 p-4 rounded-lg">
+                    <div className="font-semibold text-lg">Delete Account</div>
+                    <div>
+                      {" "}
+                      This action cannot be undone. This will permanently delete
+                      your account and remove all your data from our servers.
                     </div>
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      className="rounded-md border"
-                    />
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Upcoming Sessions</h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">John Doe</p>
-                            <p className="text-sm text-muted-foreground">
-                              Dec 15, 2024 - 2:00 PM
-                            </p>
-                          </div>
-                          <Badge>Upcoming</Badge>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">Jane Smith</p>
-                            <p className="text-sm text-muted-foreground">
-                              Dec 16, 2024 - 10:00 AM
-                            </p>
-                          </div>
-                          <Badge>Upcoming</Badge>
-                        </div>
-                      </div>
-                    </div>
+                    <Separator />
+                    <DeleteAccountDialog />
                   </div>
                 </TabsContent>
               </div>
             </ScrollArea>
           </div>
         </Tabs>
-        <DialogFooter className="px-6 py-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button type="submit">Save Changes</Button>
-        </DialogFooter>
+        {activeTab !== "danger" && (
+          <DialogFooter className="px-6 py-4">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">Save Changes</Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

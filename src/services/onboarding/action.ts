@@ -6,7 +6,7 @@ import { updateCurrentUserPhone } from "../auth/action";
 
 interface FormData {
   name?: string;
-  age?: number;
+  age?: string;
   gender?: string;
   pronouns?: string;
   phone?: string;

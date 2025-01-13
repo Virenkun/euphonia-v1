@@ -10,3 +10,13 @@ export const getUserDetails = async () => {
   }
   return data;
 };
+
+export const deleteUser = async () => {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_user");
+  if (error) {
+    console.error(`Supabase Error: ${error.message}`);
+  } else {
+    console.log("User deleted successfully");
+  }
+};
