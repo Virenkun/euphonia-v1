@@ -81,6 +81,7 @@ export const completeOnboarding = async ({
         terms_agreement: formObject.termsAgreement,
         sessions: null,
         is_onboarded: true,
+        plan: 1,
       },
     ])
     .eq("auth_id", authId);

@@ -137,14 +137,21 @@ export default function Dashboard({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-800">
-              {dashboardData.streaks.current_streak} days
+              {dashboardData.streaks ? dashboardData.streaks.current_streak : 0}{" "}
+              days
             </div>
             <Progress
-              value={dashboardData.streaks.current_streak * 10}
+              value={
+                dashboardData.streaks
+                  ? dashboardData.streaks.current_streak * 10
+                  : 0
+              }
               className="mt-2 bg-blue-100"
             />
             <p className="text-xs text-blue-600 font-semibold mt-2">
-              Maximum Streaks: {dashboardData.streaks.max_streak} Days
+              Maximum Streaks:{" "}
+              {dashboardData.streaks ? dashboardData.streaks.max_streak : 0}{" "}
+              Days
             </p>
           </CardContent>
         </Card>
@@ -157,9 +164,11 @@ export default function Dashboard({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-800">
-              {(
-                Number(dashboardData.avg_session_duration.toFixed(2)) / 60
-              ).toFixed(2)}{" "}
+              {dashboardData.avg_session_duration
+                ? (
+                    Number(dashboardData.avg_session_duration.toFixed(2)) / 60
+                  ).toFixed(2)
+                : 0}{" "}
               minutes
             </div>
             <p className="text-xs text-gray-500">Optimal: 15-25 minutes</p>
@@ -188,7 +197,9 @@ export default function Dashboard({
               </CardHeader>
               <CardContent className="flex items-end gap-1">
                 <p className="text-4xl font-bold text-center">
-                  {dashboardData.user_avg_word_count.toFixed(2)}
+                  {dashboardData.user_avg_word_count
+                    ? dashboardData.user_avg_word_count.toFixed(2)
+                    : 0}
                 </p>
                 <p className="text-sm font-medium text-end mb-1">
                   words per session
@@ -211,7 +222,9 @@ export default function Dashboard({
               </CardHeader>
               <CardContent className="flex items-end gap-1">
                 <p className="text-4xl font-bold text-center">
-                  {dashboardData.assistant_avg_word_count.toFixed(2)}
+                  {dashboardData.assistant_avg_word_count
+                    ? dashboardData.assistant_avg_word_count.toFixed(2)
+                    : 0}
                 </p>
                 <p className="text-sm font-medium text-end mb-1">
                   words per session

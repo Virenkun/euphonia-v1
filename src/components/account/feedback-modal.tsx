@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { SubmitFeedbackByUser } from "@/services/common/action";
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -24,31 +25,29 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [rating, setRating] = useState<string>("");
   const [comment, setComment] = useState("");
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Here you would typically send the feedback to your backend
-    console.log("Feedback submitted:", { rating, comment });
+    await SubmitFeedbackByUser({ rating, comment });
     onClose();
-    // Reset form
     setRating("");
     setComment("");
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] md:max-w-[500px] lg:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Provide Feedback</DialogTitle>
           <DialogDescription>
-            Your feedback helps us improve our AI therapy sessions. Thank you
-            for your input!
+            Your feedback helps us improve our euphonia app. Thank you for your
+            input!
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <h4 className="font-medium text-sm">
-                How would you rate your session?
+                How would you rate your overall experience?
               </h4>
               <RadioGroup
                 value={rating}
@@ -68,13 +67,14 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="comment" className="text-right">
-                Additional comments
+                how can we improve?{" "}
               </Label>
               <Textarea
                 id="comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Please share your thoughts about the session..."
+                className="w-full h-32"
               />
             </div>
           </div>
