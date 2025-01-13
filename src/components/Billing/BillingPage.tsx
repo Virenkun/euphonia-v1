@@ -32,7 +32,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   CreditCard,
-  Check,
   Star,
   Zap,
   Shield,
