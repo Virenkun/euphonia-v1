@@ -22,10 +22,7 @@ export async function GetDashboardData() {
   );
 
   const { data: sessions, error: sessionDurationError } = await supabase.rpc(
-    "count_session_durations_and_word_count",
-    {
-      input_user_id: auth_id,
-    }
+    "count_session_durations_and_word_count"
   );
 
   console.log("sesss", sessions.length);
