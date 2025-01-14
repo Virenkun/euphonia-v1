@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import {
   Calendar,
@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteSessionById } from "@/services/chats/action";
 
 interface Message {
   id: string;
@@ -60,10 +61,15 @@ export default function ChatHistory({
 }) {
   const [chatData, setChatData] = useState(initialChatData);
   const chatsPresent = Object.keys(chatData).length > 0;
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  useEffect(() => {
+    setChatData(initialChatData);
+  }, [initialChatData]);
 
   const sessions = useMemo(() => {
     if (!chatsPresent) return [];
-    return Object.keys(chatData).map((sessionId) => ({
+    return Object.keys(chatData)?.map((sessionId) => ({
       id: sessionId,
       topic: "Therapy Session", // You might want to modify this
       date: parseISO(chatData[sessionId][0].created_at),
@@ -91,7 +97,7 @@ export default function ChatHistory({
 
   const sessionMessages = useMemo(() => {
     if (!chatsPresent || !selectedSessionId) return [];
-    return chatData[selectedSessionId].map((message) => ({
+    return chatData[selectedSessionId]?.map((message) => ({
       id: message.id,
       sender: message.role === "user" ? "You" : "AI",
       message: message.content.trim(),
@@ -111,19 +117,15 @@ export default function ChatHistory({
     }
   };
 
-  const handleDeleteSession = (sessionId: string) => {
-    setChatData((prevChatData) => {
-      const newChatData = { ...prevChatData };
-      delete newChatData[sessionId];
-      return newChatData;
-    });
-
+  const handleDeleteSession = async (sessionId: string) => {
+    setLoadingDelete(true);
+    await deleteSessionById(sessionId);
     if (selectedSessionId === sessionId) {
-      const remainingSessions = Object.keys(chatData).filter(
-        (id) => id !== sessionId
+      setSelectedSessionId(
+        filteredSessions.find((s) => s.id !== sessionId)?.id || ""
       );
-      setSelectedSessionId(remainingSessions[0] || "");
     }
+    setLoadingDelete(false);
   };
 
   if (!chatsPresent) {
@@ -183,7 +185,7 @@ export default function ChatHistory({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All dates</SelectItem>
-                {sessions.slice(0, 10).map((session) => (
+                {sessions.slice(0, 10)?.map((session) => (
                   <SelectItem
                     key={session.id}
                     value={format(session.date, "yyyy-MM-dd")}
@@ -201,7 +203,7 @@ export default function ChatHistory({
           </div>
         )}
         <ScrollArea className="h-[calc(100vh-8rem)]">
-          {filteredSessions.map((session) => (
+          {filteredSessions?.map((session) => (
             <div key={session.id} className="flex items-center">
               <Button
                 variant="ghost"
@@ -264,7 +266,10 @@ export default function ChatHistory({
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleDeleteSession(session.id)}
+                        onClick={async () =>
+                          await handleDeleteSession(session.id)
+                        }
+                        disabled={loadingDelete}
                       >
                         Delete
                       </AlertDialogAction>
@@ -292,7 +297,7 @@ export default function ChatHistory({
           </p>
         </div>
         <ScrollArea className="flex-1 p-6">
-          {sessionMessages.map((message) => (
+          {sessionMessages?.map((message) => (
             <div
               key={message.id}
               className={`flex items-start mb-6 ${

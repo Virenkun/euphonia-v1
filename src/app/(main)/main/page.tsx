@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { UseSpeechToText } from "@/hooks/useSpeechToText";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
-import { LLM_PROMPT } from "@/constant/constants";
+import { LLM_PROMPT, SESSIONS_ANALYSIS_PROMPT } from "@/constant/constants";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { ForwardedAudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
@@ -24,6 +24,9 @@ import {
 } from "@/components/ui/dialog";
 import { groq } from "@/utils/groq/client";
 import { synthesizeSpeech } from "@/utils/aws/polly";
+import EnhancedSessionSummaryModal from "@/components/SessionsSummary/session-summary-modal";
+import { SessionData } from "@/components/SessionsSummary/type";
+import { insertSession } from "@/services/chats/action";
 
 export default function ListeningInterface() {
   const [isListening, setIsListening] = useState(false);
@@ -36,6 +39,10 @@ export default function ListeningInterface() {
   const [sessionLength, setSessionLength] = useState<number>(0);
   const [deleteSpeed, setDeleteSpeed] = useState<number>(99999);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [sessionSummaryData, setSessionSummaryData] =
+    useState<SessionData | null>(null);
+
   const audioRef = useRef<{
     stopAudio: () => void;
   }>(null);
@@ -220,6 +227,7 @@ export default function ListeningInterface() {
   const beginSession = async () => {
     setIsLoading(true);
     const { user } = await getUserDetails();
+
     const newSessionId = uuidv4();
     setSessionId(newSessionId);
     localStorage.setItem("sessionId", newSessionId);
@@ -252,21 +260,60 @@ export default function ListeningInterface() {
     stopAudioHandler();
     setIsLoading(true);
     const { user } = await getUserDetails();
+    const chats = await fetchChatContext();
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: SESSIONS_ANALYSIS_PROMPT,
+        },
+
+        {
+          role: "user",
+          content: JSON.stringify(chats),
+        },
+      ],
+      model: "llama-3.1-70b-versatile",
+      temperature: 1,
+      max_tokens: 1024,
+      top_p: 1,
+      stream: false,
+    });
+    console.log(chats);
+    const content = chatCompletion.choices[0]?.message?.content;
+    if (content) {
+      console.log(JSON.parse(content));
+      setSessionSummaryData(JSON.parse(content));
+    } else {
+      console.error("Content is null");
+    }
     setIsSessionActive(false);
     setSessionId("");
     localStorage.removeItem("sessionId");
     setAssistantResponse("");
-    const { error } = await supabase.from("session").insert([
-      {
-        id: sessionId,
-        user_id: user.id,
-        length: sessionLength,
-      },
-    ]);
-    if (error) {
-      console.error("Error saving session:", error.message);
+    await insertSession({
+      id: sessionId,
+      user_id: user.id,
+      length: sessionLength,
+    });
+    const { error: session_summary_error } = await supabase
+      .from("session_summary")
+      .insert([
+        {
+          session_id: sessionId,
+          summary: content ? JSON.parse(content) : null,
+          user_id: user.id,
+        },
+      ]);
+    if (session_summary_error) {
+      console.error(
+        "Error saving session summary:",
+        session_summary_error.message
+      );
     }
+
     setIsLoading(false);
+    setIsSessionModalOpen(true);
   };
 
   useEffect(() => {
@@ -302,87 +349,94 @@ export default function ListeningInterface() {
   };
 
   return (
-    <div className="min-h-[88vh]">
-      <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-        <div className="text-neutral-800 text-lg h-6 mb-10">
-          {isListening ? "listening..." : ""}
-        </div>
-        <ForwardedAudioVisualizer
-          audioBlob={audioBlob}
-          onPlayingChange={setIsAudioPlaying}
-          ref={audioRef}
-        />
-        {isSessionActive && !isLoading && (
-          <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
-            <Typewriter
-              options={{
-                strings: [assistantResponse],
-                autoStart: true,
-                delay: 50,
-                deleteSpeed: deleteSpeed,
-              }}
-            />
+    <>
+      <div className="min-h-[88vh]">
+        <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
+          <div className="text-neutral-800 text-lg h-6 mb-10">
+            {isListening ? "listening..." : ""}
           </div>
-        )}
+          <ForwardedAudioVisualizer
+            audioBlob={audioBlob}
+            onPlayingChange={setIsAudioPlaying}
+            ref={audioRef}
+          />
+          {isSessionActive && !isLoading && (
+            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+              <Typewriter
+                options={{
+                  strings: [assistantResponse],
+                  autoStart: true,
+                  delay: 50,
+                  deleteSpeed: deleteSpeed,
+                }}
+              />
+            </div>
+          )}
 
-        {!isSessionActive || isLoading ? (
-          <RainbowButton onClick={beginSession}>
-            {isLoading ? "Settings Things..." : "Begin Session"}
-          </RainbowButton>
-        ) : (
-          <div className="flex gap-8 mt-16">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
-              // onClick={() => console.log("Toggle audio")}
-            >
-              <Volume2 className="w-6 h-6 dark:text-black" />
-              <span className="sr-only">Toggle audio</span>
-            </Button>
+          {!isSessionActive || isLoading ? (
+            <RainbowButton onClick={beginSession}>
+              {isLoading ? "Settings Things..." : "Begin Session"}
+            </RainbowButton>
+          ) : (
+            <div className="flex gap-8 mt-16">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
+                // onClick={() => console.log("Toggle audio")}
+              >
+                <Volume2 className="w-6 h-6 dark:text-black" />
+                <span className="sr-only">Toggle audio</span>
+              </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
-              onClick={handleMicClick}
-              disabled={isAudioPlaying}
-            >
-              {isListening ? (
-                <Square className="w-8 h-8 text-white dark:text-black" />
-              ) : (
-                <Mic className="w-8 h-8 text-white dark:text-black" />
-              )}
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
+                onClick={handleMicClick}
+                disabled={isAudioPlaying}
+              >
+                {isListening ? (
+                  <Square className="w-8 h-8 text-white dark:text-black" />
+                ) : (
+                  <Mic className="w-8 h-8 text-white dark:text-black" />
+                )}
+              </Button>
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
-                >
-                  <X className="w-6 h-6 dark:text-black" />
-                  <span className="sr-only ark:text-black">End Session</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>End the Session</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to end the session?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="destructive" onClick={endSession}>
-                    {isLoading ? "Ending..." : "End Session"}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200 dark:text-black"
+                  >
+                    <X className="w-6 h-6 dark:text-black" />
+                    <span className="sr-only ark:text-black">End Session</span>
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>End the Session</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to end the session?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="destructive" onClick={endSession}>
+                      {isLoading ? "Ending..." : "End Session"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      <EnhancedSessionSummaryModal
+        isOpen={isSessionModalOpen}
+        onClose={() => setIsSessionModalOpen(false)}
+        data={sessionSummaryData}
+      />
+    </>
   );
 }
