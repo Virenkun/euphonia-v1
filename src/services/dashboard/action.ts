@@ -25,8 +25,6 @@ export async function GetDashboardData() {
     }
   );
 
-  console.log("sesss", sessions.length);
-
   const { data: streks, error: streaksError } = await supabase.rpc(
     "get_user_streaks",
     { user_uuid: auth_id }
