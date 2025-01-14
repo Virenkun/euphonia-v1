@@ -22,6 +22,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { groq } from "@/utils/groq/client";
+import { AI_CHECK_IN_PROMPT } from "@/constant/constants";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import ReactMarkdown from "react-markdown";
 
 export default function AICheckinForm() {
   const [mood, setMood] = useState(5);
@@ -44,13 +49,50 @@ export default function AICheckinForm() {
   const [aiResponse, setAiResponse] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setIsSubmitting(true);
-    // Simulate AI processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setAiResponse(
-      "Based on your comprehensive check-in, it appears you're experiencing a mix of challenges and positive aspects in your mental well-being. Your mood, energy, and focus are moderate, but you're dealing with some anxiety and stress. It's great that you're maintaining good sleep habits and engaging in regular exercise. However, your appetite changes and social interaction levels suggest some areas for improvement. Your self-esteem and work-life balance could use some attention. I recommend trying our AI-Guided Meditation to help with anxiety and stress management. Our Virtual Nature Walks could boost your mood and energy. To improve social interaction, consider joining our Peer Support Network. For work-life balance, our AI Scheduling Assistant might be helpful. Your chosen coping mechanisms are good starting points; consider exploring our Cognitive Games and AI Art Therapy to expand your toolkit. Remember, small, consistent steps lead to significant improvements. If you need more support, don't hesitate to use our AI Therapist or schedule a session with a human professional."
-    );
+    e.preventDefault();
+    const formData = {
+      mood,
+      energy,
+      anxiety,
+      focus,
+      motivation,
+      sleep,
+      sleepQuality,
+      appetite,
+      socialInteraction,
+      exercise,
+      stressLevel,
+      selfEsteem,
+      physicalHealth,
+      workLifeBalance,
+      copingMechanisms,
+      journal,
+    };
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: AI_CHECK_IN_PROMPT,
+        },
+        {
+          role: "user",
+          content: JSON.stringify(formData),
+        },
+      ],
+      model: "llama-3.1-70b-versatile",
+      temperature: 1,
+      max_tokens: 1024,
+      top_p: 1,
+      stream: false,
+    });
+
+    const response = chatCompletion.choices[0]?.message?.content ?? "";
+    console.log("====================================");
+    console.log(response, "resss");
+    console.log("====================================");
+
+    setAiResponse(response);
     setIsSubmitting(false);
   };
 
@@ -383,7 +425,70 @@ export default function AICheckinForm() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>{aiResponse}</p>
+            <div className="prose prose-lg text-lg font-[400] dark:prose-invert max-w-none">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight]}
+                components={{
+                  h1: ({ ...props }) => (
+                    <h1
+                      className="mt-8 mb-4 font-semibold text-4xl"
+                      {...props}
+                    />
+                  ),
+                  h2: ({ ...props }) => (
+                    <h2
+                      className="mt-6 mb-3 font-semibold text-3xl"
+                      {...props}
+                    />
+                  ),
+                  h3: ({ ...props }) => (
+                    <h3 className="mt-5 mb-2 font-medium text-2xl" {...props} />
+                  ),
+                  p: ({ ...props }) => (
+                    <p className="mb-4 leading-relaxed text-lg" {...props} />
+                  ),
+                  ul: ({ ...props }) => (
+                    <ul className="mb-4 list-disc list-inside" {...props} />
+                  ),
+                  ol: ({ ...props }) => (
+                    <ol className="mb-4 list-decimal list-inside" {...props} />
+                  ),
+                  li: ({ ...props }) => <li className="mb-1" {...props} />,
+                  blockquote: ({ ...props }) => (
+                    <blockquote
+                      className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400"
+                      {...props}
+                    />
+                  ),
+                  code: ({
+                    inline,
+                    ...props
+                  }: React.HTMLAttributes<HTMLElement> & {
+                    inline?: boolean;
+                  }) =>
+                    inline ? (
+                      <code
+                        className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm"
+                        {...props}
+                      />
+                    ) : (
+                      <pre
+                        className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-auto"
+                        {...props}
+                      />
+                    ),
+                  strong: ({ ...props }) => (
+                    <strong
+                      className="font-bold text-gray-800 dark:text-gray-200"
+                      {...props}
+                    />
+                  ),
+                }}
+              >
+                {aiResponse}
+              </ReactMarkdown>
+            </div>
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">

@@ -1,3 +1,4 @@
+import { SessionData } from "@/components/SessionsSummary/type";
 import { redirect } from "next/navigation";
 
 export function isValidEmail(email: string) {
@@ -131,3 +132,73 @@ export const getErrorRedirect = (
     disableButton,
     arbitraryParams
   );
+
+interface DataArray {
+  summary: SessionData;
+}
+
+export function getOverallSentimentAndScore(dataArray: DataArray[]) {
+  const sentimentCounts = { positive: 0, neutral: 0, negative: 0 };
+
+  // Aggregate sentiment counts from all session summaries
+  dataArray.forEach((session) => {
+    const sentimentDistribution =
+      session.summary.sentiment_analysis.sentiment_distribution;
+    sentimentCounts.positive += sentimentDistribution.positive || 0;
+    sentimentCounts.neutral += sentimentDistribution.neutral || 0;
+    sentimentCounts.negative += sentimentDistribution.negative || 0;
+  });
+
+  // Calculate the total sentiment count
+  const total =
+    sentimentCounts.positive +
+    sentimentCounts.neutral +
+    sentimentCounts.negative;
+
+  if (total === 0)
+    return { overallSentiment: "No Sentiment Data", sentimentScore: 0 };
+
+  // Compute the sentiment score
+  const sentimentScore =
+    (sentimentCounts.positive * 1 +
+      sentimentCounts.neutral * 0 +
+      sentimentCounts.negative * -1) /
+    total;
+
+  // Determine the overall sentiment
+  const overallSentiment =
+    sentimentCounts.positive >= sentimentCounts.neutral &&
+    sentimentCounts.positive >= sentimentCounts.negative
+      ? "Positive"
+      : sentimentCounts.neutral >= sentimentCounts.negative
+      ? "Neutral"
+      : "Negative";
+
+  return {
+    overallSentiment,
+    sentimentScore: Number(sentimentScore.toFixed(2)),
+  };
+}
+
+export function getMainTopicsSummary(data: DataArray[]) {
+  const topicCount: { [key: string]: number } = {};
+
+  // Count occurrences of each topic
+  data.forEach((item) => {
+    const { main_topics } = item.summary.session_summary;
+
+    main_topics.forEach((topic) => {
+      topicCount[topic] = (topicCount[topic] || 0) + 1;
+    });
+  });
+
+  // Convert the result into an array of objects
+  const topicOccurrencesArray = Object.entries(topicCount).map(
+    ([topic, occurrence]) => ({
+      topic,
+      occurrence,
+    })
+  );
+
+  return topicOccurrencesArray;
+}

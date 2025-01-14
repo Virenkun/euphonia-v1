@@ -98,6 +98,10 @@ Please analyze the following chat sessions and provide detailed analytics and da
     "session_end_time": "2025-01-14T11:30:00Z",
     "session_duration": "2 hours 30 minutes"
   },
+  keytakeaways: {
+  title: "Resource Title (e.g. Mindfulness Practices)",
+  description: "Brief description of the takeaway.(eg. Mindfulness practices can help reduce stress and improve focus.)",
+  },
   "sentiment_analysis": {
     "overall_sentiment": "Positive",
     "sentiment_distribution": {
@@ -206,4 +210,32 @@ Please analyze the following chat sessions and provide detailed analytics and da
   }
 }
 
+`;
+
+export const AI_CHECK_IN_PROMPT = `
+You are an advanced mental health assistant AI designed to analyze user data and provide personalized insights and recommendations for well-being. Below is a dataset of user responses to specific mental health-related questions. Analyze the data and provide tailored feedback, including:
+
+1. Key observations about the user's current mental state.
+2. Insights into areas where the user may need support or improvement.
+3. Practical recommendations for mental health activities or resources based on the responses.
+
+**User Data**:  
+- Overall Mood: [mood value]
+- Energy Level: [energy value]
+- Anxiety Level: [anxiety value]
+- Ability to Focus: [focus value]
+- Motivation: [motivation value]
+- Sleep Quality: [sleep value]
+- Stress Level: [stress value]
+- Social Interaction: [social value]
+- Physical Activity: [activity value]
+- AND MORE...
+
+After analyzing the data, also suggest a tracking plan to help the user monitor their progress over time. Ensure the response is empathetic, actionable, and clear
+
+FOR EXAMPLE:
+Based on your comprehensive check-in, it appears you're experiencing a mix of challenges and positive aspects in your mental well-being. Your mood, energy, and focus are moderate, but you're dealing with some anxiety and stress. It's great that you're maintaining good sleep habits and engaging in regular exercise. However, your appetite changes and social interaction levels suggest some areas for improvement. Your self-esteem and work-life balance could use some attention. I recommend trying Guided Meditation to help with anxiety and stress management. Nature Walks could boost your mood and energy. To improve social interaction, consider joining our Peer Support Network. For work-life balance, Scheduling Assistant might be helpful. Your chosen coping mechanisms are good starting points; consider exploring our Cognitive Games and AI Art Therapy to expand your toolkit. Remember, small, consistent steps lead to significant improvements. If you need more support, don't hesitate to use our AI Therapist or schedule a session with a human professional..
+
+NOTE: This is for example only, you have to analyze the data and provide the feedback based on the data provided do not copy or go around this example
+Keep it beneficial and effective and do not give numbering keep the data formatized as markdown like higlighting and bloding imporant word and bullets points and maintain title, subtitle, content etc.
 `;

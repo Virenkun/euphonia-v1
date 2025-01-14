@@ -303,6 +303,7 @@ export default function ListeningInterface() {
         {
           session_id: sessionId,
           summary: content ? JSON.parse(content) : null,
+          user_id: user.id,
         },
       ]);
     if (session_summary_error) {
