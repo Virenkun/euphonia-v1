@@ -26,6 +26,7 @@ import { groq } from "@/utils/groq/client";
 import { synthesizeSpeech } from "@/utils/aws/polly";
 import EnhancedSessionSummaryModal from "@/components/SessionsSummary/session-summary-modal";
 import { SessionData } from "@/components/SessionsSummary/type";
+import { insertSession } from "@/services/chats/action";
 
 export default function ListeningInterface() {
   const [isListening, setIsListening] = useState(false);
@@ -290,13 +291,11 @@ export default function ListeningInterface() {
     setSessionId("");
     localStorage.removeItem("sessionId");
     setAssistantResponse("");
-    const { error } = await supabase.from("session").insert([
-      {
-        id: sessionId,
-        user_id: user.id,
-        length: sessionLength,
-      },
-    ]);
+    await insertSession({
+      id: sessionId,
+      user_id: user.id,
+      length: sessionLength,
+    });
     const { error: session_summary_error } = await supabase
       .from("session_summary")
       .insert([
@@ -312,9 +311,7 @@ export default function ListeningInterface() {
         session_summary_error.message
       );
     }
-    if (error) {
-      console.error("Error saving session:", error.message);
-    }
+
     setIsLoading(false);
     setIsSessionModalOpen(true);
   };
