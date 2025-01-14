@@ -15,14 +15,14 @@ export async function GetDashboardData() {
   const auth_id = user?.id;
 
   const { data: session_count, error } = await supabase.rpc(
-    "count_unique_sessions",
-    {
-      input_user_id: auth_id,
-    }
+    "count_unique_sessions"
   );
 
   const { data: sessions, error: sessionDurationError } = await supabase.rpc(
-    "count_session_durations_and_word_count"
+    "count_session_durations_and_word_count",
+    {
+      input_user_id: auth_id,
+    }
   );
 
   console.log("sesss", sessions.length);

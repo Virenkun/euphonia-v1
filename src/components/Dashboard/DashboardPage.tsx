@@ -50,6 +50,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SessionTable } from "@/components/Dashboard/SessionsTable";
+import Link from "next/link";
 
 const topicsData = [
   { name: "Anxiety", value: 30 },
@@ -109,7 +110,9 @@ export default function Dashboard({
               <SelectItem value="year">This Year</SelectItem>
             </SelectContent>
           </Select>
-          <RainbowButton>Begin Session</RainbowButton>
+          <Link href="/main">
+            <RainbowButton className="p-2">Begin Session</RainbowButton>
+          </Link>
         </div>
       </div>
 
