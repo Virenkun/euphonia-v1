@@ -34,8 +34,6 @@ export default async function Layout({
     redirect("/onboarding-form");
   }
 
-  console.log("User Info", userInfo);
-
   return (
     <SidebarProvider>
       <AppSidebar

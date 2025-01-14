@@ -15,10 +15,7 @@ export async function GetDashboardData() {
   const auth_id = user?.id;
 
   const { data: session_count, error } = await supabase.rpc(
-    "count_unique_sessions",
-    {
-      input_user_id: auth_id,
-    }
+    "count_unique_sessions"
   );
 
   const { data: sessions, error: sessionDurationError } = await supabase.rpc(
@@ -27,8 +24,6 @@ export async function GetDashboardData() {
       input_user_id: auth_id,
     }
   );
-
-  console.log("sesss", sessions.length);
 
   const { data: streks, error: streaksError } = await supabase.rpc(
     "get_user_streaks",
