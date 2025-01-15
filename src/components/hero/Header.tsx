@@ -31,16 +31,16 @@ export default function Header() {
           </Link>
           <nav className="hidden md:flex space-x-8">
             <Link
-              href="#features"
+              href="/why-euphonia"
               className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
-              Features
+              Why
             </Link>
             <Link
-              href="#how-it-works"
+              href="/our-mission"
               className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
-              How It Works
+              Mission
             </Link>
             <Link
               href="/blog"

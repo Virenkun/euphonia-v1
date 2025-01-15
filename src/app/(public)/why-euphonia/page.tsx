@@ -25,6 +25,27 @@ const WhyEuphonia = () => {
           </div>
         </div>
 
+        {/* Meaning of .me Section */}
+        <div className="rounded-lg bg-gray-50 py-10 px-6 lg:px-16 mb-16">
+          <h2 className="text-3xl font-extrabold text-gray-800 text-center mb-6">
+            What’s up with <span className="text-indigo-600">.me</span>?
+          </h2>
+          <p className="text-xl text-gray-700 text-center leading-relaxed">
+            The <span className="font-semibold text-indigo-600">{`".me"`}</span>
+            {` in
+            Euphonia.me isn’t just a fancy internet address—it’s our way of
+            saying, "Hey, this is all about`}{" "}
+            <span className="italic">you</span>
+            {` !" It’s like a digital hug, but without the awkward pat on the back.
+            When you see`}{" "}
+            <span className="font-semibold">{`".me"`}</span>, think of it as
+            your VIP pass to a space where your feelings take center stage. So,
+            whether you’re here to laugh, cry, or just figure things out,
+            Euphonia is ready to help <span className="italic">you</span> do{" "}
+            <span className="italic">you</span>—in the best way possible.
+          </p>
+        </div>
+
         {/* Highlights Section */}
         <div className="rounded-lg p-8 mb-16">
           <h2 className="text-4xl font-extrabold text-gray-800 text-center mb-8">

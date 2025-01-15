@@ -85,7 +85,7 @@ const OurMission = () => {
           <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
             What We Offer
           </h2>
-          <div className="space-y-8">
+          <div className="space-y-8 ">
             {[
               {
                 title: "AI-Powered Conversations",
