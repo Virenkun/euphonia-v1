@@ -15,9 +15,13 @@ export default async function Home() {
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-blue-50">
       <ScrollProgress className="top-[65px]" />
       <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         <main>
           <Hero />
+        </main>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <main>
           <Features />
           <WhatIsEuphonia />
           <HowItWorks />
