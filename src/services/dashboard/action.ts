@@ -1,5 +1,9 @@
 "use server";
 
+import {
+  getMainTopicsSummary,
+  getOverallSentimentAndScore,
+} from "@/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 
 export async function GetDashboardData() {
@@ -15,10 +19,7 @@ export async function GetDashboardData() {
   const auth_id = user?.id;
 
   const { data: session_count, error } = await supabase.rpc(
-    "count_unique_sessions",
-    {
-      input_user_id: auth_id,
-    }
+    "count_unique_sessions"
   );
 
   const { data: sessions, error: sessionDurationError } = await supabase.rpc(
@@ -27,8 +28,6 @@ export async function GetDashboardData() {
       input_user_id: auth_id,
     }
   );
-
-  console.log("sesss", sessions.length);
 
   const { data: streks, error: streaksError } = await supabase.rpc(
     "get_user_streaks",
@@ -65,9 +64,24 @@ export async function GetDashboardData() {
     0
   );
 
+  const { data: userSessionData, error: userSessionError } = await supabase
+    .from("session_summary")
+    .select("*")
+    .eq("user_id", auth_id);
+
+  console.log("authId", auth_id);
+
+  if (userSessionError) {
+    console.error("Error While Getting Dashboard Data", userSessionError);
+  }
+
+  console.log(userSessionData, "userSessionData");
+
   const averageDuration = totalDuration / sessions.length;
   const averageUserWordCount = totalUserWordCount / sessions.length;
   const averageAssistantWordCount = totalAssistantWordCount / sessions.length;
+  const sentiment = getOverallSentimentAndScore(userSessionData || []);
+  const topics = getMainTopicsSummary(userSessionData || []);
 
   return {
     session_count: session_count,
@@ -76,5 +90,7 @@ export async function GetDashboardData() {
     avg_session_duration: averageDuration,
     user_avg_word_count: averageUserWordCount,
     assistant_avg_word_count: averageAssistantWordCount,
+    sentiment: sentiment,
+    topics: topics,
   };
 }

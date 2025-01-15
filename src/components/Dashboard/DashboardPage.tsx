@@ -50,14 +50,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SessionTable } from "@/components/Dashboard/SessionsTable";
+import Link from "next/link";
 
-const topicsData = [
-  { name: "Anxiety", value: 30 },
-  { name: "Depression", value: 25 },
-  { name: "Stress", value: 20 },
-  { name: "Relationships", value: 15 },
-  { name: "Self-esteem", value: 10 },
-];
+// const topicsData = [
+//   { name: "Anxiety", value: 30 },
+//   { name: "Depression", value: 25 },
+//   { name: "Stress", value: 20 },
+//   { name: "Relationships", value: 15 },
+//   { name: "Self-esteem", value: 10 },
+// ];
 
 interface DashboardData {
   session_count: number;
@@ -77,6 +78,14 @@ interface DashboardData {
   avg_session_duration: number;
   user_avg_word_count: number;
   assistant_avg_word_count: number;
+  sentiment: {
+    sentimentScore: number;
+    overallSentiment: string;
+  };
+  topics: {
+    topic: string;
+    occurrence: number;
+  }[];
 }
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
@@ -109,7 +118,9 @@ export default function Dashboard({
               <SelectItem value="year">This Year</SelectItem>
             </SelectContent>
           </Select>
-          <RainbowButton>Begin Session</RainbowButton>
+          <Link href="/main">
+            <RainbowButton className="p-2">Begin Session</RainbowButton>
+          </Link>
         </div>
       </div>
 
@@ -137,14 +148,21 @@ export default function Dashboard({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-800">
-              {dashboardData.streaks.current_streak} days
+              {dashboardData.streaks ? dashboardData.streaks.current_streak : 0}{" "}
+              days
             </div>
             <Progress
-              value={dashboardData.streaks.current_streak * 10}
+              value={
+                dashboardData.streaks
+                  ? dashboardData.streaks.current_streak * 10
+                  : 0
+              }
               className="mt-2 bg-blue-100"
             />
             <p className="text-xs text-blue-600 font-semibold mt-2">
-              Maximum Streaks: {dashboardData.streaks.max_streak} Days
+              Maximum Streaks:{" "}
+              {dashboardData.streaks ? dashboardData.streaks.max_streak : 0}{" "}
+              Days
             </p>
           </CardContent>
         </Card>
@@ -157,26 +175,65 @@ export default function Dashboard({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-800">
-              {(
-                Number(dashboardData.avg_session_duration.toFixed(2)) / 60
-              ).toFixed(2)}{" "}
+              {dashboardData.avg_session_duration
+                ? (
+                    Number(dashboardData.avg_session_duration.toFixed(2)) / 60
+                  ).toFixed(2)
+                : 0}{" "}
               minutes
             </div>
             <p className="text-xs text-gray-500">Optimal: 15-25 minutes</p>
           </CardContent>
         </Card>
-        <Card className="bg-white shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Overall Mood Improvement
-            </CardTitle>
-            <Brain className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-800">+23%</div>
-            <p className="text-xs text-green-600">Since starting therapy</p>
-          </CardContent>
-        </Card>
+        <Tooltip>
+          <TooltipTrigger>
+            <Card className="bg-white shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  Overall Sentiment Score
+                </CardTitle>
+                <Brain className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                {dashboardData.sentiment.sentimentScore > 0 ? (
+                  <div className="text-4xl font-bold text-green-500">
+                    {dashboardData.sentiment.sentimentScore}
+                  </div>
+                ) : dashboardData.sentiment.sentimentScore < 0 ? (
+                  <div className="text-4xl font-bold text-red-500">
+                    {dashboardData.sentiment.sentimentScore}
+                  </div>
+                ) : (
+                  <div className="text-4xl font-bold text-gray-500">
+                    {dashboardData.sentiment.sentimentScore}
+                  </div>
+                )}
+                <p className="text-xs font-semibold">
+                  {dashboardData.sentiment.overallSentiment === "Positive" ? (
+                    <span className="text-green-500">
+                      {dashboardData.sentiment.overallSentiment}
+                    </span>
+                  ) : dashboardData.sentiment.overallSentiment ===
+                    "Negative" ? (
+                    <span className="text-red-500">
+                      {dashboardData.sentiment.overallSentiment}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500">
+                      {dashboardData.sentiment.overallSentiment}
+                    </span>
+                  )}
+                </p>
+              </CardContent>
+            </Card>
+          </TooltipTrigger>
+          <TooltipContent className="p-2 text-sm border border-gray-200 rounded-md shadow-md">
+            <p className="font-semibold">Sentiment Analysis</p>
+            <p>Reflects the mood of sessions.</p>
+            <p className="mt-1 font-semibold">Score</p>
+            <p>Ranges from -1 (Negative) to +1 (Positive).</p>
+          </TooltipContent>
+        </Tooltip>
         <Tooltip>
           <TooltipTrigger>
             <Card className="bg-white shadow-lg">
@@ -188,7 +245,9 @@ export default function Dashboard({
               </CardHeader>
               <CardContent className="flex items-end gap-1">
                 <p className="text-4xl font-bold text-center">
-                  {dashboardData.user_avg_word_count.toFixed(2)}
+                  {dashboardData.user_avg_word_count
+                    ? dashboardData.user_avg_word_count.toFixed(2)
+                    : 0}
                 </p>
                 <p className="text-sm font-medium text-end mb-1">
                   words per session
@@ -211,7 +270,9 @@ export default function Dashboard({
               </CardHeader>
               <CardContent className="flex items-end gap-1">
                 <p className="text-4xl font-bold text-center">
-                  {dashboardData.assistant_avg_word_count.toFixed(2)}
+                  {dashboardData.assistant_avg_word_count
+                    ? dashboardData.assistant_avg_word_count.toFixed(2)
+                    : 0}
                 </p>
                 <p className="text-sm font-medium text-end mb-1">
                   words per session
@@ -266,20 +327,20 @@ export default function Dashboard({
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={topicsData}
+                  data={dashboardData.topics}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
                   outerRadius={80}
                   fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
+                  dataKey="occurrence"
+                  label={({ topic, percent }) =>
+                    `${topic} ${(percent * 100).toFixed(0)}%`
                   }
                 >
-                  {topicsData.map((entry, index) => (
+                  {dashboardData.topics.map((entry, index) => (
                     <Cell
-                      key={`cell-${index}-${entry.name}`}
+                      key={`cell-${index}-${entry.topic}`}
                       fill={COLORS[index % COLORS.length]}
                     />
                   ))}

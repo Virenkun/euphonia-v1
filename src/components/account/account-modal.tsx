@@ -13,13 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -68,8 +61,6 @@ export function AccountModal({
         >
           <TabsList className="px-4 py-2 border-b justify-start">
             <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="professional">Professional</TabsTrigger>
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
             <TabsTrigger value="danger" className="text-red-500">
               Delete Zone
             </TabsTrigger>
@@ -148,142 +139,118 @@ export function AccountModal({
                           id="bio"
                           placeholder="Tell us about your experience and expertise..."
                           defaultValue="Experienced therapist specializing in cognitive behavioral therapy and trauma recovery. Passionate about helping individuals overcome challenges and achieve personal growth."
+                          className="h-24"
                         />
+                      </div>
+                      <div className="space-y-6">
+                        <h4 className="font-medium">Account Preferences</h4>
+
+                        {/* Sessions Reminder */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Sessions Reminder</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Receive reminders for upcoming sessions.
+                            </p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        {/* Email Notifications */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Email Notifications</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Get email notifications about new messages and
+                              appointments.
+                            </p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        {/* SMS Reminders */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>SMS Reminders</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Receive SMS reminders for upcoming appointments.
+                            </p>
+                          </div>
+                          <Switch />
+                        </div>
+
+                        {/* Accessibility Preferences */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Dark Mode</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Enable dark mode for a better viewing experience.
+                            </p>
+                          </div>
+                          <Switch />
+                        </div>
+
+                        {/* Language Preference */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Language</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Set your preferred language for the app.
+                            </p>
+                          </div>
+                          <select className="border text-sm px-2 py-1 rounded-md">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                          </select>
+                        </div>
+
+                        {/* Notification Frequency */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Notification Frequency</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Choose how often you want to receive
+                              notifications.
+                            </p>
+                          </div>
+                          <select className="border text-sm px-2 py-1 rounded-md">
+                            <option value="immediate">Immediate</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                          </select>
+                        </div>
+
+                        {/* Privacy Settings */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Personalized Recommendations</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Allow us to personalize your experience based on
+                              your preferences.
+                            </p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        {/* Download Data */}
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Download My Data</Label>
+                            <p className="text-sm text-muted-foreground">
+                              Download a copy of your data for your records.
+                            </p>
+                          </div>
+                          <button className="text-sm text-blue-500 hover:underline">
+                            Download
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="professional">
-                  <div className="space-y-6">
-                    <div className="grid gap-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="specialization">Specialization</Label>
-                        <Select defaultValue="cognitive">
-                          <SelectTrigger id="specialization">
-                            <SelectValue placeholder="Select specialization" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="general">
-                              General Therapy
-                            </SelectItem>
-                            <SelectItem value="cognitive">
-                              Cognitive Behavioral Therapy
-                            </SelectItem>
-                            <SelectItem value="trauma">
-                              Trauma Therapy
-                            </SelectItem>
-                            <SelectItem value="relationship">
-                              Relationship Counseling
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="experience">Years of Experience</Label>
-                        <Input
-                          id="experience"
-                          type="number"
-                          min="0"
-                          defaultValue="8"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="rate">Hourly Rate ($)</Label>
-                        <Input
-                          id="rate"
-                          type="number"
-                          min="0"
-                          defaultValue="150"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="education">Education</Label>
-                        <Textarea
-                          id="education"
-                          placeholder="List your degrees and certifications..."
-                          defaultValue="Ph.D. in Clinical Psychology, University of California, Berkeley
-M.A. in Counseling Psychology, Stanford University
-Licensed Clinical Psychologist (License #12345)"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="languages">Languages Spoken</Label>
-                        <Input id="languages" defaultValue="English, Spanish" />
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="preferences">
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Account Preferences</h4>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Available for New Clients</Label>
-                          <p className="text-sm text-muted-foreground">
-                            Show your profile to potential new clients
-                          </p>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Email Notifications</Label>
-                          <p className="text-sm text-muted-foreground">
-                            Receive notifications about new messages and
-                            appointments
-                          </p>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>SMS Reminders</Label>
-                          <p className="text-sm text-muted-foreground">
-                            Receive SMS reminders for upcoming appointments
-                          </p>
-                        </div>
-                        <Switch />
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Session Preferences</h4>
-                      <div className="grid gap-2">
-                        <Label htmlFor="session-duration">
-                          Default Session Duration
-                        </Label>
-                        <Select defaultValue="60">
-                          <SelectTrigger id="session-duration">
-                            <SelectValue placeholder="Select duration" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="30">30 minutes</SelectItem>
-                            <SelectItem value="45">45 minutes</SelectItem>
-                            <SelectItem value="60">60 minutes</SelectItem>
-                            <SelectItem value="90">90 minutes</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="buffer-time">
-                          Buffer Time Between Sessions
-                        </Label>
-                        <Select defaultValue="15">
-                          <SelectTrigger id="buffer-time">
-                            <SelectValue placeholder="Select buffer time" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="0">No buffer</SelectItem>
-                            <SelectItem value="5">5 minutes</SelectItem>
-                            <SelectItem value="10">10 minutes</SelectItem>
-                            <SelectItem value="15">15 minutes</SelectItem>
-                            <SelectItem value="30">30 minutes</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
+
                 <TabsContent value="danger">
                   <div className="flex flex-col gap-3 border border-red-500 p-4 rounded-lg">
                     <div className="font-semibold text-lg">Delete Account</div>
