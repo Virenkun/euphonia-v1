@@ -20,7 +20,7 @@ export default function Hero() {
               Therapy, but make it
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
                 {" "}
-                fun
+                fun & way more easy
               </span>
             </h1>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-700 mb-6">
