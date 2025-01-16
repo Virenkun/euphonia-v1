@@ -8,19 +8,19 @@ export default function Hero() {
   return (
     <section className="py-20 md:py-32 overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-col  justify-center items-center gap-2">
-          <h1 className="w-[90%] text-center text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 tracking-wide leading-relaxed">
+        <div className="flex flex-col lg:flex-col  justify-center items-center lg:gap-2 md:gap-2 sm:gap-2 gap-2">
+          <div className="lg:w-[90%] md:w-full sm:w-full w-full text-center text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 lg:mb-6 md:mb-4 sm:mb-2 tracking-normal lg:tracking-wide  md:tracking-normal">
             Therapy but make <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
               {" "}
               it fun & way more easy
             </span>
-          </h1>
-          <h2 className="w-[65%] text-center text-xl md:text-xl lg:text-2xl font-semibold text-gray-700 mb-6">
+          </div>
+          <h2 className="lg:w-[65%] md:w-[75%] w-full text-center text-sm sm:text-base md:text-lg lg:text-2xl lg:font-semibold font-medium text-gray-700 lg:mb-6 md:mb-4 sm:mb-2">
             Spill your thoughts, get answers, share secrets <br /> (we won’t
             even tell your diary).
           </h2>
-          <p className="w-[55%] text-center text-xl text-gray-600 mb-8">
+          <p className="lg:w-[55%] md:w-[65%] sm:w-full w-full text-center lg:text-xl md:text-md sm:text-sm text-sm text-gray-600 mb-8">
             {`Meet your new favorite therapist: always awake, never out of
               coffee, and ready to listen without saying, "Tell me how that
               makes you feel." Your mental wellness, served with a side of AI
@@ -29,7 +29,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/signin/signup">
-              <RainbowButton className="font-bold text-xl px-8 py-6 rounded-lg transition-transform hover:scale-105">
+              <RainbowButton className="font-bold lg:text-xl md:text-md lg:px-10  lg:py-7 md:px-8 md:py-5 rounded-lg transition-transform hover:scale-105">
                 Experience Euphonia Now
               </RainbowButton>
             </Link>
