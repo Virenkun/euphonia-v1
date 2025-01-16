@@ -12,6 +12,7 @@ import {
   Lightbulb,
   TrendingUp,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const steps = [
   {
@@ -54,6 +55,7 @@ const steps = [
 export default function HowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
   const controls = useAnimation();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     controls.start((i) => ({
@@ -88,7 +90,7 @@ export default function HowItWorks() {
         </motion.p>
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="lg:w-1/2 mb-10 lg:mb-0 lg:pr-16 relative">
-            <div className="absolute left-8 top-0 h-[90%] bottom-0 w-1 bg-gradient-to-b from-pink-500 via-purple-500 to-indigo-500 rounded-full"></div>
+            <div className="absolute left-8 top-0 h-[85%] bottom-0 w-1 bg-gradient-to-b from-pink-500 via-purple-500 to-indigo-500 rounded-full"></div>
             {steps.map((step, index) => (
               <motion.div
                 key={index}
@@ -125,23 +127,25 @@ export default function HowItWorks() {
             ))}
           </div>
           <div className="lg:w-1/2 justify-center items-center flex flex-col">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="relative z-10"
-              >
-                <Image
-                  src="/Astronot.gif"
-                  alt="AI Therapist Journey Illustration"
-                  width={600}
-                  height={600}
-                  className="rounded-2xl  transform hover:scale-105 transition-transform duration-300"
-                />
-              </motion.div>
-            </div>
+            {!isMobile && (
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                  className="relative z-10"
+                >
+                  <Image
+                    src="/Astronot.gif"
+                    alt="AI Therapist Journey Illustration"
+                    width={600}
+                    height={600}
+                    className="rounded-2xl  transform hover:scale-105 transition-transform duration-300"
+                  />
+                </motion.div>
+              </div>
+            )}
             <Link
               href="/signin/signup"
               className="flex-1 justify-center items-center self-center"

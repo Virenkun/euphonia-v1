@@ -40,3 +40,31 @@ export async function SubmitFeedbackByUser({
     );
   }
 }
+
+interface GuestFeedback {
+  mood: string;
+  exprience: string;
+  accessibilty: string;
+  recommendation: string;
+}
+
+export async function SubmitFeedbackByGuest({
+  mood,
+  exprience,
+  accessibilty,
+  recommendation,
+}: GuestFeedback) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("user_feedback").insert([
+    {
+      mood: mood,
+      exprience: exprience,
+      accessibilty: accessibilty,
+      recommendation: recommendation,
+    },
+  ]);
+
+  if (error) {
+    console.error(`Error While Submitting the Feedback: ${error.message}`);
+  }
+}

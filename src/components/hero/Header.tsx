@@ -5,10 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
+import UserFeedbackPage from "../user-feedback-modal";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userFeedbackOpen, setUserFeedbackOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,10 +26,17 @@ export default function Header() {
         scrolled ? "bg-white/80 backdrop-blur-md shadow-md" : ""
       }`}
     >
+      <UserFeedbackPage
+        open={userFeedbackOpen}
+        onOpenChange={setUserFeedbackOpen}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-2xl font-[700] text-indigo-600">
-            euphonia
+            euphonia{" "}
+            <span className="ml-1 p-1 px-3 align-middle self-center text-[10px] font-normal rounded-full bg-black text-white">
+              beta
+            </span>
           </Link>
           <nav className="hidden md:flex space-x-8">
             <Link
@@ -49,10 +58,13 @@ export default function Header() {
               Blogs
             </Link>
             <Link
-              href="#faq"
+              href=""
               className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
+              onClick={() => {
+                setUserFeedbackOpen(true);
+              }}
             >
-              FAQ
+              Feedback
             </Link>
           </nav>
           <div className="hidden md:block">
@@ -80,30 +92,33 @@ export default function Header() {
       </div>
       {mobileMenuOpen && (
         <div className="md:hidden bg-white shadow-lg">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+          <div className="flex flex-col px-2 pt-2 pb-3 space-y-1">
             <Link
               href="/why-euphonia"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[400]"
             >
               Why
             </Link>
             <Link
               href="/our-mission"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[400]"
             >
               Mission
             </Link>
             <Link
               href="/blog"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[400]"
             >
               Blogs
             </Link>
             <Link
-              href="#faq"
-              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
+              href=""
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[400]"
+              onClick={() => {
+                setUserFeedbackOpen(true);
+              }}
             >
-              FAQ
+              Feedback
             </Link>
           </div>
           <div className="px-4 py-3">
