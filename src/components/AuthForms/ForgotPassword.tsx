@@ -37,7 +37,7 @@ export default function ForgotPassword({
   };
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+    <div className="min-h-screen bg-[#4B4ACF]">
       <div className="p-4 rounded-full">
         <Link href="/" className="text-white hover:text-white/80">
           <Button

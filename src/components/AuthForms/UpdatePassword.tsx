@@ -29,7 +29,7 @@ export default function UpdatePassword({
   };
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+    <div className="min-h-screen bg-[#4B4ACF]">
       <main className="flex flex-col items-center px-6">
         <div className="w-full max-w-[400px] space-y-16">
           <div className="flex justify-center text-[38px] font-[700] text-white"></div>

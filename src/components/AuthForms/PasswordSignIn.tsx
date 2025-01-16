@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { handleRequest } from "@/helpers/auth-helpers";
 import { signInWithOAuth, signInWithPassword } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ export default function PasswordSignIn({
   const router = useRouter();
   const shouldRedirect = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [googleIsSubmitting, setGoogleIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const searchParams = useSearchParams();
@@ -32,6 +33,7 @@ export default function PasswordSignIn({
   const error = searchParams.get("error");
   const error_description = searchParams.get("error_description");
 
+  const pathname = usePathname();
   useEffect(() => {
     if (error) {
       setTimeout(() =>
@@ -41,8 +43,9 @@ export default function PasswordSignIn({
           description: error_description,
         })
       );
+      router.replace(pathname);
     }
-  }, [error, error_description, toast]);
+  }, [error, error_description, toast, pathname, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
@@ -65,7 +68,7 @@ export default function PasswordSignIn({
   };
 
   const handleGoogleSignIn = async () => {
-    setIsSubmitting(true);
+    setGoogleIsSubmitting(true);
     await signInWithOAuth("google");
   };
 
@@ -74,7 +77,7 @@ export default function PasswordSignIn({
   }
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+    <div className="min-h-screen bg-[#4B4ACF]">
       <div className="p-4">
         <Link href="/" className="text-white hover:text-white/80">
           <Button
@@ -113,7 +116,7 @@ export default function PasswordSignIn({
               <Button
                 className="w-full h-[52px] bg-white rounded-[14px] flex items-center justify-center space-x-3 hover:bg-white/95 transition-colors"
                 onClick={handleGoogleSignIn}
-                isLoading={isSubmitting}
+                disabled={googleIsSubmitting}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -139,8 +142,10 @@ export default function PasswordSignIn({
                   />
                   <path d="M1 1h22v22H1z" fill="none" />
                 </svg>
-                <span className="text-[16px] font-[700] text-[#1A1A1A]">
-                  Continue with Google
+                <span className="text-[16px] font-[700] text-[#1A1A1A] disabled:text-black">
+                  {googleIsSubmitting
+                    ? "Signing in..."
+                    : "Continue with Google"}
                 </span>
               </Button>
 
@@ -205,28 +210,28 @@ export default function PasswordSignIn({
                   disabled={isSubmitting}
                   className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
                 >
-                  {isSubmitting ? "Setting Up Your Profile..." : "Continue"}
+                  {isSubmitting ? "Taking You to the Euphonia..." : "Continue"}
                 </Button>
               </form>
-
-              <Link
-                href="/signin/forgot_password"
-                className="text-white hover:text-white/80"
-              >
-                <p className="text-[18px] font-[700] text-center text-white pt-1">
-                  Forgot your password?
-                </p>
-              </Link>
-
-              <p className="text-[18px] font-[700] text-center text-white pt-1">
-                Do not have an account?{" "}
+              <div className="mt-20">
                 <Link
-                  href="/signin/signup"
+                  href="/signin/forgot_password"
                   className="text-white hover:text-white/80"
                 >
-                  Regsiter
+                  <p className="text-[18px] font-[700] text-center text-white pt-1">
+                    Forgot your password?
+                  </p>
                 </Link>
-              </p>
+
+                <Link
+                  href="/signin/signup"
+                  className="text-white hover:text-white/100"
+                >
+                  <p className="text-[18px] font-[700] text-center text-white hover:text-white/100 pt-1">
+                    Do not have an account? Regsiter
+                  </p>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

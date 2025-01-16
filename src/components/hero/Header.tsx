@@ -82,26 +82,26 @@ export default function Header() {
         <div className="md:hidden bg-white shadow-lg">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
-              href="#features"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md"
+              href="/why-euphonia"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
-              Features
+              Why
             </Link>
             <Link
-              href="#how-it-works"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md"
+              href="/our-mission"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
-              How It Works
+              Mission
             </Link>
             <Link
-              href="#pricing"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md"
+              href="/blog"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               Blogs
             </Link>
             <Link
               href="#faq"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md"
+              className="text-gray-600 hover:text-indigo-600 transition-colors font-[600]"
             >
               FAQ
             </Link>

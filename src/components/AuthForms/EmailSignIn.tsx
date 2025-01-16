@@ -42,6 +42,7 @@ export default function EmailSignIn({
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setIsSubmitting(true);
     e.preventDefault();
 
     if (email !== "")
@@ -52,7 +53,7 @@ export default function EmailSignIn({
   };
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+    <div className="min-h-screen bg-[#4B4ACF]">
       <div className="p-4">
         <Link href="/" className="text-white hover:text-white/80">
           <Button
@@ -139,7 +140,7 @@ export default function EmailSignIn({
                   disabled={isSubmitting || disableButton}
                   className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
                 >
-                  {isSubmitting ? "Setting Up Your Profile..." : "Continue"}
+                  {isSubmitting ? "Please Wait..." : "Continue"}
                 </Button>
               </form>
 
