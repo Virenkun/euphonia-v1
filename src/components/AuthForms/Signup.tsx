@@ -95,7 +95,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
   }, [error, error_description, toast]);
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF] min-w-max">
+    <div className="min-h-screen bg-[#4B4ACF]">
       <div className="p-4">
         <Link href="/" className="text-white hover:text-white/80">
           <Button
@@ -301,11 +301,17 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
 
                 <p className="text-[13px] text-center text-white/60 pt-1">
                   By signing up or logging in, you agree to our{" "}
-                  <Link href="#" className="underline hover:text-white/80">
+                  <Link
+                    href="/terms-of-services"
+                    className="underline hover:text-white/80"
+                  >
                     Terms of use
                   </Link>{" "}
                   and{" "}
-                  <Link href="#" className="underline hover:text-white/80">
+                  <Link
+                    href="/privacy-policy"
+                    className="underline hover:text-white/80"
+                  >
                     Privacy policy
                   </Link>
                 </p>
@@ -323,16 +329,16 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
                   {isSubmitting ? "Setting Up Your Profile..." : "Continue"}
                 </Button>
               </form>
-
-              <p className="text-[18px] font-[700] text-center text-white pt-1">
-                Have an account?{" "}
+              <div className="mt-20">
                 <Link
                   href="/signin/password_signin"
                   className="text-white hover:text-white/80"
                 >
-                  Log in
+                  <p className="text-[18px] font-[700] text-center text-white pt-1">
+                    Have an account? Log in
+                  </p>
                 </Link>
-              </p>
+              </div>
             </div>
           </div>
         </div>

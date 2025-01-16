@@ -37,24 +37,25 @@ export default function ConfirmPage() {
   }, [resendTimeout]);
 
   const handleConfirm = async (formData: FormData) => {
+    setIsLoading(true);
     setError(null);
     setSuccess(null);
-    setIsLoading(true);
     formData.append("email", email ?? "");
     formData.append("phone", phone ?? "");
     if (isMagicLink !== "true") {
       const result = await confirmSignup(formData);
-      setIsLoading(false);
+
       if (result?.error) {
         setError(result.error);
       }
     } else {
       const result = await confirmOtpSignin(formData);
-      setIsLoading(false);
       if (result?.error) {
         setError(result.error);
       }
     }
+
+    setIsLoading(false);
   };
 
   const handleResendEmail = async () => {
