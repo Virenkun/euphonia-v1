@@ -45,7 +45,6 @@ export default async function Layout({
         usedSessions={session_count}
       />
       <main className="flex-1">
-        {/* <SidebarTrigger /> */}
         <div>{children}</div>
       </main>
     </SidebarProvider>
