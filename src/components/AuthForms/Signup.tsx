@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { handleRequest } from "@/helpers/auth-helpers";
 import { signInWithOAuth, signUp } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
   const router = useRouter();
   const shouldUseRouter = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingOAuth, setIsLoadingOAuth] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -31,6 +32,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const error_description = searchParams.get("error_description");
+  const pathname = usePathname();
 
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -79,6 +81,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
   };
 
   const handleGoogleSignIn = async () => {
+    setIsLoadingOAuth(true);
     await signInWithOAuth("google");
   };
 
@@ -91,6 +94,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
           description: error_description,
         })
       );
+      router.replace(pathname);
     }
   }, [error, error_description, toast]);
 
@@ -134,6 +138,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
               <Button
                 className="w-full h-[52px] bg-white rounded-[14px] flex items-center justify-center space-x-3 hover:bg-white/95 transition-colors"
                 onClick={handleGoogleSignIn}
+                disabled={isLoadingOAuth}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +165,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
                   <path d="M1 1h22v22H1z" fill="none" />
                 </svg>
                 <span className="text-[16px] font-[700] text-[#1A1A1A]">
-                  Continue with Google
+                  {isLoadingOAuth ? "Signing Up...." : "Continue with Google"}
                 </span>
               </Button>
 
@@ -322,7 +327,10 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
                     isSubmitting ||
                     !!emailError ||
                     !!passwordError ||
-                    !!confirmPasswordError
+                    !!confirmPasswordError ||
+                    !email ||
+                    !password ||
+                    !confirmPassword
                   }
                   className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
                 >

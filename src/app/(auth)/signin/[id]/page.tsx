@@ -19,7 +19,7 @@ export default async function SignIn({
 }: {
   readonly params: Promise<{ readonly id: string }>;
   readonly searchParams: Promise<{
-    readonly disable_button: boolean;
+    readonly disable_button: string;
     readonly error: string;
     readonly error_description: string;
   }>;
@@ -57,6 +57,8 @@ export default async function SignIn({
     return redirect("/signin");
   }
 
+  const disabledButton = (await searchParams).disable_button === "true";
+
   return (
     <div>
       {viewProp === "password_signin" && (
@@ -66,14 +68,14 @@ export default async function SignIn({
         <EmailSignIn
           allowPassword={allowPassword}
           redirectMethod={redirectMethod}
-          disableButton={(await searchParams).disable_button}
+          disableButton={disabledButton}
         />
       )}
       {viewProp === "forgot_password" && (
         <ForgotPassword
           allowEmail={allowEmail}
           redirectMethod={redirectMethod}
-          disableButton={(await searchParams).disable_button}
+          disableButton={disabledButton}
         />
       )}
       {viewProp === "update_password" && (
