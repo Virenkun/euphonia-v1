@@ -20,11 +20,25 @@ export default function PasswordSignIn({
   const router = useRouter();
   const shouldRedirect = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [googleIsSubmitting, setGoogleIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState(false);
+
+  const validateEmail = (email: string) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email) {
+      setEmailError("Email is required");
+    } else if (!re.test(email)) {
+      setEmailError("Invalid email format");
+    } else {
+      setEmailError("");
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -50,9 +64,9 @@ export default function PasswordSignIn({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
     e.preventDefault();
-    e.persist(); // Persist the event object
+    e.persist();
 
-    setIsSubmitting(true); // Indicate loading state
+    setIsSubmitting(true);
 
     try {
       await handleRequest(
@@ -63,7 +77,7 @@ export default function PasswordSignIn({
     } catch (error) {
       console.error("Error during sign-in:", error);
     } finally {
-      setIsSubmitting(false); // Reset loading state
+      setIsSubmitting(false);
     }
   };
 
@@ -165,12 +179,22 @@ export default function PasswordSignIn({
                         placeholder="name@example.com"
                         type="email"
                         name="email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          validateEmail(e.target.value);
+                        }}
                         autoCapitalize="none"
                         autoComplete="email"
                         autoCorrect="off"
                         className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
                         required
                       />
+                      {emailError && (
+                        <p id="email-error" className="text-sm text-red-500">
+                          {emailError}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -182,6 +206,10 @@ export default function PasswordSignIn({
                           placeholder="Password"
                           type={showPassword ? "text" : "password"}
                           name="password"
+                          value={password}
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                          }}
                           autoComplete="password"
                           className={`w-full pr-10 h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
                           required
@@ -207,7 +235,7 @@ export default function PasswordSignIn({
 
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !email || !password || !!emailError}
                   className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
                 >
                   {isSubmitting ? "Taking You to the Euphonia..." : "Continue"}

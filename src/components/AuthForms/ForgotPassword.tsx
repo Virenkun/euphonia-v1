@@ -1,19 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { handleRequest } from "@/helpers/auth-helpers";
 import { requestPasswordUpdate } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
+import * as Yup from "yup";
+import { useFormik } from "formik";
+import { useToast } from "@/hooks/use-toast";
 
 interface ForgotPasswordProps {
   allowEmail: boolean;
   redirectMethod: string;
   disableButton?: boolean;
 }
+
+const validationSchema = Yup.object({
+  email: Yup.string().email().required(),
+});
 
 export default function ForgotPassword({
   allowEmail,
@@ -23,18 +30,43 @@ export default function ForgotPassword({
   const router = useRouter();
   const shouldUseRouter = redirectMethod === "client";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.persist();
-    await handleRequest(
-      e,
-      requestPasswordUpdate,
-      shouldUseRouter ? router : null
-    );
-    await handleRequest(e, requestPasswordUpdate, router);
-    setIsSubmitting(false);
-  };
+  const status = searchParams.get("status");
+  const status_description = searchParams.get("status_description");
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      setIsSubmitting(true);
+      console.log("onSubmit", values);
+      const newFormData = new FormData();
+      newFormData.append("email", values.email);
+      await handleRequest(
+        newFormData,
+        requestPasswordUpdate,
+        shouldUseRouter ? router : null
+      );
+      setIsSubmitting(false);
+    },
+  });
+
+  useEffect(() => {
+    if (status) {
+      setTimeout(() =>
+        toast({
+          variant: "default",
+          title: status,
+          description: status_description,
+        })
+      );
+      // router.replace(pathname);
+    }
+  }, [status, status_description, toast]);
 
   return (
     <div className="min-h-screen bg-[#4B4ACF]">
@@ -64,32 +96,44 @@ export default function ForgotPassword({
             </h1>
 
             <div className="space-y-3">
-              <form noValidate onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <div className="space-y-2">
-                      <Input
-                        id="email"
-                        placeholder="name@example.com"
-                        type="email"
-                        name="email"
-                        autoCapitalize="none"
-                        autoComplete="email"
-                        autoCorrect="off"
-                        className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
-                        required
-                      />
-                    </div>
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <div className="space-y-2">
+                    <Input
+                      id="email"
+                      placeholder="name@example.com"
+                      type="email"
+                      {...formik.getFieldProps("email")}
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      autoCorrect="off"
+                      className={`w-full h-[52px] bg-[#4342B9] border-0 rounded-[14px] text-white placeholder:text-white/60 px-4 focus-visible:ring-1 focus-visible:ring-white focus-visible:border-transparent focus-visible:outline-none`}
+                      required
+                    />
+                    {formik.touched.email && formik.errors.email && (
+                      <p className="text-xs text-red-500">
+                        {formik.errors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || disableButton}
-                  className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
-                >
-                  {isSubmitting ? "Sending..." : "Send Email"}
-                </Button>
-              </form>
+              </div>
+              <Button
+                type="button"
+                disabled={
+                  isSubmitting ||
+                  disableButton ||
+                  !formik.dirty ||
+                  !!formik.errors.email
+                }
+                className="w-full h-[52px] bg-white rounded-[14px] text-[18px] text-[#1A1A1A] font-bold hover:bg-white/95 transition-colors mt-2"
+                onClick={() => {
+                  formik.handleSubmit();
+                }}
+              >
+                {isSubmitting ? "Sending..." : "Send Email"}
+              </Button>
+
               <div className="mt-8">
                 <Link
                   href="/signin/password_signin"
