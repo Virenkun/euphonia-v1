@@ -54,3 +54,31 @@ export const getBillingDetails = async () => {
     console.log("User not found");
   }
 };
+
+export default async function isSessionLimitReached() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: userInfoArray } = await supabase
+    .from("user_info")
+    .select(`*,plan(*)`)
+    .eq("email", user?.email);
+  const userInfo = userInfoArray ? userInfoArray[0] : null;
+  const { data: session_count, error } = await supabase.rpc(
+    "count_unique_sessions"
+  );
+
+  if (error) {
+    console.error("Error While Getting Session Count", error);
+  }
+
+  const allotedSessions = userInfo?.plan?.features?.sessions;
+  const usedSessions = session_count;
+
+  if (usedSessions >= allotedSessions) {
+    return true;
+  } else {
+    return false;
+  }
+}
