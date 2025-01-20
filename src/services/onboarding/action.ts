@@ -3,36 +3,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { permanentRedirect } from "next/navigation";
 import { updateCurrentUserPhone } from "../auth/action";
-
-interface FormData {
-  name?: string;
-  age?: string;
-  gender?: string;
-  pronouns?: string;
-  phone?: string;
-  communicationStyle?: string;
-  primaryGoal?: string;
-  interests?: string;
-  sessionLength?: string;
-  schedulingPreferences?: string;
-  emergencyContact?: string;
-  currentEmotionalState?: string;
-  mentalHealthHistory?: string;
-  currentChallenges?: string;
-  stressLevel?: string;
-  existingSupport?: string;
-  preferredLanguage?: string;
-  accessibilityNeeds?: string;
-  interactionPreference?: string;
-  avatar?: string;
-  dataConsent?: boolean;
-  termsAgreement?: boolean;
-}
+import { OnboardingFormValues } from "@/app/(onboarding)/onboarding-form/page";
 
 export const completeOnboarding = async ({
   formObject,
 }: {
-  formObject: FormData;
+  formObject: OnboardingFormValues;
 }) => {
   const supabase = await createClient();
   const {
@@ -62,20 +38,10 @@ export const completeOnboarding = async ({
         gender: formObject.gender,
         pronouns: formObject.pronouns,
         phone: formObject.phone,
-        communication_style: formObject.communicationStyle,
-        primary_goals: formObject.primaryGoal,
         interest: formObject.interests,
-        session_length: formObject.sessionLength,
-        scheduling_preferences: formObject.schedulingPreferences,
-        emergency_contact: formObject.emergencyContact,
-        current_emotional_state: formObject.currentEmotionalState,
-        mental_health_history: formObject.mentalHealthHistory,
         current_challenges: formObject.currentChallenges,
-        stress_level: formObject.stressLevel,
         existing_support: formObject.existingSupport,
         preferred_language: formObject.preferredLanguage,
-        accessibility_needs: formObject.accessibilityNeeds,
-        interaction_preference: formObject.interactionPreference,
         avatar: formObject.avatar,
         data_consent: formObject.dataConsent,
         terms_agreement: formObject.termsAgreement,
