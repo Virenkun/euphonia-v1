@@ -9,11 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Zap, Users, Briefcase, Building2, BadgeCheck } from "lucide-react";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
-import { CheckoutSession } from "@/services/payment/action";
-import { useRouter } from "next/navigation";
+import RazorpayButton from "@/components/razorpay-button";
 
 const plans = [
   {
@@ -100,32 +98,32 @@ const plans = [
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const handleSubscribe = async (priceId: string, planId: string) => {
-    setLoading(true);
-    if (priceId === "0") {
-      router.push("/main");
-      return;
-    }
+  // const [loading, setLoading] = useState(false);
+  // const router = useRouter();
+  // const handleSubscribe = async (priceId: string, planId: string) => {
+  //   setLoading(true);
+  //   if (priceId === "0") {
+  //     router.push("/main");
+  //     return;
+  //   }
 
-    try {
-      const userId = "user-id";
-      const response = await CheckoutSession({ priceId, userId, planId });
-      console.log(response);
+  //   try {
+  //     const userId = "user-id";
+  //     const response = await CheckoutSession({ priceId, userId, planId });
+  //     console.log(response);
 
-      const data = response;
+  //     const data = response;
 
-      if (data.sessionUrl) {
-        window.location.href = data.sessionUrl;
-      } else {
-        console.error("Failed to redirect to Stripe:", data.error);
-      }
-    } catch (error) {
-      console.error("Error during subscription:", error);
-    }
-    setLoading(false);
-  };
+  //     if (data.sessionUrl) {
+  //       window.location.href = data.sessionUrl;
+  //     } else {
+  //       console.error("Failed to redirect to Stripe:", data.error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during subscription:", error);
+  //   }
+  //   setLoading(false);
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#4B4ACF] to-[#7A79FF] py-16 px-4 sm:px-6 lg:px-8">
@@ -186,16 +184,16 @@ export default function PricingPage() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button
-                  className="w-full bg-[#4B4ACF] text-white hover:bg-[#4B4AEF]"
-                  onClick={() =>
-                    plan.priceId &&
-                    handleSubscribe(plan.priceId, plan.id.toString())
+                <RazorpayButton
+                  amount={
+                    isYearly
+                      ? Number((Number(plan.price) * 12 * 0.8).toFixed(0))
+                      : Number(plan.price)
                   }
-                  disabled={loading}
-                >
-                  {loading ? "Loading..." : "Subscribe"}
-                </Button>
+                  currency="INR"
+                  productId={plan.id.toString()}
+                  productName={plan.name}
+                />
               </CardFooter>
             </Card>
           ))}
