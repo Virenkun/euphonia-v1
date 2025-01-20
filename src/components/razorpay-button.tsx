@@ -90,7 +90,7 @@ export default function RazorpayButton({
         currency: order.currency,
         name: "Euphonia",
         description: "Test Transaction",
-        image: "/euphonia.png",
+        image: "/white_logo.png",
         order_id: order.id,
         handler: (response: {
           razorpay_payment_id: string;
