@@ -8,19 +8,10 @@ import { Button } from "@/components/ui/button";
 import { BasicInfo } from "@/components/steps/BasicInfo";
 import { ContactInfo } from "@/components/steps/ContactInfo";
 import { Interests } from "@/components/steps/Interests";
-import { MentalHealth } from "@/components/steps/MentalHealth";
-import { AdditionalPreferences } from "@/components/steps/AdditionalPreferences";
 import { Consent } from "@/components/steps/Consent";
 import { completeOnboarding } from "@/services/onboarding/action";
 
-const steps = [
-  "Basic Info",
-  "Contact",
-  "Interests",
-  "Mental Health",
-  "Preferences",
-  "Consent",
-];
+const steps = ["Basic Info", "Contact", "Interests", "Consent"];
 
 export interface OnboardingFormValues {
   name: string;
@@ -35,6 +26,7 @@ export interface OnboardingFormValues {
   dataConsent: boolean;
   termsAgreement: boolean;
   avatar: string | undefined;
+  country: string;
 }
 
 const validationSchema = Yup.object({
@@ -51,6 +43,7 @@ const validationSchema = Yup.object({
     .max(10, "Maximum stress level is 10"),
   dataConsent: Yup.boolean().oneOf([true], "Data consent is required"),
   termsAgreement: Yup.boolean().oneOf([true], "Terms agreement is required"),
+  country: Yup.string().required("Country is required"),
 });
 
 export default function OnboardingForm() {
@@ -60,7 +53,7 @@ export default function OnboardingForm() {
   const formik = useFormik({
     initialValues: {
       name: "",
-      age: 0,
+      age: 18,
       gender: "",
       pronouns: "",
       phone: "",
@@ -71,6 +64,7 @@ export default function OnboardingForm() {
       dataConsent: false,
       termsAgreement: false,
       avatar: avatarUrl,
+      country: "",
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -101,10 +95,6 @@ export default function OnboardingForm() {
       case 2:
         return <Interests formik={formik} />;
       case 3:
-        return <MentalHealth formik={formik} />;
-      case 4:
-        return <AdditionalPreferences formik={formik} />;
-      case 5:
         return <Consent formik={formik} />;
       default:
         return null;
@@ -115,15 +105,16 @@ export default function OnboardingForm() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white mb-2">
-            Welcome to Euphonia
+          <h1 className="text-3xl font-extrabold tracking-tight text-white mb-4">
+            Hey, Dreamer! Welcome to{" "}
+            <span className="text-indigo-400">Euphonia</span>
           </h1>
-          <p className="text-xl text-white/80">
-            {`Let's personalize your experience`}
+          <p className="text-lg text-white/90 italic">
+            {`Let’s make your vibe uniquely yours.`}
           </p>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
+        <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
           <div className="flex justify-between mb-8">
             {steps.map((step, index) => (
               <div key={step} className="flex flex-col items-center">
@@ -165,14 +156,14 @@ export default function OnboardingForm() {
               <Button
                 onClick={formik.submitForm}
                 disabled={!formik.isValid || formik.isSubmitting}
-                className="bg-white text-indigo-700 hover:bg-white/90 transition-colors"
+                className="bg-white text-base font-medium text-indigo-700 hover:bg-white/90 transition-colors"
               >
                 {formik.isSubmitting ? "Submitting..." : "Complete"}
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                className="bg-white text-indigo-700 hover:bg-white/90 transition-colors"
+                className="bg-white text-base font-medium text-indigo-700 hover:bg-white/90 transition-colors"
               >
                 Next
               </Button>

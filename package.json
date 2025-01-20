@@ -57,6 +57,7 @@
     "nodemailer": "^6.9.16",
     "posthog-js": "^1.205.0",
     "react": "19.0.0-rc-66855b96-20241106",
+    "react-country-flag": "^3.1.0",
     "react-day-picker": "8.10.1",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-markdown": "^9.0.3",
