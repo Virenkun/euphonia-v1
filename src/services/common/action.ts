@@ -68,3 +68,38 @@ export async function SubmitFeedbackByGuest({
     console.error(`Error While Submitting the Feedback: ${error.message}`);
   }
 }
+
+export async function SubmitSupportRequest({
+  category,
+  message,
+}: {
+  category: string;
+  message: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: auth_error,
+  } = await supabase.auth.getUser();
+  if (auth_error || !user) {
+    console.error(
+      `Supabase Error: ${auth_error?.message ?? "User not authenticated"}`
+    );
+    return;
+  }
+  const { error } = await supabase.from("support_request").insert([
+    {
+      category: category,
+      message: message,
+      status: "open",
+      user_id: user.id,
+    },
+  ]);
+
+  if (error) {
+    console.error(
+      `Error While Submitting the Support Request: ${error.message}`
+    );
+  }
+  console.log("Support Request Submitted Successfully");
+}
