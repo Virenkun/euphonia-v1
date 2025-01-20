@@ -1,11 +1,12 @@
 "use client";
 
-import { GetSubscriptionDetails } from "@/services/payment/action";
 import { useEffect, useState } from "react";
 import { CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { getUserDetails } from "@/services/users/action";
+import { getUserDetails, savePaymentDetails } from "@/services/users/action";
 import { createClient } from "@/utils/supabase/client";
+import { getOrderDetails, getPaymentDetails } from "@/services/razorpay/action";
+import { useRouter } from "next/navigation";
 
 export default function SuccessPage() {
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,7 @@ export default function SuccessPage() {
     amountPaid: number;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSubscriptionDetails = async () => {
@@ -28,19 +30,57 @@ export default function SuccessPage() {
       }
 
       try {
-        const response: {
-          productName?: string;
-          amountPaid?: number;
-          error?: string;
-        } = await GetSubscriptionDetails({ sessionId });
+        const response = await getPaymentDetails({
+          paymentId: sessionId,
+        });
 
-        if (response.productName && response.amountPaid) {
+        console.log(response, "res");
+
+        if (
+          response &&
+          response.amount &&
+          response.notes?.productId &&
+          response.notes?.productName
+        ) {
+          await savePaymentDetails({
+            order_id: response.order_id,
+            payment_id: response.id,
+            email: response.email,
+            card: response.card
+              ? {
+                  last4: response.card.last4,
+                  network: response.card.network,
+                  type: response.card.type,
+                  issuer: response.card.issuer,
+                  international: response.card.international.toString(),
+                  emi: response.card.emi.toString(),
+                  sub_type: response.card.sub_type,
+                }
+              : undefined,
+            card_id: response.card_id,
+            bank: response.bank,
+            currency: response.currency,
+            amount: response.amount,
+            international: response.international,
+            method: response.method,
+            wallet: response.wallet,
+            status: response.status,
+            notes: response.notes,
+            invoice_id: response.invoice_id,
+          });
+          if (response.status === "failed") {
+            router.push("/payment/failed");
+          }
           const data = await getUserDetails();
           const supabase = createClient();
+          const order = await getOrderDetails({
+            orderId: response.order_id,
+          });
+          console.log(order, "order");
           const { error } = await supabase
             .from("user_info")
             .update({
-              plan: response.productName,
+              plan: response.notes.productId,
             })
             .match({ auth_id: data.user.id });
 
@@ -50,11 +90,11 @@ export default function SuccessPage() {
           }
 
           setSubscriptionData({
-            productName: response.productName,
-            amountPaid: response.amountPaid,
+            productName: response?.notes.productName,
+            amountPaid: Number(response.amount),
           });
-        } else if (response.error) {
-          setError(response.error);
+        } else if (error) {
+          setError(error);
         }
       } catch (err: unknown) {
         setError(
@@ -118,7 +158,7 @@ export default function SuccessPage() {
                     Amount Paid
                   </p>
                   <p className="text-lg font-bold text-gray-800">
-                    ${subscriptionData.amountPaid.toFixed(2)}
+                    ${subscriptionData.amountPaid}
                   </p>
                 </div>
               </div>

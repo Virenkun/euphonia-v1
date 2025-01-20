@@ -44,6 +44,7 @@ export default function ListeningInterface({
   const [deleteSpeed, setDeleteSpeed] = useState<number>(99999);
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [thinking, setThinking] = useState(false);
   const [sessionSummaryData, setSessionSummaryData] =
     useState<SessionData | null>(null);
 
@@ -168,6 +169,7 @@ export default function ListeningInterface({
     setDeleteSpeed(99999);
     const { user } = await getUserDetails();
     setAssistantResponse("");
+    setThinking(true);
 
     // Save user input to Supabase
     const { error: userError } = await supabase.from("messages").insert([
@@ -206,6 +208,7 @@ export default function ListeningInterface({
 
       const response = chatCompletion.choices[0]?.message?.content ?? "";
 
+      const blob = await synthesizeSpeech(response);
       const { error: assistantError } = await supabase.from("messages").insert([
         {
           role: "assistant",
@@ -214,12 +217,10 @@ export default function ListeningInterface({
           user_id: user.id,
         },
       ]);
-
+      setThinking(false);
       if (assistantError) {
         console.error("Error saving assistant message:", assistantError);
       }
-
-      const blob = await synthesizeSpeech(response);
       if (blob) {
         setAudioBlob(blob);
       }
@@ -357,24 +358,35 @@ export default function ListeningInterface({
       <div className="min-h-[88vh]">
         <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
           <div className="text-neutral-800 text-lg h-6 mb-10">
-            {isListening ? "listening..." : ""}
+            {isListening ? "euphonia listening to you..." : ""}
           </div>
           <ForwardedAudioVisualizer
             audioBlob={audioBlob}
             onPlayingChange={setIsAudioPlaying}
             ref={audioRef}
           />
-          {isSessionActive && !isLoading && (
-            <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
-              <Typewriter
-                options={{
-                  strings: [assistantResponse],
-                  autoStart: true,
-                  delay: 50,
-                  deleteSpeed: deleteSpeed,
-                }}
-              />
+          {thinking ? (
+            <div>
+              <div className="flex items-center gap-2 text-lg text-neutral-800">
+                <span>euphonia is thinking</span>
+                <div className="animate-bounce">...</div>
+              </div>
             </div>
+          ) : (
+            <>
+              {isSessionActive && !isLoading && (
+                <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+                  <Typewriter
+                    options={{
+                      strings: [assistantResponse],
+                      autoStart: true,
+                      delay: 42,
+                      deleteSpeed: deleteSpeed,
+                    }}
+                  />
+                </div>
+              )}
+            </>
           )}
 
           {limitReached ? (
@@ -399,7 +411,6 @@ export default function ListeningInterface({
                     variant="ghost"
                     size="icon"
                     className="w-16 h-16 rounded-full bg-neutral-100 hover:bg-neutral-200"
-                    // onClick={() => console.log("Toggle audio")}
                   >
                     <Volume2 className="w-6 h-6 dark:text-black" />
                     <span className="sr-only">Toggle audio</span>

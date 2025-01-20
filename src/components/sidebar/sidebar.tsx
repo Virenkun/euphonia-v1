@@ -54,6 +54,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
+import { SupportModal } from "../account/support-modal";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -181,6 +182,7 @@ export default function AppSidebar({
         title: "Support",
         url: "#",
         icon: LifeBuoy,
+        onClick: () => setIsSupportModalOpen(true),
       },
       {
         title: "Feedback",
@@ -232,6 +234,7 @@ export default function AppSidebar({
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -259,6 +262,10 @@ export default function AppSidebar({
       <FeedbackModal
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
+      />
+      <SupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
       />
       <Sidebar>
         <SidebarHeader>
@@ -378,7 +385,7 @@ export default function AppSidebar({
                   >
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
-                        src={userInfo?.avatar}
+                        src={avatar ?? userInfo?.avatar}
                         alt={userInfo?.name}
                       />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
