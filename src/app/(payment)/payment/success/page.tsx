@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { getUserDetails, savePaymentDetails } from "@/services/users/action";
 import { createClient } from "@/utils/supabase/client";
 import { getOrderDetails, getPaymentDetails } from "@/services/razorpay/action";
+import { useRouter } from "next/navigation";
 
 export default function SuccessPage() {
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,7 @@ export default function SuccessPage() {
     amountPaid: number;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSubscriptionDetails = async () => {
@@ -66,6 +68,9 @@ export default function SuccessPage() {
             notes: response.notes,
             invoice_id: response.invoice_id,
           });
+          if (response.status === "failed") {
+            router.push("/payment/failed");
+          }
           const data = await getUserDetails();
           const supabase = createClient();
           const order = await getOrderDetails({

@@ -12,6 +12,8 @@ import {
 import { Zap, Users, Briefcase, Building2, BadgeCheck } from "lucide-react";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import RazorpayButton from "@/components/razorpay-button";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const plans = [
   {
@@ -184,16 +186,24 @@ export default function PricingPage() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <RazorpayButton
-                  amount={
-                    isYearly
-                      ? Number((Number(plan.price) * 12 * 0.8).toFixed(0))
-                      : Number(plan.price)
-                  }
-                  currency="INR"
-                  productId={plan.id.toString()}
-                  productName={plan.name}
-                />
+                {plan.price === "0" ? (
+                  <Link href="/main">
+                    <Button className="h-12 w-full bg-[#4B4ACF] text-white text-lg font-semibold hover:bg-[#4B4AEF]">
+                      Continue with {plan.name}
+                    </Button>
+                  </Link>
+                ) : (
+                  <RazorpayButton
+                    amount={
+                      isYearly
+                        ? Number((Number(plan.price) * 12 * 0.8).toFixed(0))
+                        : Number(plan.price)
+                    }
+                    currency="INR"
+                    productId={plan.id.toString()}
+                    productName={plan.name}
+                  />
+                )}
               </CardFooter>
             </Card>
           ))}
