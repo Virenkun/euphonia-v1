@@ -385,7 +385,7 @@ export default function AppSidebar({
                   >
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
-                        src={userInfo?.avatar}
+                        src={avatar ?? userInfo?.avatar}
                         alt={userInfo?.name}
                       />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
