@@ -105,11 +105,16 @@ Please analyze the following chat sessions and provide detailed analytics and da
     "total_time_spent": "2h 30m",
     "average_message_length": "35 words",
     "engagement_level": "High",
-    "main_topics": [
-      "Product Features",
-      "Customer Support",
-      "Technical Issues"
-    ],
+    "main_topics":[
+  "Anxiety Management",
+  "Relationship Communication",
+  "Emotional Awareness",
+  "Life Transitions",
+  "Overcoming Fears",
+  "Grief Coping",
+  "Building Resilience"
+]
+,
     "session_start_time": "2025-01-14T09:00:00Z",
     "session_end_time": "2025-01-14T11:30:00Z",
     "session_duration": "2 hours 30 minutes"
@@ -225,6 +230,16 @@ Please analyze the following chat sessions and provide detailed analytics and da
     ]
   }
 }
+
+Note: This instruction Only for main topics choose main topic from the following topics: [
+  "Anxiety Management",
+  "Relationship Communication",
+  "Emotional Awareness",
+  "Life Transitions",
+  "Overcoming Fears",
+  "Grief Coping",
+  "Building Resilience"
+];
 
 `;
 

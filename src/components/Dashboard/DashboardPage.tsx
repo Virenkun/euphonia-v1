@@ -2,28 +2,17 @@
 
 import { useState } from "react";
 import {
-  Bar,
-  BarChart,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
-  XAxis,
   YAxis,
-  Tooltip as Tool,
+  Tooltip as RechartsTooltip,
   Cell,
   Legend,
+  AreaChart,
+  Area,
 } from "recharts";
-import {
-  Clock,
-  MessageCircle,
-  TrendingUp,
-  User,
-  Brain,
-  Target,
-  Award,
-} from "lucide-react";
+import { Clock, MessageCircle, User, Brain, Flame } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -86,6 +75,15 @@ interface DashboardData {
     topic: string;
     occurrence: number;
   }[];
+  keytakeaways: {
+    title: string | undefined;
+    description: string | undefined;
+  }[];
+  sentiment_distribution: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  }[];
 }
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
@@ -96,6 +94,8 @@ export default function Dashboard({
   dashboardData: DashboardData;
 }) {
   const [timeFrame, setTimeFrame] = useState("week");
+
+  console.log(dashboardData.sentiment_distribution, "dashboardData.topics");
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -144,7 +144,7 @@ export default function Dashboard({
             <CardTitle className="text-sm font-medium text-gray-600">
               Consistency Streak
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-500" />
+            <Flame className="h-6 w-6 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-800">
@@ -298,21 +298,32 @@ export default function Dashboard({
           </CardHeader>
           <CardContent className="pl-2">
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={dashboardData.sessions}>
-                <XAxis
-                  // dataKey="min_created_at"
-                  stroke="#6B7280"
-                  reversed={true}
-                />
+              <AreaChart
+                data={dashboardData.sessions.sort(
+                  (a, b) =>
+                    new Date(a.min_created_at).getTime() -
+                    new Date(b.min_created_at).getTime()
+                )}
+              >
+                {/* <XAxis stroke="#6B7280" reversed={true} /> */}
+                <Legend verticalAlign="top" height={36} />
                 <YAxis stroke="#6B7280" />
-                <Tool
-                  contentStyle={{
+                <RechartsTooltip
+                  wrapperStyle={{
                     backgroundColor: "white",
                     border: "1px solid #E5E7EB",
+                    borderRadius: "0.375rem",
+                    padding: "0.5rem",
                   }}
                 />
-                <Bar dataKey="duration_seconds" fill="#3B82F6" />
-              </BarChart>
+                <Area
+                  type="monotone"
+                  dataKey="duration_seconds"
+                  name="Session Duration"
+                  stroke="#3B82F6"
+                  fill="#3B82F6"
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
@@ -345,7 +356,7 @@ export default function Dashboard({
                     />
                   ))}
                 </Pie>
-                <Tool
+                <RechartsTooltip
                   contentStyle={{
                     backgroundColor: "white",
                     border: "1px solid #E5E7EB",
@@ -367,92 +378,124 @@ export default function Dashboard({
           </CardHeader>
           <CardContent className="pl-2">
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={dashboardData.sessions}>
-                <XAxis dataKey="week" stroke="#6B7280" />
-                <YAxis stroke="#6B7280" />
-                <Legend />
-                <Tool
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #E5E7EB",
-                  }}
-                />
-                <Line
+              <AreaChart
+                data={dashboardData.sessions}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                {/* <XAxis dataKey="week" /> */}
+                <YAxis />
+
+                <Tooltip />
+                <Legend verticalAlign="top" height={36} />
+                <Area
                   type="monotone"
+                  name="User Words Count"
                   dataKey="user_word_count"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                  name="Users Words Count"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="assistant_word_count"
                   stroke="#8884d8"
-                  strokeWidth={2}
-                  name="Assistant Words Count"
+                  fillOpacity={1}
+                  fill="url(#colorUv)"
                 />
-              </LineChart>
+                <Area
+                  type="monotone"
+                  name="Assistant Words Count"
+                  dataKey="assistant_word_count"
+                  stroke="#82ca9d"
+                  fillOpacity={1}
+                  fill="url(#colorPv)"
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
         <Card className="col-span-3 bg-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-gray-800">
-              Goals & Achievements
+              Sentiment Distribution
             </CardTitle>
             <CardDescription className="text-gray-600">
-              Your therapy milestones
+              Sentiment analysis of your therapy sessions
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9 bg-blue-100">
-                  <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                  <AvatarFallback>
-                    <Target className="h-4 w-4 text-blue-500" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none text-gray-700">
-                    Stress Reduction
-                  </p>
-                  <Progress value={70} className="w-[60%] bg-blue-100" />
-                  <p className="text-xs text-gray-500">70% Complete</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9 bg-green-100">
-                  <AvatarImage src="/avatars/02.png" alt="Avatar" />
-                  <AvatarFallback>
-                    <Target className="h-4 w-4 text-green-500" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none text-gray-700">
-                    Improve Sleep Quality
-                  </p>
-                  <Progress value={45} className="w-[60%] bg-green-100" />
-                  <p className="text-xs text-gray-500">45% Complete</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9 bg-yellow-100">
-                  <AvatarImage src="/avatars/03.png" alt="Avatar" />
-                  <AvatarFallback>
-                    <Award className="h-4 w-4 text-yellow-500" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none text-gray-700">
-                    30-Day Meditation Streak
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Achieved on May 15, 2023
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart
+                data={dashboardData.sentiment_distribution}
+                margin={{
+                  top: 10,
+                  right: 30,
+                  left: 0,
+                  bottom: 0,
+                }}
+              >
+                {/* Define gradients */}
+                <defs>
+                  <linearGradient
+                    id="positiveGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#4CAF50" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#4CAF50" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient
+                    id="negativeGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#F44336" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#F44336" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient
+                    id="neutralGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#9E9E9E" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#9E9E9E" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+
+                <YAxis />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="positive"
+                  stackId="1"
+                  stroke="#4CAF50"
+                  fill="url(#positiveGradient)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="negative"
+                  stackId="1"
+                  stroke="#F44336"
+                  fill="url(#negativeGradient)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="neutral"
+                  stackId="1"
+                  stroke="#9E9E9E"
+                  fill="url(#neutralGradient)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
@@ -465,61 +508,28 @@ export default function Dashboard({
               Key takeaways from your recent sessions
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-8">
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9 bg-purple-100">
-                  <AvatarImage src="/avatars/04.png" alt="Avatar" />
-                  <AvatarFallback>
-                    <User className="h-4 w-4 text-purple-500" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none text-gray-700">
-                    Cognitive Restructuring
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Identifying and challenging negative thought patterns shows
-                    promising results
-                  </p>
+          {dashboardData.keytakeaways.map((keytakeaway) => (
+            <CardContent key={keytakeaway.title}>
+              <div className="space-y-8">
+                <div className="flex items-center">
+                  <Avatar className="h-9 w-9 bg-purple-100">
+                    <AvatarImage src="/avatars/04.png" alt="Avatar" />
+                    <AvatarFallback>
+                      <User className="h-4 w-4 text-purple-500" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4 space-y-1">
+                    <p className="text-sm font-semibold leading-none text-gray-700">
+                      {keytakeaway.title}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {keytakeaway.description}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9 bg-blue-100">
-                  <AvatarImage src="/avatars/05.png" alt="Avatar" />
-                  <AvatarFallback>
-                    <User className="h-4 w-4 text-blue-500" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none text-gray-700">
-                    Mindfulness Practices
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Regular mindfulness exercises are helping to reduce anxiety
-                    symptoms
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9 bg-green-100">
-                  <AvatarImage src="/avatars/06.png" alt="Avatar" />
-                  <AvatarFallback>
-                    <User className="h-4 w-4 text-green-500" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none text-gray-700">
-                    Social Support Network
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Expanding social connections is contributing to improved
-                    mood and resilience
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          ))}
         </Card>
       </div>
       <Card className="mt-8">
