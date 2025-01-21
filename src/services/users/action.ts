@@ -137,8 +137,9 @@ export async function savePaymentDetails({
     .from("payment")
     .select("*")
     .eq("payment_id", payment_id);
+  console.log(is_payment_exists, "is_payment_exists");
 
-  if (is_payment_exists.data) {
+  if (is_payment_exists.count) {
     console.log("Payment already exists");
     return;
   }
@@ -159,6 +160,8 @@ export async function savePaymentDetails({
       status,
       notes,
       invoice_id,
+      auth_id: notes.authId,
+      is_current: true,
     },
   ]);
 
@@ -167,4 +170,35 @@ export async function savePaymentDetails({
     return { error: "Failed to save payment details" };
   }
   console.log("Payment details saved successfully");
+}
+
+export async function getPaymentList() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    console.error("Error in auth user");
+    return;
+  }
+
+  if (!user) {
+    console.error("User not found");
+    return;
+  }
+
+  const { data, error: paymentFetchError } = await supabase
+    .from("payment")
+    .select("*")
+    .eq("auth_id", user.id);
+
+  if (paymentFetchError) {
+    console.error("Error fetching payment details:", paymentFetchError.message);
+    return { error: "Failed to fetch payment details" };
+  }
+  console.log("data", data);
+  return data;
 }

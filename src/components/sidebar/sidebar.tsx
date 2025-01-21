@@ -19,6 +19,7 @@ import {
   TentTree,
   MessageCircleMore,
   GraduationCap,
+  Crown,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -479,9 +480,15 @@ export default function AppSidebar({
                   className="h-3 mt-2"
                 />
               </div>
-              <Link href="/checkout">
-                <Button className="w-full">Upgrade</Button>
-              </Link>
+              {planName !== "Harmonic" ? (
+                <Button className="w-full bg-indigo-600 font-semibold text-base shadow-lg hover:bg-indigo-700">
+                  Premium <Crown />
+                </Button>
+              ) : (
+                <Link href="/checkout">
+                  <Button className="w-full">Upgrade</Button>
+                </Link>
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

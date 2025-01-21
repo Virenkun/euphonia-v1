@@ -22,7 +22,7 @@ export default function TermsOfService() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-900">
+    <div className="min-h-screen flex flex-col  text-gray-900">
       {/* Background Pattern */}
       <div className="fixed inset-0 z-0">
         <svg

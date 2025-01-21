@@ -82,6 +82,12 @@ export async function GetDashboardData() {
   const averageAssistantWordCount = totalAssistantWordCount / sessions.length;
   const sentiment = getOverallSentimentAndScore(userSessionData || []);
   const topics = getMainTopicsSummary(userSessionData || []);
+  const keytakeaways = userSessionData.map((session: any) => {
+    return {
+      session_id: session.summary.keytakeaways?.title,
+      key_takeaways: session.summary.keytakeaways?.description,
+    };
+  });
 
   return {
     session_count: session_count,
@@ -92,5 +98,6 @@ export async function GetDashboardData() {
     assistant_avg_word_count: averageAssistantWordCount,
     sentiment: sentiment,
     topics: topics,
+    keytakeaways: keytakeaways,
   };
 }
