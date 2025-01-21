@@ -43,6 +43,7 @@ export default async function Layout({
         planName={userInfo?.plan?.name}
         allotedSessions={userInfo?.plan?.features?.sessions}
         usedSessions={session_count}
+        features={userInfo?.plan?.features}
       />
       <main className="flex-1">
         <div>{children}</div>

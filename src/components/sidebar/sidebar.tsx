@@ -20,6 +20,7 @@ import {
   MessageCircleMore,
   GraduationCap,
   Crown,
+  BellDot,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -56,6 +57,7 @@ import { useRouter } from "next/navigation";
 import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
 import { SupportModal } from "../account/support-modal";
+import { fetchModuleAccess } from "@/utils/utils-functions";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -75,6 +77,14 @@ interface AppSidebarProps {
   planName: string | undefined;
   allotedSessions: number | undefined;
   usedSessions: number;
+  features: {
+    sessions: number;
+    dashboardAccess: boolean;
+    chatHistoryAccess: boolean;
+    aiResourceAccess: boolean;
+    professionalTherapistAccess: boolean;
+    aiCheckInAccess: boolean;
+  };
 }
 
 export default function AppSidebar({
@@ -84,7 +94,10 @@ export default function AppSidebar({
   planName,
   allotedSessions,
   usedSessions,
+  features,
 }: Readonly<AppSidebarProps>) {
+  const currentFeatures = fetchModuleAccess(features);
+
   const data = {
     user: {
       name: "shadcn",
@@ -198,37 +211,43 @@ export default function AppSidebar({
         url: "/main",
         icon: MessageCircleHeart,
         isPremium: false,
+        code: "sessions",
       },
       {
         name: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
         isPremium: false,
+        code: "dashboardAccess",
       },
       {
         name: "Professional Therapist",
         url: "/professional-therapist",
         icon: GraduationCap,
         isPremium: false,
+        code: "professionalTherapistAccess",
       },
       {
         name: "Resources",
         url: "/resources",
         icon: TentTree,
         isPremium: false,
+        code: "aiResourceAccess",
       },
       {
         name: "Chat History",
         url: "/chat-history",
         icon: MessageCircleMore,
-        isPremium: true,
+        isPremium: false,
+        code: "chatHistoryAccess",
       },
 
       {
         name: "AI Check-In",
         url: "/ai-checkin",
         icon: HandHeart,
-        isPremium: true,
+        isPremium: false,
+        code: "aiCheckInAccess",
       },
     ],
   };
@@ -236,6 +255,7 @@ export default function AppSidebar({
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [allRead, setAllRead] = useState(false);
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -259,6 +279,7 @@ export default function AppSidebar({
       <NotificationModal
         open={isNotificationModalOpen}
         onOpenChange={setIsNotificationModalOpen}
+        setAllRead={setAllRead}
       />
       <FeedbackModal
         isOpen={isFeedbackModalOpen}
@@ -329,27 +350,33 @@ export default function AppSidebar({
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarMenu>
-              {data.projects.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} className="font-medium">
-                      <item.icon />
-                      <span>{item.name}</span>
-                      {item.isPremium && (
-                        // <Image
-                        //   src={"/premium.png"}
-                        //   alt="Premium"
-                        //   height={22}
-                        //   width={22}
-                        // />
-                        <div className="flex-1 text-yellow-500 ml-2">
-                          premium
-                        </div>
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {data.projects
+                .filter((module) =>
+                  currentFeatures
+                    .map((feature) => feature.code)
+                    .includes(module.code)
+                )
+                .map((item) => (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url} className="font-medium">
+                        <item.icon />
+                        <span>{item.name}</span>
+                        {item.isPremium && (
+                          // <Image
+                          //   src={"/premium.png"}
+                          //   alt="Premium"
+                          //   height={22}
+                          //   width={22}
+                          // />
+                          <div className="flex-1 text-yellow-500 ml-2">
+                            premium
+                          </div>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               {/* <SidebarMenuItem>
                 <SidebarMenuButton>
                   <MoreHorizontal />
@@ -449,8 +476,12 @@ export default function AppSidebar({
                     <DropdownMenuItem
                       onClick={() => setIsNotificationModalOpen(true)}
                     >
-                      <Bell />
-                      Notifications
+                      {allRead ? (
+                        <Bell />
+                      ) : (
+                        <BellDot className="text-red-500" />
+                      )}
+                      Notifications{" "}
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />

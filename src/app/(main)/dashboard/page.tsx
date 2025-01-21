@@ -4,7 +4,6 @@ import React from "react";
 
 export default async function Page() {
   const response = await GetDashboardData();
-  console.log(response);
 
   return <Dashboard dashboardData={response} />;
 }
