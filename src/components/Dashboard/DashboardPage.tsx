@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import {
   Pie,
   PieChart,
@@ -24,13 +24,13 @@ import { format } from "date-fns";
 
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
 import {
@@ -93,9 +93,7 @@ export default function Dashboard({
 }: {
   dashboardData: DashboardData;
 }) {
-  const [timeFrame, setTimeFrame] = useState("week");
-
-  console.log(dashboardData.sentiment_distribution, "dashboardData.topics");
+  // const [timeFrame, setTimeFrame] = useState("week");
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -108,7 +106,7 @@ export default function Dashboard({
           </p>
         </nav>
         <div className="flex items-center space-x-4">
-          <Select value={timeFrame} onValueChange={setTimeFrame}>
+          {/* <Select value={timeFrame} onValueChange={setTimeFrame}>
             <SelectTrigger className="w-[180px] bg-white">
               <SelectValue placeholder="Select time frame" />
             </SelectTrigger>
@@ -117,7 +115,7 @@ export default function Dashboard({
               <SelectItem value="month">This Month</SelectItem>
               <SelectItem value="year">This Year</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
           <Link href="/main">
             <RainbowButton className="p-2">Begin Session</RainbowButton>
           </Link>
@@ -338,7 +336,7 @@ export default function Dashboard({
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={dashboardData.topics}
+                  data={dashboardData.topics.slice(0, 5)}
                   cx="50%"
                   cy="50%"
                   labelLine={false}

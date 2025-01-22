@@ -72,6 +72,14 @@ interface AppSidebarProps {
     subscription?: string;
     is_onboarded?: boolean;
     auth_id: string;
+    country?: string;
+    preferred_language: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    notification_frequency: string;
+    required_cookies: boolean;
+    analytics_cookies: boolean;
   } | null;
   avatar: string | undefined;
   planName: string | undefined;
@@ -275,6 +283,7 @@ export default function AppSidebar({
         open={isAccountModalOpen}
         onOpenChange={setIsAccountModalOpen}
         userInfo={userInfo}
+        avatar={avatar}
       />
       <NotificationModal
         open={isNotificationModalOpen}
@@ -454,10 +463,21 @@ export default function AppSidebar({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <Sparkles />
-                      Upgrade to Pro
-                    </DropdownMenuItem>
+                    {planName !== "Harmonic" ? (
+                      <DropdownMenuItem>
+                        <Sparkles className="text-indigo-600" />
+                        <div className="text-indigo-700 font-semibold">
+                          Pro Member
+                        </div>
+                      </DropdownMenuItem>
+                    ) : (
+                      <Link href="/checkout">
+                        <DropdownMenuItem>
+                          <Sparkles />
+                          Upgrade to Pro
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import * as Yup from "yup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,20 +20,37 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Upload } from "lucide-react";
 import { Separator } from "../ui/separator";
 import DeleteAccountDialog from "./delete-account-dailog";
+import { useFormik } from "formik";
+import { phoneRegExp } from "@/constant/regex";
+import { updateUserInfo } from "@/services/users/action";
+
+const validationSchema = Yup.object({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.string()
+    .matches(phoneRegExp, "Phone number is not valid")
+    .nullable(),
+  avatar: Yup.string().nullable(),
+  country: Yup.string().nullable(),
+  preferred_language: Yup.string().required("Language preference is required"),
+  required_cookies: Yup.boolean(),
+  analytics_cokkies: Yup.boolean(),
+});
 
 export function AccountModal({
   open,
   onOpenChange,
   userInfo,
+  avatar,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  avatar: string | undefined;
   userInfo: {
     name?: string;
     age?: number;
     email?: string;
     phone?: string;
-    location?: string;
     communication_style?: string;
     primary_goals?: string;
     interest?: string;
@@ -42,8 +59,41 @@ export function AccountModal({
     subscription?: string;
     is_onboarded?: boolean;
     auth_id: string;
+    country?: string;
+    preferred_language: string;
+    notification_frequency: string;
+    required_cookies: boolean;
+    analytics_cookies: boolean;
   } | null;
 }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const router = useRouter();
+  const formik = useFormik({
+    initialValues: {
+      name: userInfo?.name,
+      email: userInfo?.email,
+      phone: userInfo?.phone,
+      avatar: avatar ?? userInfo?.avatar,
+      country: userInfo?.country,
+      preferred_language: userInfo?.preferred_language,
+      required_cookies: userInfo?.required_cookies,
+      analytics_cookies: userInfo?.analytics_cookies,
+      notification_frequency: userInfo?.notification_frequency ?? "",
+    },
+    validationSchema,
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        setIsSubmitting(true);
+        await updateUserInfo(values);
+        resetForm();
+        onOpenChange(false);
+        setIsSubmitting(false);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+      }
+    },
+  });
+
   const [activeTab, setActiveTab] = useState("profile");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,7 +122,10 @@ export function AccountModal({
                   <div className="space-y-6">
                     <div className="flex flex-col items-center space-y-4">
                       <Avatar className="w-24 h-24">
-                        <AvatarImage src={userInfo?.avatar ?? undefined} />
+                        <AvatarImage
+                          src={avatar ?? userInfo?.avatar}
+                          alt={userInfo?.name}
+                        />
                         <AvatarFallback>
                           <Upload className="w-8 h-8 text-muted-foreground" />
                         </AvatarFallback>
@@ -84,6 +137,7 @@ export function AccountModal({
                           // onChange={handleImageUpload}
                           className="hidden"
                           id="picture-upload"
+                          // {...formik.getFieldProps("avatar")}
                         />
                         <label
                           htmlFor="picture-upload"
@@ -108,86 +162,90 @@ export function AccountModal({
                     <div className="grid gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" defaultValue={userInfo?.name} />
+                        <Input id="name" {...formik.getFieldProps("name")} />
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                           id="email"
                           type="email"
-                          defaultValue={userInfo?.email}
+                          {...formik.getFieldProps("email")}
+                          disabled
+                          className="disabled:text-black disabled:opacity-100"
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone">
+                          Phone Number (with country code)
+                        </Label>
                         <Input
                           id="phone"
                           type="tel"
-                          defaultValue={userInfo?.phone}
+                          placeholder="e.g. 916789452382"
+                          {...formik.getFieldProps("phone")}
                         />
+                        {formik.touched.phone && formik.errors.phone && (
+                          <p className="text-xs text-red-500">
+                            {formik.errors.phone}
+                          </p>
+                        )}
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="location">Location</Label>
+                        <Label htmlFor="location">Country</Label>
                         <Input
-                          id="location"
-                          defaultValue={userInfo?.location}
+                          id="country"
+                          {...formik.getFieldProps("country")}
+                          disabled
+                          className="disabled:text-black disabled:opacity-100"
                         />
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="bio">Professional Bio</Label>
-                        <Textarea
-                          id="bio"
-                          placeholder="Tell us about your experience and expertise..."
-                          defaultValue="Experienced therapist specializing in cognitive behavioral therapy and trauma recovery. Passionate about helping individuals overcome challenges and achieve personal growth."
-                          className="h-24"
-                        />
-                      </div>
+
                       <div className="space-y-6">
                         <h4 className="font-medium">Account Preferences</h4>
 
-                        {/* Sessions Reminder */}
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label>Sessions Reminder</Label>
+                            <Label>Required Cookies</Label>
                             <p className="text-sm text-muted-foreground">
-                              Receive reminders for upcoming sessions.
+                              These cookies are necessary for the website to
+                              function and cannot be switched off in our
+                              systems.
                             </p>
                           </div>
-                          <Switch defaultChecked />
+                          <Switch
+                            checked={formik.values.required_cookies}
+                            onCheckedChange={(checked) =>
+                              formik.setFieldValue("required_cookies", checked)
+                            }
+                          />
                         </div>
 
-                        {/* Email Notifications */}
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label>Email Notifications</Label>
+                            <Label>Analytics Cookies</Label>
                             <p className="text-sm text-muted-foreground">
-                              Get email notifications about new messages and
-                              appointments.
+                              These cookies allow us to count visits and traffic
+                              sources so we can measure and improve the
+                              performance of our site.
                             </p>
                           </div>
-                          <Switch defaultChecked />
-                        </div>
-
-                        {/* SMS Reminders */}
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <Label>SMS Reminders</Label>
-                            <p className="text-sm text-muted-foreground">
-                              Receive SMS reminders for upcoming appointments.
-                            </p>
-                          </div>
-                          <Switch />
+                          <Switch
+                            checked={formik.values.analytics_cookies}
+                            onCheckedChange={(checked) =>
+                              formik.setFieldValue("analytics_cookies", checked)
+                            }
+                          />
                         </div>
 
                         {/* Accessibility Preferences */}
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label>Dark Mode</Label>
+                            <Label>Dark Mode (Coming Soon)</Label>
                             <p className="text-sm text-muted-foreground">
                               Enable dark mode for a better viewing experience.
                             </p>
                           </div>
-                          <Switch />
+                          <Switch disabled />
                         </div>
 
                         {/* Language Preference */}
@@ -198,7 +256,10 @@ export function AccountModal({
                               Set your preferred language for the app.
                             </p>
                           </div>
-                          <select className="border text-sm px-2 py-1 rounded-md">
+                          <select
+                            className="border text-sm px-2 py-1 rounded-md"
+                            {...formik.getFieldProps("preferred_language")}
+                          >
                             <option value="en">English</option>
                             <option value="es">Spanish</option>
                             <option value="fr">French</option>
@@ -211,38 +272,29 @@ export function AccountModal({
                           <div className="space-y-0.5">
                             <Label>Notification Frequency</Label>
                             <p className="text-sm text-muted-foreground">
-                              Choose how often you want to receive
-                              notifications.
+                              Choose how often you want to receive notifications
+                              om email or phone to remind you of sessions.
                             </p>
                           </div>
-                          <select className="border text-sm px-2 py-1 rounded-md">
+                          <select
+                            className="border text-sm px-2 py-1 rounded-md"
+                            {...formik.getFieldProps("notification_frequency")}
+                          >
                             <option value="immediate">Immediate</option>
                             <option value="daily">Daily</option>
                             <option value="weekly">Weekly</option>
                           </select>
                         </div>
 
-                        {/* Privacy Settings */}
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <Label>Personalized Recommendations</Label>
-                            <p className="text-sm text-muted-foreground">
-                              Allow us to personalize your experience based on
-                              your preferences.
-                            </p>
-                          </div>
-                          <Switch defaultChecked />
-                        </div>
-
                         {/* Download Data */}
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label>Download My Data</Label>
+                            <Label>Download My Data (Coming Soon)</Label>
                             <p className="text-sm text-muted-foreground">
                               Download a copy of your data for your records.
                             </p>
                           </div>
-                          <button className="text-sm text-blue-500 hover:underline">
+                          <button disabled className="text-sm text-gray-600">
                             Download
                           </button>
                         </div>
@@ -272,7 +324,12 @@ export function AccountModal({
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button
+              onClick={() => formik.handleSubmit()}
+              disabled={!formik.dirty || !formik.isValid || isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
           </DialogFooter>
         )}
       </DialogContent>

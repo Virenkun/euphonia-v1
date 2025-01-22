@@ -1,5 +1,6 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
 
 interface PaymentDetails {
   order_id: string;
@@ -41,6 +42,40 @@ export const getUserInfo = async () => {
     throw new Error(`Supabase Error: ${error.message}`);
   }
   return data;
+};
+
+interface UserInfoUpdate {
+  name?: string;
+  age?: number;
+  email?: string;
+  phone?: string;
+  communication_style?: string;
+  primary_goals?: string;
+  interest?: string;
+  avatar?: string;
+  sessions?: null;
+  subscription?: string;
+  is_onboarded?: boolean;
+  auth_id?: string;
+  country?: string;
+  preferred_language?: string;
+  notification_frequency?: string;
+  required_cookies?: boolean;
+  analytics_cookies?: boolean;
+}
+
+export const updateUserInfo = async (values: UserInfoUpdate) => {
+  const supabase = await createClient();
+  const userInfo = await getUserInfo();
+  const { error } = await supabase
+    .from("user_info")
+    .update(values)
+    .eq("auth_id", userInfo?.auth_id);
+  if (error) {
+    console.error("Error Updating User");
+    return;
+  }
+  revalidatePath("/", "layout");
 };
 
 export const deleteUser = async () => {
