@@ -3,6 +3,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { getUserInfo } from "@/services/users/action";
+import { sendMail } from "@/lib/send-mail";
+import { SubscriptionTemplate } from "@/template/template";
 
 interface RazorpayOptions {
   key: string;
@@ -72,7 +74,6 @@ export default function RazorpayButton({
 
     setLoading(true);
     const userDetails = await getUserInfo();
-    console.log("user", userDetails);
 
     try {
       const order = await createOrder({
@@ -92,7 +93,7 @@ export default function RazorpayButton({
         description: "Test Transaction",
         image: "/white_logo.png",
         order_id: order.id,
-        handler: (response: {
+        handler: async (response: {
           razorpay_payment_id: string;
           razorpay_order_id: string;
           razorpay_signature: string;
@@ -100,6 +101,13 @@ export default function RazorpayButton({
           router.push(
             `/payment/success?session_id=${response.razorpay_payment_id}`
           );
+          sendMail({
+            email: process.env.NEXT_PUBLIC_SMTP_SERVER_USERNAME ?? "",
+            sendTo: userDetails?.email,
+            subject: "Welcome to Euphonia – Your Subscription is Confirmed!",
+            text: "",
+            html: SubscriptionTemplate,
+          });
         },
         prefill: {
           name: userDetails?.name || "",

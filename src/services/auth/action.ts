@@ -91,7 +91,7 @@ export async function confirmSignup(formData: FormData) {
       sendTo: data.user.email,
       subject: "Welcome to the site!",
       text: "You have successfully signed up.",
-      html: WelcomeTemplate({ userName: data.user.email }),
+      html: WelcomeTemplate({ userName: data.user.email ?? "" }),
     });
   }
 

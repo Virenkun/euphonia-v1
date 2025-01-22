@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         sendTo: data.user.email,
         subject: "Welcome to the site!",
         text: "You have successfully signed up.",
-        html: WelcomeTemplate({ userName: data.user.email }),
+        html: WelcomeTemplate({ userName: data.user.email ?? "" }),
       });
     }
 

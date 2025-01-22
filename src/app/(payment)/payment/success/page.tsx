@@ -5,7 +5,7 @@ import { CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { getUserDetails, savePaymentDetails } from "@/services/users/action";
 import { createClient } from "@/utils/supabase/client";
-import { getOrderDetails, getPaymentDetails } from "@/services/razorpay/action";
+import { getPaymentDetails } from "@/services/razorpay/action";
 import { useRouter } from "next/navigation";
 
 export default function SuccessPage() {
@@ -70,13 +70,12 @@ export default function SuccessPage() {
           });
           if (response.status === "failed") {
             router.push("/payment/failed");
+            return;
           }
+
           const data = await getUserDetails();
           const supabase = createClient();
-          const order = await getOrderDetails({
-            orderId: response.order_id,
-          });
-          console.log(order, "order");
+
           const { error } = await supabase
             .from("user_info")
             .update({
@@ -158,7 +157,7 @@ export default function SuccessPage() {
                     Amount Paid
                   </p>
                   <p className="text-lg font-bold text-gray-800">
-                    ${subscriptionData.amountPaid}
+                    ${subscriptionData.amountPaid / 100}
                   </p>
                 </div>
               </div>
