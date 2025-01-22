@@ -23,6 +23,7 @@ import DeleteAccountDialog from "./delete-account-dailog";
 import { useFormik } from "formik";
 import { phoneRegExp } from "@/constant/regex";
 import { updateUserInfo } from "@/services/users/action";
+import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
@@ -67,7 +68,7 @@ export function AccountModal({
   } | null;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const router = useRouter();
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
       name: userInfo?.name,
@@ -81,13 +82,13 @@ export function AccountModal({
       notification_frequency: userInfo?.notification_frequency ?? "",
     },
     validationSchema,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       try {
         setIsSubmitting(true);
         await updateUserInfo(values);
-        resetForm();
-        onOpenChange(false);
+        router.refresh();
         setIsSubmitting(false);
+        onOpenChange(false);
       } catch (error) {
         console.error("Error submitting form:", error);
       }
