@@ -1,6 +1,5 @@
 "use server";
 
-import { getAuthTypes } from "@/helpers/auth-helpers";
 import { type Provider } from "@supabase/supabase-js";
 import {
   getErrorRedirect,

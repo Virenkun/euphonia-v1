@@ -2,15 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { format, parseISO } from "date-fns";
-import {
-  Calendar,
-  Lock,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  MessageSquare,
-  Trash2,
-} from "lucide-react";
+import { Calendar, Lock, Search, MessageSquare, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,7 +77,7 @@ export default function ChatHistory({
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed] = useState(false);
 
   const filteredSessions = useMemo(() => {
     if (!chatsPresent || !sessions) return [];
