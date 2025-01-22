@@ -68,6 +68,7 @@ export default function Hero() {
                 autoPlay
                 muted
                 loop
+                playsInline
                 className="border border-indigo-400 p-2 rounded-lg"
               >
                 <source src="/phonevideo.mp4" type="video/mp4" />
