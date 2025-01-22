@@ -106,24 +106,67 @@ export async function confirmOtpSignin(formData: FormData) {
   const token = formData.get("token") as string;
 
   let error;
+  let isExistingUser = false;
+  let data;
   if (phone) {
-    ({ error } = await supabase.auth.verifyOtp({
+    ({ data, error } = await supabase.auth.verifyOtp({
       phone,
       token,
       type: "sms",
     }));
+    data = data as any;
+    const { count, error: errorInGettingPhoneByPhone } = await supabase
+      .from("user_info")
+      .select("phone")
+      .eq("phone", phone);
+    if (errorInGettingPhoneByPhone) {
+      console.error("Error getting phone by phone", errorInGettingPhoneByPhone);
+    }
+    if (count !== null && count > 0) {
+      isExistingUser = true;
+    }
   } else {
-    ({ error } = await supabase.auth.verifyOtp({
+    ({ data, error } = await supabase.auth.verifyOtp({
       email,
       token,
       type: "email",
     }));
+    data = data as any;
+    const { count, error: errorInGettingEmailByEmailId } = await supabase
+      .from("user_info")
+      .select("email")
+      .eq("email", email);
+    if (errorInGettingEmailByEmailId) {
+      console.error(
+        "Error getting email by email",
+        errorInGettingEmailByEmailId
+      );
+    }
+    if (count !== null && count > 0) {
+      isExistingUser = true;
+    }
   }
 
   if (error) {
     console.error("Error confirming email:", error);
     return { error: "Invalid or expired confirmation code." };
   } else {
+    if (!isExistingUser) {
+      await supabase.from("user_info").insert([
+        {
+          is_onboarded: false,
+          auth_id: data.user.id,
+          email: email,
+        },
+      ]);
+      await sendMail({
+        email: process.env.SMTP_SERVER_USERNAME ?? "",
+        sendTo: email,
+        subject: "Welcome to the site!",
+        text: "You have successfully signed up.",
+        html: WelcomeTemplate({ userName: email ?? "" }),
+      });
+    }
     redirect("/main");
   }
 }
@@ -209,9 +252,6 @@ export async function signInWithEmail(formData: FormData) {
     shouldCreateUser: true,
   };
 
-  // If allowPassword is false, do not create a new user
-  const { allowPassword } = getAuthTypes();
-  if (allowPassword) options.shouldCreateUser = false;
   const { data, error } = await supabase.auth.signInWithOtp({
     email,
     options: options,
