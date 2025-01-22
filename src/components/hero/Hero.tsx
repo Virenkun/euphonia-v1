@@ -3,8 +3,11 @@
 import { RainbowButton } from "../ui/rainbow-button";
 import Link from "next/link";
 import AutoPlayVideo from "../auto-play-video";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Hero() {
+  const isMobile = useIsMobile();
+  console.log(isMobile, "iss");
   return (
     <section className="py-20 md:py-32 overflow-hidden">
       <div className="container mx-auto px-4">
@@ -53,9 +56,25 @@ export default function Hero() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-purple-600/20 to-indigo-600/20 mix-blend-overlay"></div>
             </div>
           </motion.div> */}
-          <div className="w-[60%] mt-28">
-            <AutoPlayVideo src={"/loop.mp4"} />
-          </div>
+          {!isMobile ? (
+            <div className="w-[60%] mt-28">
+              <AutoPlayVideo src={"/loop.mp4"} />
+            </div>
+          ) : (
+            <div className="w-full mt-8">
+              <video
+                height="600"
+                width="600"
+                autoPlay
+                muted
+                loop
+                className="border border-indigo-400 p-2 rounded-lg"
+              >
+                <source src="/phonevideo.mp4" type="video/mp4" />
+                Your browser does not support the video tag...
+              </video>
+            </div>
+          )}
         </div>
       </div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-purple-50 to-indigo-50 -z-10"></div>

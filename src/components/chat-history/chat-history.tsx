@@ -2,15 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { format, parseISO } from "date-fns";
-import {
-  Calendar,
-  Lock,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  MessageSquare,
-  Trash2,
-} from "lucide-react";
+import { Calendar, Lock, Search, MessageSquare, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,8 +48,10 @@ interface ChatData {
 
 export default function ChatHistory({
   chatData: initialChatData,
+  avatar,
 }: {
   chatData: ChatData;
+  avatar?: string;
 }) {
   const [chatData, setChatData] = useState(initialChatData);
   const chatsPresent = Object.keys(chatData).length > 0;
@@ -83,7 +77,7 @@ export default function ChatHistory({
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("all");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed] = useState(false);
 
   const filteredSessions = useMemo(() => {
     if (!chatsPresent || !sessions) return [];
@@ -104,18 +98,6 @@ export default function ChatHistory({
       timestamp: parseISO(message.created_at),
     }));
   }, [chatsPresent, selectedSessionId, chatData]);
-
-  const handleDeleteMessage = (messageId: string) => {
-    if (selectedSessionId) {
-      const updatedMessages = chatData[selectedSessionId].filter(
-        (message) => message.id !== messageId
-      );
-      setChatData((prevChatData) => ({
-        ...prevChatData,
-        [selectedSessionId]: updatedMessages,
-      }));
-    }
-  };
 
   const handleDeleteSession = async (sessionId: string) => {
     setLoadingDelete(true);
@@ -155,21 +137,15 @@ export default function ChatHistory({
           sidebarCollapsed ? "w-16" : "w-80"
         }`}
       >
-        <div className="p-4 flex items-center justify-between">
+        <div className="p-6 flex items-center justify-between bg-gray-50">
           {!sidebarCollapsed && (
-            <h2 className="text-2xl font-bold text-gray-800">Sessions</h2>
+            <h2 className="text-2xl font-bold text-gray-800 bg-gray-50">
+              Sessions
+            </h2>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            {sidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
-          </Button>
         </div>
         {!sidebarCollapsed && (
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-4 bg-gray-50">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
@@ -202,7 +178,7 @@ export default function ChatHistory({
             </Select>
           </div>
         )}
-        <ScrollArea className="h-[calc(100vh-8rem)]">
+        <ScrollArea className="h-[calc(100vh-8rem)] bg-gray-50">
           {filteredSessions?.map((session) => (
             <div key={session.id} className="flex items-center">
               <Button
@@ -306,7 +282,7 @@ export default function ChatHistory({
             >
               {message.sender !== "You" && (
                 <Avatar className="mr-4">
-                  <AvatarImage src="/happy.png" />
+                  <AvatarImage src="/euphonia.png" />
                   <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
               )}
@@ -326,20 +302,11 @@ export default function ChatHistory({
                 </div>
                 <div className="mt-2 text-xs text-gray-500 flex items-center justify-end">
                   <span>{format(message.timestamp, "h:mm a")}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteMessage(message.id)}
-                    className="ml-2 text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Delete message</span>
-                  </Button>
                 </div>
               </div>
               {message.sender === "You" && (
                 <Avatar className="ml-4">
-                  <AvatarImage src="/girl.png" />
+                  <AvatarImage src={avatar} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>
               )}
