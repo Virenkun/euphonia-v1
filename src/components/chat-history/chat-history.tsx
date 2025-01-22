@@ -99,18 +99,6 @@ export default function ChatHistory({
     }));
   }, [chatsPresent, selectedSessionId, chatData]);
 
-  const handleDeleteMessage = (messageId: string) => {
-    if (selectedSessionId) {
-      const updatedMessages = chatData[selectedSessionId].filter(
-        (message) => message.id !== messageId
-      );
-      setChatData((prevChatData) => ({
-        ...prevChatData,
-        [selectedSessionId]: updatedMessages,
-      }));
-    }
-  };
-
   const handleDeleteSession = async (sessionId: string) => {
     setLoadingDelete(true);
     await deleteSessionById(sessionId);

@@ -77,12 +77,13 @@ export async function confirmSignup(formData: FormData) {
   if (error) {
     console.error("Error confirming email:", error.message);
     return { error: "Invalid or expired confirmation code." };
-  } else if (data.user) {
+  } else if (data?.user) {
+    const user = data.user;
     await supabase.from("user_info").insert([
       {
         is_onboarded: false,
-        auth_id: data.user.id,
-        email: data.user.email,
+        auth_id: user.id,
+        email: user.email,
       },
     ]);
     await sendMail({
@@ -113,7 +114,7 @@ export async function confirmOtpSignin(formData: FormData) {
       token,
       type: "sms",
     }));
-    data = data as any;
+    data = data;
     const { count, error: errorInGettingPhoneByPhone } = await supabase
       .from("user_info")
       .select("phone")
@@ -130,7 +131,7 @@ export async function confirmOtpSignin(formData: FormData) {
       token,
       type: "email",
     }));
-    data = data as any;
+    data = data;
     const { count, error: errorInGettingEmailByEmailId } = await supabase
       .from("user_info")
       .select("email")
@@ -154,7 +155,7 @@ export async function confirmOtpSignin(formData: FormData) {
       await supabase.from("user_info").insert([
         {
           is_onboarded: false,
-          auth_id: data.user.id,
+          auth_id: data?.user?.id,
           email: email,
         },
       ]);
