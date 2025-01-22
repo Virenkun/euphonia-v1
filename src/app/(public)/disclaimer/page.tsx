@@ -7,14 +7,14 @@ export default function Disclaimer() {
         <main className="flex-grow container mx-auto px-4 py-12 max-w-6xl">
           {/* Header */}
           <div className="mb-12 text-center">
-            <h1 className="text-5xl font-bold mb-4">Disclaimer</h1>
+            <h1 className="text-3xl font-bold mb-4">Disclaimer</h1>
             <p className="text-gray-600">
               Last updated: {new Date().toLocaleDateString()}
             </p>
           </div>
 
           {/* Content */}
-          <div className="space-y-6 text-lg text-gray-800">
+          <div className="space-y-6  text-gray-700">
             <section>
               <h2 className="text-2xl font-semibold mb-2">
                 General Disclaimer
@@ -99,7 +99,7 @@ export default function Disclaimer() {
                   href="mailto:support@euphonia.me"
                   className="text-blue-500 underline"
                 >
-                  support@euphoniaapp.com
+                  support@euphonia.me
                 </a>
                 .
               </p>

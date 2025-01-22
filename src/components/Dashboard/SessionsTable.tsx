@@ -30,10 +30,6 @@ const fuzzyFilter: FilterFn<Session> = (row, columnId, value) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const columns: ColumnDef<Session, any>[] = [
-  columnHelper.accessor("session_id", {
-    cell: (info) => info.getValue(),
-    header: "Session ID",
-  }),
   columnHelper.accessor("min_created_at", {
     cell: (info) =>
       info.getValue() && format(info.getValue(), "MMMM d, yyyy h:mm a"),

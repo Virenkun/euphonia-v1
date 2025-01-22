@@ -199,7 +199,7 @@ export default function PricingPage() {
                         ? Number((Number(plan.price) * 12 * 0.8).toFixed(0))
                         : Number(plan.price)
                     }
-                    currency="INR"
+                    currency="USD"
                     productId={plan.id.toString()}
                     productName={plan.name}
                   />

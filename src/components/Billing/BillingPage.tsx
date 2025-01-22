@@ -29,18 +29,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  CreditCard,
-  Star,
-  Zap,
-  Shield,
-  Clock,
-  Users,
-  Crown,
-  Download,
-  ArrowRight,
-} from "lucide-react";
+
+import { Star, Zap, Shield, Clock, Users, Crown, Check } from "lucide-react";
+import { UUIDTypes } from "uuid";
+import { formatDate, formatDateReadble } from "@/utils/formatters";
+import { fetchModuleAccess, getNextBillingInfo } from "@/utils/utils-functions";
 
 type Plan = {
   description: string;
@@ -49,6 +42,11 @@ type Plan = {
   price: number;
   features: {
     sessions: number;
+    dashboardAccess: boolean;
+    chatHistoryAccess: boolean;
+    aiResourceAccess: boolean;
+    professionalTherapistAccess: boolean;
+    aiCheckInAccess: boolean;
   };
 };
 
@@ -56,15 +54,48 @@ interface BillingPageProps {
   currentPlan: Plan;
   sessionUsed: number;
   allPlans: Plan[];
+  paymentList: PaymentList[];
 }
+
+type PaymentList = {
+  card: Card;
+  currency: string;
+  method: string;
+  amount: string;
+  status: string;
+  notes: PaymentNotes;
+  created_at: string;
+  is_current: boolean;
+};
+
+type Card = {
+  last4: string;
+  network: string;
+  type: string;
+  issuer: string;
+  international: string;
+  emi: string;
+  sub_type: string;
+};
+
+type PaymentNotes = {
+  authId: UUIDTypes;
+  product: string;
+  productId: string;
+  productName: string;
+};
 
 export default function BillingPage({
   currentPlan,
   sessionUsed,
   allPlans,
+  paymentList,
 }: BillingPageProps) {
   const [yearlyBilling, setYearlyBilling] = useState(false);
   const [showPlanDetails, setShowPlanDetails] = useState(false);
+  const { nextBillingDate, daysRemaining } = getNextBillingInfo(
+    paymentList.filter((item) => item.is_current)[0].created_at
+  );
   const GetIcons = (planname: string) => {
     switch (planname) {
       case "Harmonic":
@@ -83,68 +114,13 @@ export default function BillingPage({
     current: plan.name === currentPlan.name,
   }));
 
-  const paymentLogs = [
-    { date: "2025-01-10", amount: 149, status: "Paid", invoice: "INV-001" },
-    { date: "2024-12-10", amount: 149, status: "Paid", invoice: "INV-002" },
-    { date: "2024-11-10", amount: 149, status: "Paid", invoice: "INV-003" },
-    { date: "2024-10-10", amount: 149, status: "Paid", invoice: "INV-004" },
-    { date: "2024-09-10", amount: 149, status: "Paid", invoice: "INV-005" },
-  ];
-
   return (
     <div className="p-6 space-y-8 max-w-7xl mx-auto">
       {/* Current Plan Section */}
       <section className="space-y-4">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <h1 className="text-3xl font-bold">Billing & Subscription</h1>
-          <div className="flex gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Invoices
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Download Invoices</DialogTitle>
-                  <DialogDescription>
-                    Select the invoice you want to download.
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paymentLogs.map((log, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{log.date}</TableCell>
-                          <TableCell>{log.invoice}</TableCell>
-                          <TableCell>${log.amount}</TableCell>
-                          <TableCell>
-                            <Button variant="ghost" size="sm">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-            <Button variant="default">
-              <CreditCard className="mr-2 h-4 w-4" />
-              Manage Billing
-            </Button>
-          </div>
+          <div className="flex gap-4"></div>
         </div>
 
         <Card className="border-2 border-primary">
@@ -187,9 +163,9 @@ export default function BillingPage({
                 </span>
               </div>
               <Progress value={37} className="h-2" />
-              <p className="text-xs text-muted-foreground text-right">
+              {/* <p className="text-xs text-muted-foreground text-right">
                 Next reset: Feb 10, 2025
-              </p>
+              </p> */}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -198,26 +174,75 @@ export default function BillingPage({
                   icon: <Users className="h-4 w-4 text-primary" />,
                   title: "Sessions",
                   value: { sessionUsed },
-                  subtext: "Used this month",
+                  subtext: "Used",
                 },
                 {
                   icon: <Clock className="h-4 w-4 text-primary" />,
                   title: "Next Billing",
-                  value: "Feb 10",
-                  subtext: "$149/month",
+                  value: (
+                    <div className="text-xl">
+                      {daysRemaining}{" "}
+                      <span className="text-sm font-normal">
+                        days remaining
+                      </span>
+                    </div>
+                  ),
+                  subtext: `Next billing on ${
+                    formatDate(nextBillingDate)?.split(",")[0]
+                  }`,
                 },
                 {
                   icon: <Shield className="h-4 w-4 text-primary" />,
                   title: "Status",
                   value: "Active",
-                  subtext: "Auto-renewal on",
                   valueColor: "text-green-500",
                 },
                 {
                   icon: <Star className="h-4 w-4 text-primary" />,
-                  title: "Perks",
-                  value: "4/4",
-                  subtext: "Features active",
+                  title: "Features Access",
+                  value: (
+                    <div className="font-bold">
+                      {fetchModuleAccess(currentPlan?.features).length}/6
+                      <div>
+                        <Dialog
+                          open={showPlanDetails}
+                          onOpenChange={setShowPlanDetails}
+                        >
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="link"
+                              className="w-full underline text-blue-600"
+                            >
+                              View Features Details
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                              <DialogTitle>
+                                {currentPlan?.name} Plan Details
+                              </DialogTitle>
+                              <DialogDescription>
+                                Your current plan features and benefits.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              {fetchModuleAccess(currentPlan?.features).map(
+                                (feature, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center gap-2 font-medium"
+                                  >
+                                    <Check className="h-4 w-4 text-green-500" />
+                                    <span>{feature.name}</span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </div>
+                  ),
                 },
               ].map((item, index) => (
                 <Card key={index}>
@@ -231,7 +256,8 @@ export default function BillingPage({
                     <div
                       className={`text-2xl font-bold ${item.valueColor || ""}`}
                     >
-                      {typeof item.value === "object"
+                      {typeof item.value === "object" &&
+                      "sessionUsed" in item.value
                         ? item.value.sessionUsed
                         : item.value}
                     </div>
@@ -243,34 +269,6 @@ export default function BillingPage({
               ))}
             </div>
           </CardContent>
-          <CardFooter>
-            <Dialog open={showPlanDetails} onOpenChange={setShowPlanDetails}>
-              <DialogTrigger asChild>
-                <Button variant="link" className="w-full">
-                  View Plan Details
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Symphony Plan Details</DialogTitle>
-                  <DialogDescription>
-                    Your current plan features and benefits.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  {/* {plans
-                    .find((p) => p.current)
-                    ?.features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>{feature}</span>
-                      </div>
-                    ))} */}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardFooter>
         </Card>
       </section>
 
@@ -361,7 +359,7 @@ export default function BillingPage({
         </div>
       </section>
 
-      {/* Payment Method Section */}
+      {/* Payment Method Section
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Payment Methods</h2>
         <div className="grid gap-4 md:grid-cols-3">
@@ -416,7 +414,7 @@ export default function BillingPage({
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section> */}
 
       {/* Payment Logs Section */}
       <section className="space-y-4">
@@ -428,30 +426,31 @@ export default function BillingPage({
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Amount</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>Method</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Invoice</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paymentLogs.map((log, index) => (
+                {paymentList.map((log, index) => (
                   <TableRow key={index}>
-                    <TableCell>{log.date}</TableCell>
-                    <TableCell>${log.amount}</TableCell>
+                    <TableCell>{formatDateReadble(log.created_at)}</TableCell>
+                    <TableCell>
+                      ${(Number(log.amount) / 100).toFixed(2)}
+                    </TableCell>
+
+                    <TableCell>{log.notes.productName}</TableCell>
+                    <TableCell>{log.method}</TableCell>
                     <TableCell>
                       <Badge
                         variant={
-                          log.status === "Paid" ? "default" : "destructive"
+                          log.status === "captured" ? "default" : "destructive"
                         }
+                        className="bg-green-600"
                       >
-                        {log.status}
+                        {log.status === "captured" ? "Success" : "Failed"}
                       </Badge>
-                    </TableCell>
-                    <TableCell>{log.invoice}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

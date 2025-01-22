@@ -1,4 +1,8 @@
-export const WelcomeTemplate = ({ userName }) => `<!DOCTYPE html>
+export const WelcomeTemplate = ({
+  userName,
+}: {
+  userName: string;
+}) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -230,3 +234,113 @@ export const WelcomeTemplate = ({ userName }) => `<!DOCTYPE html>
     </div>
   </body>
 </html>`;
+
+export const SubscriptionTemplate = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Confirmation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      color: #333333;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background-color: #4342B9;
+      color: #ffffff;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .body {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .body h2 {
+      color: #4342B9;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .body p {
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+
+    .footer {
+      background-color: #f0f0f5;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: #666666;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #ffffff;
+      background-color: #4342B9;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .button:hover {
+      background-color: #333393;
+    }
+
+    .logo {
+      width: 100px;
+      margin: 0 auto 20px;
+    }
+
+    .divider {
+      border-top: 1px solid #eaeaea;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Welcome to Euphonia</h1>
+    </div>
+    <div class="body">
+      <h2>Subscription Confirmed!</h2>
+      <p>Thank you for subscribing to Euphonia. We’re thrilled to have you on board!</p>
+      <p>You can now enjoy all the features of your plan to enhance your well-being and explore our AI-powered therapy tools.</p>
+      <a href="https://euphonia.me/main" class="button">Go to Your Dashboard</a>
+      <div class="divider"></div>
+      <p>If you have any questions, feel free to reach out to our support team at <a href="mailto:support@euphonia.me">support@euphonia.me</a>.</p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2025 Euphonia. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+
+</html>
+`;
