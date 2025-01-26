@@ -3,8 +3,9 @@ import { redirectToPath } from "./helpers";
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement> | FormData,
-  requestFunc: (formData: FormData) => Promise<string>,
-  router: AppRouterInstance | null = null
+  requestFunc: (formData: FormData, ref?: string | null) => Promise<string>,
+  router: AppRouterInstance | null = null,
+  ref?: string | null | undefined
 ): Promise<boolean | void> {
   let formData;
   if (e instanceof FormData) {
@@ -12,7 +13,7 @@ export async function handleRequest(
   } else {
     formData = new FormData(e.currentTarget);
   }
-  const redirectUrl: string = await requestFunc(formData);
+  const redirectUrl: string = await requestFunc(formData, ref);
 
   if (router) {
     // If client-side router is provided, use it to redirect

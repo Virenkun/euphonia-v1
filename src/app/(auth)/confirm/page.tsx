@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/input-otp";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { submitRefer } from "@/services/users/action";
 
 export default function ConfirmPage() {
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +25,7 @@ export default function ConfirmPage() {
   const [isResending, setIsResending] = useState(false);
   const [resendTimeout, setResendTimeout] = useState(60);
   const searchParams = useSearchParams();
+  const ref = searchParams.get("ref");
   const email = searchParams.get("email");
   const phone = searchParams.get("phone");
   const isMagicLink = searchParams.get("isMagicLink");
@@ -48,13 +50,20 @@ export default function ConfirmPage() {
       if (result?.error) {
         setError(result.error);
       }
+
+      if (ref && ref !== "undefined") {
+        await submitRefer(ref);
+      }
     } else {
       const result = await confirmOtpSignin(formData);
       if (result?.error) {
         setError(result.error);
       }
-    }
 
+      if (ref && ref !== "undefined") {
+        await submitRefer(ref);
+      }
+    }
     setIsLoading(false);
   };
 
@@ -137,7 +146,7 @@ export default function ConfirmPage() {
             <Button
               variant="outline"
               onClick={handleResendEmail}
-              disabled={isResending || resendTimeout > 0}
+              disabled={isResending || resendTimeout > 0 || isLoading}
               className="h-[50px] px-6 bg-transparent border-2 border-white rounded-[14px] text-[16px] text-white font-medium hover:bg-white hover:text-[#4B4ACF] transition-colors"
             >
               {isResending

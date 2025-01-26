@@ -10,7 +10,7 @@ import { LLM_PROMPT, SESSIONS_ANALYSIS_PROMPT } from "@/constant/constants";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { ForwardedAudioVisualizer } from "@/components/audio-visulizer";
 import { useAsyncEffect } from "@/hooks/useAysncEffect";
-import { getUserDetails } from "@/services/users/action";
+import { getUserDetails, incrementSessions } from "@/services/users/action";
 import Typewriter from "typewriter-effect";
 
 import {
@@ -27,6 +27,7 @@ import { synthesizeSpeech } from "@/utils/aws/polly";
 import EnhancedSessionSummaryModal from "@/components/SessionsSummary/session-summary-modal";
 import { SessionData } from "@/components/SessionsSummary/type";
 import { insertSession } from "@/services/chats/action";
+import Link from "next/link";
 
 export default function ListeningInterface({
   limitReached,
@@ -259,6 +260,7 @@ export default function ListeningInterface({
     } else {
       console.error("Error fetching sessions:", error);
     }
+    await incrementSessions();
   };
 
   const endSession = async () => {
@@ -395,9 +397,11 @@ export default function ListeningInterface({
                 You have used all your Euphonia sessions. Please upgrade to
                 continue your journey towards better mental health.
               </div>
-              <RainbowButton>
-                Upgrade Now to continue talking to Euphonia
-              </RainbowButton>
+              <Link href="/checkout">
+                <RainbowButton>
+                  Upgrade Now to continue talking to Euphonia
+                </RainbowButton>
+              </Link>
             </div>
           ) : (
             <>

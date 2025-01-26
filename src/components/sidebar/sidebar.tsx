@@ -21,6 +21,7 @@ import {
   GraduationCap,
   Crown,
   BellDot,
+  Users,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -58,6 +59,7 @@ import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
 import { SupportModal } from "../account/support-modal";
 import { fetchModuleAccess } from "@/utils/utils-functions";
+import { ReferModal } from "../account/refer-modal";
 
 interface AppSidebarProps {
   email: string | undefined;
@@ -93,6 +95,12 @@ interface AppSidebarProps {
     professionalTherapistAccess: boolean;
     aiCheckInAccess: boolean;
   };
+  referInfo: {
+    id: string;
+    points: number;
+    claimed: number;
+    refers: number;
+  };
 }
 
 export default function AppSidebar({
@@ -103,6 +111,7 @@ export default function AppSidebar({
   allotedSessions,
   usedSessions,
   features,
+  referInfo,
 }: Readonly<AppSidebarProps>) {
   const currentFeatures = fetchModuleAccess(features);
 
@@ -263,6 +272,7 @@ export default function AppSidebar({
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [allRead, setAllRead] = useState(false);
   const router = useRouter();
 
@@ -297,6 +307,11 @@ export default function AppSidebar({
       <SupportModal
         isOpen={isSupportModalOpen}
         onClose={() => setIsSupportModalOpen(false)}
+      />
+      <ReferModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        referInfo={referInfo}
       />
       <Sidebar>
         <SidebarHeader>
@@ -503,6 +518,10 @@ export default function AppSidebar({
                       )}
                       Notifications{" "}
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIsShareModalOpen(true)}>
+                      <Users />
+                      Refer Friends{" "}
+                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -531,7 +550,8 @@ export default function AppSidebar({
                   className="h-3 mt-2"
                 />
               </div>
-              {planName !== "Harmonic" ? (
+              {planName !== "Harmonic" &&
+              usedSessions < (allotedSessions ?? 0) ? (
                 <Button className="w-full bg-indigo-600 font-semibold text-base shadow-lg hover:bg-indigo-700">
                   Premium <Crown />
                 </Button>
