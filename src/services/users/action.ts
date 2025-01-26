@@ -132,16 +132,9 @@ export default async function isSessionLimitReached() {
     .select(`*,plan(*)`)
     .eq("email", user?.email);
   const userInfo = userInfoArray ? userInfoArray[0] : null;
-  const { data: session_count, error } = await supabase.rpc(
-    "count_unique_sessions"
-  );
-
-  if (error) {
-    console.error("Error While Getting Session Count", error);
-  }
 
   const allotedSessions = userInfo?.plan?.features?.sessions;
-  const usedSessions = session_count;
+  const usedSessions = userInfo?.session_used;
 
   if (usedSessions >= allotedSessions) {
     return true;
@@ -236,4 +229,124 @@ export async function getPaymentList() {
   }
   console.log("data", data);
   return data;
+}
+
+export async function incrementSessions() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    console.error("Error in auth user");
+    return;
+  }
+
+  if (!user) {
+    console.error("User not found");
+    return;
+  }
+  const { data: currentData, error: fetchError } = await supabase
+    .from("user_info")
+    .select("session_used")
+    .eq("auth_id", user.id)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching current sessions value:", fetchError);
+    return;
+  }
+
+  const newSessions = (currentData?.session_used || 0) + 1;
+
+  const { data: updatedData, error: updateError } = await supabase
+    .from("user_info")
+    .update({ session_used: newSessions })
+    .eq("auth_id", user.id);
+
+  if (updateError) {
+    console.error("Error updating sessions:", updateError);
+  } else {
+    console.log("Sessions incremented successfully:", updatedData);
+  }
+}
+
+export async function resetSessions() {
+  const supabase = await createClient();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.user) {
+    console.error("User not found or no active session");
+    return;
+  }
+
+  const { data: updatedData, error: updateError } = await supabase
+    .from("user_info")
+    .update({ session_used: 0 })
+    .eq("auth_id", session.user.id); // Directly use user ID from session
+
+  if (updateError) {
+    console.error("Error resetting sessions:", updateError);
+  } else {
+    console.log("Sessions reset successfully:", updatedData);
+  }
+}
+
+export async function getReferInfo() {
+  const supabase = await createClient();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.user) {
+    console.error("User not found or no active session");
+    return;
+  }
+
+  const { data: referInfo, error: fetchError } = await supabase
+    .from("refer")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching refer info:", fetchError);
+    return;
+  }
+  console.log("Refer info fetched successfully:");
+
+  return referInfo;
+}
+
+export async function submitRefer(refId: string) {
+  console.log("Submitting refer:", refId);
+  const supabase = await createClient();
+
+  const { data: referInfo, error: fetchError } = await supabase
+    .from("refer")
+    .select("*")
+    .eq("id", refId)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching refer info:", fetchError);
+    return;
+  }
+
+  const { error } = await supabase
+    .from("refer")
+    .update({ points: referInfo.points + 50 })
+    .eq("id", refId);
+
+  if (error) {
+    console.error("Error updating refer points:", error);
+    return;
+  }
+  console.log("Refer submitted successfully");
 }

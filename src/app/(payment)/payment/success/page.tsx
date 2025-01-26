@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { getUserDetails, savePaymentDetails } from "@/services/users/action";
+import {
+  getUserDetails,
+  resetSessions,
+  savePaymentDetails,
+} from "@/services/users/action";
 import { createClient } from "@/utils/supabase/client";
 import { getPaymentDetails } from "@/services/razorpay/action";
 import { useRouter } from "next/navigation";
@@ -87,6 +91,8 @@ export default function SuccessPage() {
             console.error("Error updating user plan:", error.message);
             setError("Failed to update user plan");
           }
+
+          await resetSessions();
 
           setSubscriptionData({
             productName: response?.notes.productName,

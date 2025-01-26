@@ -1,5 +1,6 @@
 import AppSidebar from "@/components/sidebar/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { getReferInfo } from "@/services/users/action";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -17,16 +18,8 @@ export default async function Layout({
     .select(`*,plan(*)`)
     .eq("email", user?.email);
   const userInfo = userInfoArray ? userInfoArray[0] : null;
-  const { data: session_count, error } = await supabase.rpc(
-    "count_unique_sessions",
-    {
-      input_user_id: userInfo?.auth_id,
-    }
-  );
 
-  if (error) {
-    console.error("Error While Getting Session Count", error);
-  }
+  const referInfo = await getReferInfo();
 
   const isOnboardingComplete = userInfo?.is_onboarded;
 
@@ -42,8 +35,9 @@ export default async function Layout({
         userInfo={userInfo}
         planName={userInfo?.plan?.name}
         allotedSessions={userInfo?.plan?.features?.sessions}
-        usedSessions={session_count}
+        usedSessions={userInfo.session_used}
         features={userInfo?.plan?.features}
+        referInfo={referInfo}
       />
       <main className="flex-1">
         <div>{children}</div>

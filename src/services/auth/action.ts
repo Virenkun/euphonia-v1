@@ -415,7 +415,10 @@ export async function signInWithPassword(formData: FormData) {
   return redirectPath;
 }
 
-export async function signUp(formData: FormData) {
+export async function signUp(
+  formData: FormData,
+  ref: string | null | undefined
+) {
   const callbackURL = getURL("/auth/callback");
 
   const email = String(formData.get("email")).trim();
@@ -455,7 +458,7 @@ export async function signUp(formData: FormData) {
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
-      `/confirm?email=${email}&`,
+      `/confirm?email=${email}&ref=${ref}&`,
       "Success!",
       "Please check your email for a confirmation link. You may now close this tab."
     );

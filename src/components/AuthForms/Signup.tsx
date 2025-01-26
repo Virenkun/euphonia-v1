@@ -30,6 +30,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const ref = searchParams.get("ref");
   const error = searchParams.get("error");
   const error_description = searchParams.get("error_description");
   const pathname = usePathname();
@@ -76,7 +77,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
       return;
     }
 
-    await handleRequest(e, signUp, shouldUseRouter ? router : null);
+    await handleRequest(e, signUp, shouldUseRouter ? router : null, ref);
     setIsSubmitting(false);
   };
 
