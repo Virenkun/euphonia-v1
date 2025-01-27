@@ -2,8 +2,9 @@
 
 import { RainbowButton } from "../ui/rainbow-button";
 import Link from "next/link";
-import AutoPlayVideo from "../auto-play-video";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Iphone15Pro from "../ui/iphone-15-pro";
+import Safari from "../ui/safari";
 
 export default function Hero() {
   const isMobile = useIsMobile();
@@ -57,12 +58,16 @@ export default function Hero() {
             </div>
           </motion.div> */}
           {!isMobile ? (
-            <div className="w-[60%] mt-28">
-              <AutoPlayVideo src={"/loop.mp4"} />
+            <div className="relative mt-28">
+              <Safari
+                url="euphonia.me"
+                className="size-full"
+                videoSrc="/loop.mp4"
+              />
             </div>
           ) : (
             <div className="w-full mt-8">
-              <video
+              {/* <video
                 height="600"
                 width="600"
                 autoPlay
@@ -73,7 +78,10 @@ export default function Hero() {
               >
                 <source src="/phonevideo.mp4" type="video/mp4" />
                 Your browser does not support the video tag...
-              </video>
+              </video> */}
+              <div className="relative">
+                <Iphone15Pro className="size-full" videoSrc="/phonevideo.mp4" />
+              </div>
             </div>
           )}
         </div>

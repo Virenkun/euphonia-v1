@@ -34,7 +34,7 @@ export const getUserInfo = async () => {
   const userDetails = await getUserDetails();
   const { data, error } = await supabase
     .from("user_info")
-    .select("*")
+    .select("*,plan(*)")
     .eq("auth_id", userDetails.user.id)
     .single();
 
@@ -133,7 +133,7 @@ export default async function isSessionLimitReached() {
     .eq("email", user?.email);
   const userInfo = userInfoArray ? userInfoArray[0] : null;
 
-  const allotedSessions = userInfo?.plan?.features?.sessions;
+  const allotedSessions = userInfo?.alloted_sessions;
   const usedSessions = userInfo?.session_used;
 
   if (usedSessions >= allotedSessions) {
@@ -349,4 +349,64 @@ export async function submitRefer(refId: string) {
     return;
   }
   console.log("Refer submitted successfully");
+}
+
+export async function claimRewards() {
+  const supabase = await createClient();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.user) {
+    console.error("User not found or no active session");
+    return;
+  }
+
+  const { data: referInfo, error: fetchError } = await supabase
+    .from("refer")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching refer info:", fetchError);
+    return;
+  }
+
+  const { data: userInfo, error: fetchErrorUserInfo } = await supabase
+    .from("user_info")
+    .select("*")
+    .eq("auth_id", session.user.id)
+    .single();
+
+  if (fetchErrorUserInfo) {
+    console.error("Error fetching user info:", fetchErrorUserInfo);
+    return;
+  }
+
+  const sessions = Math.floor((referInfo.points - referInfo.claimed) / 25);
+
+  const { error: upadingReferInfo } = await supabase
+    .from("refer")
+    .update({
+      claimed: referInfo.points,
+    })
+    .eq("user_id", session.user.id);
+
+  if (upadingReferInfo) {
+    console.error("Error Claiming Rewards", upadingReferInfo);
+  }
+
+  const { error } = await supabase
+    .from("user_info")
+    .update({ alloted_sessions: userInfo.alloted_sessions + sessions })
+    .eq("auth_id", session.user.id);
+
+  if (error) {
+    console.error("Error claiming rewards:", error);
+    return;
+  }
+  revalidatePath("/", "layout");
+  console.log("Rewards claimed successfully");
 }
