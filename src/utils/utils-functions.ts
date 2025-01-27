@@ -38,6 +38,13 @@ export function getNextBillingInfo(timestamp: string): {
   const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
 
   // Format the next billing date to an ISO string
+  if (isNaN(date.getTime())) {
+    return {
+      nextBillingDate: "Lifetime",
+      daysRemaining: Infinity,
+    };
+  }
+
   return {
     nextBillingDate: nextBillingDate.toISOString(),
     daysRemaining: daysRemaining,

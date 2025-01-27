@@ -75,7 +75,7 @@ export default function ResourcesPage() {
           content: "Generate a list of resources focused on mental health.",
         },
       ],
-      model: "llama-3.1-70b-versatile",
+      model: "llama-3.3-70b-versatile",
       temperature: 1,
       max_tokens: 2024,
       top_p: 1,

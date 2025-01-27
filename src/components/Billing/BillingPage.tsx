@@ -55,6 +55,7 @@ interface BillingPageProps {
   sessionUsed: number;
   allPlans: Plan[];
   paymentList: PaymentList[];
+  allotedSessions: number;
 }
 
 type PaymentList = {
@@ -90,11 +91,12 @@ export default function BillingPage({
   sessionUsed,
   allPlans,
   paymentList,
+  allotedSessions,
 }: BillingPageProps) {
   const [yearlyBilling, setYearlyBilling] = useState(false);
   const [showPlanDetails, setShowPlanDetails] = useState(false);
   const { nextBillingDate, daysRemaining } = getNextBillingInfo(
-    paymentList.filter((item) => item.is_current)[0].created_at
+    paymentList?.filter((item) => item?.is_current)[0]?.created_at
   );
   const GetIcons = (planname: string) => {
     switch (planname) {
@@ -148,7 +150,7 @@ export default function BillingPage({
                 </span>
                 <span className="text-muted-foreground">/month</span>
                 <Badge variant="secondary" className="ml-2">
-                  {sessionUsed}/{currentPlan?.features?.sessions} Sessions Used
+                  {sessionUsed / allotedSessions} Sessions Used
                 </Badge>
               </div>
             </div>
@@ -157,12 +159,12 @@ export default function BillingPage({
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-medium">
                 <span>{sessionUsed} sessions used</span>
-                <span>
-                  {currentPlan?.features?.sessions - sessionUsed} sessions
-                  remaining
-                </span>
+                <span>{allotedSessions - sessionUsed} sessions remaining</span>
               </div>
-              <Progress value={37} className="h-2" />
+              <Progress
+                value={(sessionUsed / allotedSessions) * 100}
+                className="h-2"
+              />
               {/* <p className="text-xs text-muted-foreground text-right">
                 Next reset: Feb 10, 2025
               </p> */}

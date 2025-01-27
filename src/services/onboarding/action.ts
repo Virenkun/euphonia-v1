@@ -45,9 +45,20 @@ export const completeOnboarding = async ({
         sessions: null,
         is_onboarded: true,
         plan: 1,
+        alloted_sessions: 5,
       },
     ])
     .eq("auth_id", authId);
+
+  const { error: referInsertError } = await supabase.from("refer").insert([
+    {
+      user_id: authId,
+    },
+  ]);
+
+  if (referInsertError) {
+    console.error("Error inserting refer data:", referInsertError.message);
+  }
 
   if (formObject.phone) {
     await updateCurrentUserPhone(formObject.phone);
