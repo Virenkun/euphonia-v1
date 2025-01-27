@@ -186,28 +186,14 @@ export const WelcomeTemplate = ({
           </div>
           <div class="feature-item">
             <div class="feature-icon">📊</div>
-            <h3 class="feature-title">Mood Tracking</h3>
+            <h3 class="feature-title">Dashboard</h3>
             <p class="feature-description">
               Monitor and analyze your emotional patterns
             </p>
           </div>
           <div class="feature-item">
-            <div class="feature-icon">🧘</div>
-            <h3 class="feature-title">Guided Meditations</h3>
-            <p class="feature-description">
-              Curated mindfulness exercises for inner peace
-            </p>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">🎯</div>
-            <h3 class="feature-title">Goal Setting</h3>
-            <p class="feature-description">
-              Set and track personal growth objectives
-            </p>
-          </div>
-          <div class="feature-item">
             <div class="feature-icon">📚</div>
-            <h3 class="feature-title">Resource Library</h3>
+            <h3 class="feature-title">AI Resource Library</h3>
             <p class="feature-description">
               Access a wealth of mental health resources
             </p>
