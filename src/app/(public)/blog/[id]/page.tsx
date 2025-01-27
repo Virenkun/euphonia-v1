@@ -74,7 +74,7 @@ export default async function BlogPost({
             </div>
           </div>
           <Image
-            src={"/blog_placeholder.jpg"}
+            src={post.cover_image || "/blog_placeholder.jpg"}
             alt={post.title}
             width={800}
             height={400}

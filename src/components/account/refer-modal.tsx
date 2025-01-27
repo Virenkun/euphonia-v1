@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, Check } from "lucide-react";
 import Image from "next/image";
-import { RainbowButton } from "../ui/rainbow-button";
+import { CongratulationModal } from "./congraulation-modal";
+import { ConfettiButton } from "../ui/confetti";
+import { claimRewards } from "@/services/users/action";
 
 interface ReferModalProps {
   isOpen: boolean;
@@ -30,6 +32,8 @@ export function ReferModal({ isOpen, onClose, referInfo }: ReferModalProps) {
   const [localRewardPoints, setLocalRewardPoints] = useState(
     referInfo.points - referInfo.claimed
   );
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [earnedSessions, setEarnedSessions] = useState(0);
 
   const shareLink = `https://euphonia.me/signin/signup?ref=${referInfo.id}`;
 
@@ -73,12 +77,19 @@ export function ReferModal({ isOpen, onClose, referInfo }: ReferModalProps) {
     setLocalRewardPoints((prev) => prev + 5);
   };
 
+  const calculateSessions = (points: number) => {
+    // Example calculation: 1 session for every 50 points
+    return Math.floor(points / 25);
+  };
+
   const handleClaimRewards = async () => {
     setIsClaiming(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Rewards claimed successfully");
+      await claimRewards();
+      const sessions = calculateSessions(localRewardPoints);
+      setEarnedSessions(sessions);
       setLocalRewardPoints(0);
+      setShowCongratulations(true);
     } catch (error) {
       console.error("Error claiming rewards:", error);
     } finally {
@@ -87,113 +98,123 @@ export function ReferModal({ isOpen, onClose, referInfo }: ReferModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">
-            Spread the word and get rewarded!
-          </DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground text-center">
-              Share Euphonia with ease across platforms, earn points, and claim
-              rewards—all in one sleek, user-friendly modal.
-            </p>
-            <div className="flex items-center space-x-2">
-              <Input value={shareLink} readOnly className="flex-grow" />
-              <Button onClick={handleCopyLink} size="icon" variant="outline">
-                {isCopied ? (
-                  <Check className="h-4 w-4 text-green-500" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {isCopied ? "Copied" : "Copy share link"}
-                </span>
-              </Button>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">
+              Spread the word and get rewarded!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground text-center">
+                Share Euphonia with ease across platforms, earn points, and
+                claim rewards—all in one sleek, user-friendly modal.
+              </p>
+              <div className="flex items-center space-x-2">
+                <Input value={shareLink} readOnly className="flex-grow" />
+                <Button onClick={handleCopyLink} size="icon" variant="outline">
+                  {isCopied ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {isCopied ? "Copied" : "Copy share link"}
+                  </span>
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-center space-x-4">
-            <Image
-              src="social/fb_icon.svg"
-              alt="Facebook"
-              width={48}
-              height={48}
-              className="cursor-pointer"
-              onClick={() => handleShare("facebook")}
-            />
-
-            <Image
-              src="social/instgram_icon_2.svg"
-              alt="Instagram"
-              width={48}
-              height={48}
-              className="cursor-pointer"
-              onClick={() => handleShare("instagram")}
-            />
-            <Image
-              src="social/x_logo.svg"
-              alt="Twitter"
-              width={48}
-              height={48}
-              className="cursor-pointer"
-              onClick={() => handleShare("x")}
-            />
-            <Image
-              src="social/linkedin_icon.svg"
-              alt="LinkedIn"
-              width={48}
-              height={48}
-              className="cursor-pointer"
-              onClick={() => handleShare("linkedin")}
-            />
-            <Image
-              src="social/whatsapp_icon.svg"
-              alt="LinkedIn"
-              width={48}
-              height={48}
-              className="cursor-pointer"
-              onClick={() => handleShare("whatsapp")}
-            />
-          </div>
-          <div className="space-y-4">
-            <div className="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
-              <div>
-                <div className="text-lg font-semibold">Your Rewards Point</div>
-                <div className="mt-2 text-sm text-muted-foreground">
-                  Earn more points by sharing with friends!
+            <div className="flex justify-center space-x-4">
+              <Image
+                src="social/fb_icon.svg"
+                alt="Facebook"
+                width={48}
+                height={48}
+                className="cursor-pointer"
+                onClick={() => handleShare("facebook")}
+              />
+              <Image
+                src="social/instgram_icon_2.svg"
+                alt="Instagram"
+                width={48}
+                height={48}
+                className="cursor-pointer"
+                onClick={() => handleShare("instagram")}
+              />
+              <Image
+                src="social/x_logo.svg"
+                alt="Twitter"
+                width={48}
+                height={48}
+                className="cursor-pointer"
+                onClick={() => handleShare("x")}
+              />
+              <Image
+                src="social/linkedin_icon.svg"
+                alt="LinkedIn"
+                width={48}
+                height={48}
+                className="cursor-pointer"
+                onClick={() => handleShare("linkedin")}
+              />
+              <Image
+                src="social/whatsapp_icon.svg"
+                alt="LinkedIn"
+                width={48}
+                height={48}
+                className="cursor-pointer"
+                onClick={() => handleShare("whatsapp")}
+              />
+            </div>
+            <div className="space-y-4">
+              <div className="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+                <div>
+                  <div className="text-lg font-semibold">
+                    Your Rewards Point
+                  </div>
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    Earn more points by sharing with friends!
+                  </div>
+                </div>
+                <div className="text-4xl font-bold text-primary">
+                  {localRewardPoints}
                 </div>
               </div>
-              <div className="text-4xl font-bold text-primary">
-                {localRewardPoints}
-              </div>
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-center">How it Works</h2>
+              <ol className="list-decimal space-y-2 pl-4 text-sm">
+                <li>Copy your unique referral link or share directly.</li>
+                <li>
+                  Send it to your friends via platforms like WhatsApp, Facebook,
+                  etc.
+                </li>
+                <li>
+                  Earn reward points for every successful signup and session
+                  used
+                </li>
+                <li>Claim your rewards points and get free sessions</li>
+              </ol>
             </div>
           </div>
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-center">How it Works</h2>
-            <ol className="list-decimal space-y-2 pl-4 text-sm">
-              <li>Copy your unique referral link or share directly.</li>
-              <li>
-                Send it to your friends via platforms like WhatsApp, Facebook,
-                etc.
-              </li>
-              <li>
-                Earn reward points for every suucessful signup and session used
-              </li>
-              <li>Claim your rewards points and get free sessions</li>
-            </ol>
+          <div className="text-center mt-4">
+            <ConfettiButton
+              className="relative"
+              onClick={handleClaimRewards}
+              disabled={isClaiming || localRewardPoints === 0}
+            >
+              {isClaiming ? "Claiming..." : "Claim Rewards"}
+            </ConfettiButton>
           </div>
-        </div>
-        <div className="text-center mt-4">
-          <RainbowButton
-            onClick={handleClaimRewards}
-            disabled={isClaiming || localRewardPoints === 0}
-          >
-            {isClaiming ? "Claiming..." : "Claim Rewards"}
-          </RainbowButton>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      <CongratulationModal
+        isOpen={showCongratulations}
+        onClose={() => setShowCongratulations(false)}
+        sessions={earnedSessions}
+      />
+    </>
   );
 }

@@ -38,11 +38,11 @@ export function BlogPosts({ posts }: { posts: Post[] }) {
             className="cursor-pointer transition-shadow hover:shadow-md"
           >
             <Image
-              src={"/blog_placeholder.jpg"}
+              src={post.cover_image}
               alt={post.title}
               width={400}
-              height={200}
-              className="w-full h-48 object-cover rounded-t-lg"
+              height={300}
+              className="w-full h-60 object-fill rounded-t-lg"
             />
             <CardHeader>
               <CardTitle className="text-2xl font-[600]">

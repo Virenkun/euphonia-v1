@@ -1,7 +1,10 @@
 import AppSidebar from "@/components/sidebar/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { getReferInfo } from "@/services/users/action";
-import { createClient } from "@/utils/supabase/server";
+import {
+  getReferInfo,
+  getUserDetails,
+  getUserInfo,
+} from "@/services/users/action";
 import { redirect } from "next/navigation";
 
 export default async function Layout({
@@ -9,15 +12,8 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: userInfoArray } = await supabase
-    .from("user_info")
-    .select(`*,plan(*)`)
-    .eq("email", user?.email);
-  const userInfo = userInfoArray ? userInfoArray[0] : null;
+  const { user } = await getUserDetails();
+  const userInfo = await getUserInfo();
 
   const referInfo = await getReferInfo();
 
@@ -34,7 +30,7 @@ export default async function Layout({
         avatar={user?.user_metadata?.avatar_url}
         userInfo={userInfo}
         planName={userInfo?.plan?.name}
-        allotedSessions={userInfo?.plan?.features?.sessions}
+        allotedSessions={userInfo?.alloted_sessions}
         usedSessions={userInfo.session_used}
         features={userInfo?.plan?.features}
         referInfo={referInfo}
