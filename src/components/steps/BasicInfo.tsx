@@ -81,6 +81,7 @@ export function BasicInfo({
         <div className="space-y-2">
           <label className="text-sm font-medium text-white/80" htmlFor="name">
             {`What's your name?`}
+            <span className="text-red-300">*</span>
           </label>
           <Input
             id="name"
