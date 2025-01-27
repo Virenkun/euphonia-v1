@@ -71,14 +71,14 @@ export function AccountModal({
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
-      name: userInfo?.name,
-      email: userInfo?.email,
-      phone: userInfo?.phone,
+      name: userInfo?.name || "",
+      email: userInfo?.email || "",
+      phone: userInfo?.phone || "",
       avatar: avatar ?? userInfo?.avatar,
-      country: userInfo?.country,
-      preferred_language: userInfo?.preferred_language,
-      required_cookies: userInfo?.required_cookies,
-      analytics_cookies: userInfo?.analytics_cookies,
+      country: userInfo?.country || "",
+      preferred_language: userInfo?.preferred_language || "en",
+      required_cookies: userInfo?.required_cookies || true,
+      analytics_cookies: userInfo?.analytics_cookies || true,
       notification_frequency: userInfo?.notification_frequency ?? "",
     },
     validationSchema,
