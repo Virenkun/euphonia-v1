@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { RainbowButton } from "../ui/rainbow-button";
@@ -13,6 +14,20 @@ export default function Hero() {
     <section className="py-20 md:py-32 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-col  justify-center items-center lg:gap-2 md:gap-2 sm:gap-2 gap-2">
+          <div className="flex items-center justify-center">
+            <a
+              href="https://www.producthunt.com/posts/euphonia?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-euphonia"
+              target="_blank"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=826294&theme=dark&t=1738065505060"
+                alt="Euphonia - Your&#0032;AI&#0032;talking&#0032;buddy&#0032;here&#0032;to&#0032;listen&#0032;and&#0032;help | Product Hunt"
+                style={{ width: "200px", height: "54px" }}
+                width="200"
+                height="48"
+              />
+            </a>
+          </div>
           <div className="lg:w-[90%] md:w-full sm:w-full w-full text-center text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 lg:mb-6 md:mb-4 sm:mb-2 tracking-normal lg:tracking-wide  md:tracking-normal">
             Therapy but make <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
