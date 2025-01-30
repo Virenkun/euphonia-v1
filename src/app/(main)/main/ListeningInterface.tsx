@@ -50,6 +50,7 @@ export default function ListeningInterface({
   const [isSessionEnding, setIsSessionEnding] = useState(false);
   const [isMooodModalOpen, setIsMooodModalOpen] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [isSpacebarHeld, setIsSpacebarHeld] = useState(false);
   const [sessionSummaryData, setSessionSummaryData] =
     useState<SessionData | null>(null);
 
@@ -79,6 +80,80 @@ export default function ListeningInterface({
 
     return () => clearInterval(timer);
   }, [isSessionActive, startTime]);
+
+  const handleMicClick = async () => {
+    if (isListening) {
+      // Stop recording
+      setThinking(true);
+      mediaRecorderRef.current?.stop();
+      setIsListening(false);
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+
+        // Handle data available event
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunksRef.current.push(event.data);
+          }
+        };
+
+        // Handle stop event
+        mediaRecorder.onstop = async () => {
+          setThinking(true);
+          setDeleteSpeed(50);
+          setAssistantResponse("");
+          const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+          chunksRef.current = [];
+          const transcription = await UseSpeechToText(audioBlob);
+          await fetchChatResponse(transcription || "");
+        };
+
+        mediaRecorder.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        isSessionActive &&
+        !isListening &&
+        !isAudioPlaying &&
+        !isLoading &&
+        !thinking &&
+        event.code === "Space" &&
+        !isSpacebarHeld
+      ) {
+        setIsSpacebarHeld(true);
+        handleMicClick();
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (isSessionActive && event.code === "Space" && isSpacebarHeld) {
+        setIsSpacebarHeld(false);
+        handleMicClick(); // Stop recording
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSpacebarHeld, isAudioPlaying, isListening, isSessionActive]);
 
   useEffect(() => {
     // Check if localStorage is available
@@ -113,45 +188,6 @@ export default function ListeningInterface({
     }
     setIsLoading(false);
   }, [isSessionActive]);
-
-  const handleMicClick = async () => {
-    if (isListening) {
-      // Stop recording
-      mediaRecorderRef.current?.stop();
-      setIsListening(false);
-    } else {
-      // Start recording
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder;
-
-        // Handle data available event
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            chunksRef.current.push(event.data);
-          }
-        };
-
-        // Handle stop event
-        mediaRecorder.onstop = async () => {
-          setDeleteSpeed(50);
-          setAssistantResponse("");
-          const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
-          chunksRef.current = [];
-          const transcription = await UseSpeechToText(audioBlob);
-          await fetchChatResponse(transcription || "");
-        };
-
-        mediaRecorder.start();
-        setIsListening(true);
-      } catch (error) {
-        console.error("Error accessing microphone:", error);
-      }
-    }
-  };
 
   const fetchChatContext = async () => {
     const { data, error } = await supabase
@@ -363,14 +399,14 @@ export default function ListeningInterface({
     <>
       <div className="min-h-[88vh]">
         <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-          <div className="text-neutral-800 text-lg h-6 mb-10">
-            {isListening ? "euphonia listening to you..." : ""}
-          </div>
           {!isSessionActive && (
             <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
               Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}{" "}
             </AuroraText>
           )}
+          <div className="text-neutral-800 text-lg font-medium h-6 mb-4">
+            {isListening ? "euphonia listening to you..." : ""}
+          </div>
           <ForwardedAudioVisualizer
             audioBlob={audioBlob}
             onPlayingChange={setIsAudioPlaying}
@@ -438,7 +474,7 @@ export default function ListeningInterface({
                     size="icon"
                     className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
                     onClick={handleMicClick}
-                    disabled={isAudioPlaying}
+                    disabled={isAudioPlaying || thinking}
                   >
                     {isListening ? (
                       <Square className="w-8 h-8 text-white dark:text-black" />
