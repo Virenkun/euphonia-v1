@@ -29,6 +29,7 @@ import { SessionData } from "@/components/SessionsSummary/type";
 import { insertSession } from "@/services/chats/action";
 import Link from "next/link";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { MoodModal } from "@/components/SessionsSummary/mood-modal";
 
 export default function ListeningInterface({
   limitReached,
@@ -47,6 +48,7 @@ export default function ListeningInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
   const [isSessionEnding, setIsSessionEnding] = useState(false);
+  const [isMooodModalOpen, setIsMooodModalOpen] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [sessionSummaryData, setSessionSummaryData] =
     useState<SessionData | null>(null);
@@ -480,8 +482,15 @@ export default function ListeningInterface({
       </div>
       <EnhancedSessionSummaryModal
         isOpen={isSessionModalOpen}
-        onClose={() => setIsSessionModalOpen(false)}
+        onClose={() => {
+          setIsSessionModalOpen(false);
+          setIsMooodModalOpen(true);
+        }}
         data={sessionSummaryData}
+      />
+      <MoodModal
+        isOpen={isMooodModalOpen || true}
+        setIsOpen={setIsMooodModalOpen}
       />
     </>
   );

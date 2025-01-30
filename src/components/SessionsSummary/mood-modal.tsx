@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  //   DialogTrigger,
 } from "@/components/ui/dialog";
 
 const moods = [
@@ -33,17 +33,17 @@ export function MoodModal({ isOpen, setIsOpen }: MoodModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
+      {/* <DialogTrigger asChild>
         <Button
           variant="outline"
           className="bg-gradient-to-r from-purple-400 to-pink-500 text-white border-none hover:from-purple-500 hover:to-pink-600 transition-all duration-300 ease-in-out transform hover:scale-105"
         >
           How are you feeling?
         </Button>
-      </DialogTrigger>
+      </DialogTrigger> */}
       <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-center text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text">
+          <DialogTitle className="text-center text-2xl font-bold bg-clip-text">
             How are you feeling now?
           </DialogTitle>
         </DialogHeader>
