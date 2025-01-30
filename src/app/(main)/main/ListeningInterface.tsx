@@ -28,6 +28,7 @@ import EnhancedSessionSummaryModal from "@/components/SessionsSummary/session-su
 import { SessionData } from "@/components/SessionsSummary/type";
 import { insertSession } from "@/services/chats/action";
 import Link from "next/link";
+import { AuroraText } from "@/components/ui/aurora-text";
 
 export default function ListeningInterface({
   limitReached,
@@ -45,6 +46,7 @@ export default function ListeningInterface({
   const [deleteSpeed, setDeleteSpeed] = useState<number>(99999);
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isSessionEnding, setIsSessionEnding] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [sessionSummaryData, setSessionSummaryData] =
     useState<SessionData | null>(null);
@@ -231,13 +233,13 @@ export default function ListeningInterface({
   };
 
   const beginSession = async () => {
+    setIsSessionActive(true);
     setIsLoading(true);
     const { user } = await getUserDetails();
-
     const newSessionId = uuidv4();
     setSessionId(newSessionId);
     localStorage.setItem("sessionId", newSessionId);
-    setIsSessionActive(true);
+
     const { data, error } = await supabase
       .from("user_info")
       .select("sessions")
@@ -265,7 +267,7 @@ export default function ListeningInterface({
 
   const endSession = async () => {
     stopAudioHandler();
-    setIsLoading(true);
+    setIsSessionEnding(true);
     const { user } = await getUserDetails();
     const chats = await fetchChatContext();
     const chatCompletion = await groq.chat.completions.create({
@@ -319,7 +321,7 @@ export default function ListeningInterface({
       );
     }
 
-    setIsLoading(false);
+    setIsSessionEnding(false);
     setIsSessionModalOpen(true);
   };
 
@@ -362,6 +364,11 @@ export default function ListeningInterface({
           <div className="text-neutral-800 text-lg h-6 mb-10">
             {isListening ? "euphonia listening to you..." : ""}
           </div>
+          {!isSessionActive && (
+            <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
+              Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}{" "}
+            </AuroraText>
+          )}
           <ForwardedAudioVisualizer
             audioBlob={audioBlob}
             onPlayingChange={setIsAudioPlaying}
@@ -406,8 +413,12 @@ export default function ListeningInterface({
           ) : (
             <>
               {!isSessionActive || isLoading ? (
-                <RainbowButton onClick={beginSession}>
-                  {isLoading ? "Settings Things..." : "Begin Session"}
+                <RainbowButton onClick={beginSession} className="min-w-64 h-12">
+                  {isLoading
+                    ? "Preparing Your Session..."
+                    : isSessionEnding
+                    ? "Getting Session Summary..."
+                    : "Begin Session"}
                 </RainbowButton>
               ) : (
                 <div className="flex gap-8 mt-16">
@@ -456,7 +467,7 @@ export default function ListeningInterface({
                       </DialogHeader>
                       <DialogFooter>
                         <Button variant="destructive" onClick={endSession}>
-                          {isLoading ? "Ending..." : "End Session"}
+                          {isSessionEnding ? "Ending..." : "End Session"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
