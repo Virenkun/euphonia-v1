@@ -33,8 +33,10 @@ import { MoodModal } from "@/components/SessionsSummary/mood-modal";
 
 export default function ListeningInterface({
   limitReached,
+  userName,
 }: {
   limitReached: boolean;
+  userName: string;
 }) {
   const [isListening, setIsListening] = useState(false);
   const [assistantResponse, setAssistantResponse] = useState<string>("");
@@ -400,9 +402,14 @@ export default function ListeningInterface({
       <div className="min-h-[88vh]">
         <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
           {!isSessionActive && (
-            <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
-              Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}{" "}
-            </AuroraText>
+            <div className="flex flex-col gap-2 items-center">
+              <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
+                Good {new Date().getHours() < 12 ? "Morning," : "Afternoon,"}{" "}
+              </AuroraText>
+              <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
+                {userName}!
+              </AuroraText>
+            </div>
           )}
           <div className="text-neutral-800 text-lg font-medium h-6 mb-1">
             {isListening ? "euphonia listening to you..." : ""}
