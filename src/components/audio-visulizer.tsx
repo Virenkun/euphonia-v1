@@ -84,6 +84,7 @@ export const AudioVisualizer = (
       setIsPlaying(false);
       onPlayingChange?.(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioBlob, onPlayingChange]);
 
   useEffect(() => {

@@ -404,7 +404,7 @@ export default function ListeningInterface({
               Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}{" "}
             </AuroraText>
           )}
-          <div className="text-neutral-800 text-lg font-medium h-6 mb-4">
+          <div className="text-neutral-800 text-lg font-medium h-6 mb-1">
             {isListening ? "euphonia listening to you..." : ""}
           </div>
           <ForwardedAudioVisualizer
@@ -504,7 +504,11 @@ export default function ListeningInterface({
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <Button variant="destructive" onClick={endSession}>
+                        <Button
+                          variant="destructive"
+                          onClick={endSession}
+                          disabled={isSessionEnding}
+                        >
                           {isSessionEnding ? "Ending..." : "End Session"}
                         </Button>
                       </DialogFooter>
@@ -512,6 +516,18 @@ export default function ListeningInterface({
                   </Dialog>
                 </div>
               )}
+              {isSessionActive &&
+                !thinking &&
+                !isAudioPlaying &&
+                !isLoading && (
+                  <div className="text-neutral-600  font-medium h-6 my-6">
+                    Press and hold{" "}
+                    <kbd className="mx-1 px-3 py-1 text-xs font-semibold text-white bg-gray-800 border border-gray-900 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+                      Spacebar
+                    </kbd>{" "}
+                    to talk or click the mic button
+                  </div>
+                )}
             </>
           )}
         </div>
