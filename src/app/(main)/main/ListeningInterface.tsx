@@ -488,10 +488,7 @@ export default function ListeningInterface({
         }}
         data={sessionSummaryData}
       />
-      <MoodModal
-        isOpen={isMooodModalOpen || true}
-        setIsOpen={setIsMooodModalOpen}
-      />
+      <MoodModal isOpen={isMooodModalOpen} setIsOpen={setIsMooodModalOpen} />
     </>
   );
 }
