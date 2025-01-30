@@ -207,7 +207,7 @@ export default function ListeningInterface({
   };
 
   const fetchChatResponse = async (userInput: string) => {
-    setDeleteSpeed(99999);
+    setDeleteSpeed(9999999);
     const { user } = await getUserDetails();
     setAssistantResponse("");
     setThinking(true);
