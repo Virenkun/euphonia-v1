@@ -1,18 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { RainbowButton } from "../ui/rainbow-button";
-import Link from "next/link";
 import { motion, useAnimation } from "framer-motion";
 import {
   Zap,
-  Target,
+  // Target,
   MessageCircle,
   Lightbulb,
   TrendingUp,
 } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const steps = [
   {
@@ -21,13 +17,6 @@ const steps = [
       "Create your account and set up your profile with your preferences and goals.",
     icon: Zap,
     color: "from-pink-500 to-rose-500",
-  },
-  {
-    title: "Choose Your Focus",
-    description:
-      "Select the areas of your mental health you'd like to work on, such as stress, anxiety, or personal growth.",
-    icon: Target,
-    color: "from-yellow-400 to-orange-500",
   },
   {
     title: "Start Talking",
@@ -39,14 +28,13 @@ const steps = [
   {
     title: "Receive Insights",
     description:
-      "Get personalized insights, coping strategies, and progress tracking based on your conversations.",
+      "Get personalized insights, coping strategies, and metrics based on your conversations.",
     icon: Lightbulb,
     color: "from-blue-400 to-indigo-500",
   },
   {
     title: "Track Progress",
-    description:
-      "Monitor your mental health journey with detailed analytics and progress reports.",
+    description: "Monitor your mental health journey with detailed analytics",
     icon: TrendingUp,
     color: "from-purple-400 to-violet-500",
   },
@@ -55,7 +43,6 @@ const steps = [
 export default function HowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
   const controls = useAnimation();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     controls.start((i) => ({
@@ -88,9 +75,9 @@ export default function HowItWorks() {
           {`Embark on a transformative experience with AITherapist. Here's how
           your path to improved well-being unfolds:`}
         </motion.p>
-        <div className="flex flex-col lg:flex-row items-center justify-between">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
           <div className="lg:w-1/2 mb-10 lg:mb-0 lg:pr-16 relative">
-            <div className="absolute left-8 top-0 h-[85%] bottom-0 w-1 bg-gradient-to-b from-pink-500 via-purple-500 to-indigo-500 rounded-full"></div>
+            <div className="absolute left-8 top-0 h-[80%] bottom-0 w-1 bg-gradient-to-b from-pink-500 via-purple-500 to-indigo-500 rounded-full"></div>
             {steps.map((step, index) => (
               <motion.div
                 key={index}
@@ -125,35 +112,6 @@ export default function HowItWorks() {
                 </div>
               </motion.div>
             ))}
-          </div>
-          <div className="lg:w-1/2 justify-center items-center flex flex-col">
-            {!isMobile && (
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
-                  className="relative z-10"
-                >
-                  <Image
-                    src="/Astronot.gif"
-                    alt="AI Therapist Journey Illustration"
-                    width={600}
-                    height={600}
-                    className="rounded-2xl  transform hover:scale-105 transition-transform duration-300"
-                  />
-                </motion.div>
-              </div>
-            )}
-            <Link
-              href="/signin/signup"
-              className="flex-1 justify-center items-center self-center"
-            >
-              <RainbowButton className="text-xl px-8 py-6 rounded-xl shadow-lg">
-                Start Your Journey Now
-              </RainbowButton>
-            </Link>
           </div>
         </div>
       </div>
