@@ -121,3 +121,21 @@ body {
 ::-webkit-scrollbar-track:hover {
   background-color: #e4e4e4; /* Hover effect for the track */
 }
+
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .recharts-wrapper {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .recharts-wrapper {
+    font-size: 16px;
+  }
+}
