@@ -429,7 +429,7 @@ export default function ListeningInterface({
           ) : (
             <>
               {isSessionActive && !isLoading && (
-                <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+                <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 ">
                   <Typewriter
                     options={{
                       strings: [assistantResponse],
