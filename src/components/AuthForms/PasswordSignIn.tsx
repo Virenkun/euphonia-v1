@@ -7,8 +7,8 @@ import { handleRequest } from "@/helpers/auth-helpers";
 import { signInWithOAuth, signInWithPassword } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, EyeIcon, EyeOffIcon, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { EyeIcon, EyeOffIcon, Mail } from "lucide-react";
 
 interface PasswordSignInProps {
   readonly redirectMethod: string;
@@ -91,23 +91,7 @@ export default function PasswordSignIn({
   }
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF]">
-      <div className="p-4">
-        <Link href="/" className="text-white hover:text-white/80">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white bg-black bg-opacity-20 font-bold hover:bg-white/10 hover:text-white rounded-full m-4"
-          >
-            <ChevronLeft
-              strokeWidth={5}
-              size={100}
-              className="font-bold text-xl"
-            />
-          </Button>
-        </Link>
-      </div>
-
+    <div>
       <main className="flex flex-col items-center px-6">
         <div className="w-full max-w-[400px] space-y-16">
           <div className="flex justify-center text-[38px] font-[700] text-white"></div>

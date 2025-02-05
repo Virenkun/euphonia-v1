@@ -621,3 +621,34 @@ export async function confirmPhoneChange(formData: FormData) {
     redirect("/main");
   }
 }
+
+export async function loginAsGuest() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInAnonymously();
+
+  if (error) {
+    return getErrorRedirect(
+      "/signin",
+      "Sign in failed.",
+      error.message ?? "Please try again."
+    );
+  } else {
+    await supabase.from("user_info").insert([
+      {
+        is_onboarded: true,
+        auth_id: data?.user?.id,
+        plan: 1,
+      },
+    ]);
+    const { error: referInsertError } = await supabase.from("refer").insert([
+      {
+        user_id: data?.user?.id,
+      },
+    ]);
+
+    if (referInsertError) {
+      console.error("Error inserting refer data:", referInsertError.message);
+    }
+    redirect("/main");
+  }
+}
