@@ -209,7 +209,7 @@ export default function AICheckinForm({
           content: JSON.stringify(formData),
         },
       ],
-      model: "llama-3.1-70b-versatile",
+      model: "llama-3.3-70b-versatile",
       temperature: 1,
       max_tokens: 1024,
       top_p: 1,

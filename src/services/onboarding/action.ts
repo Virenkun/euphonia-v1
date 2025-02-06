@@ -26,9 +26,6 @@ export const completeOnboarding = async ({
 
   const authId = user.id;
 
-  console.log("Onboarding form data:", formObject);
-
-  // Insert data into the user_info table
   const { data, error } = await supabase
     .from("user_info")
     .update([
@@ -45,9 +42,20 @@ export const completeOnboarding = async ({
         sessions: null,
         is_onboarded: true,
         plan: 1,
+        alloted_sessions: 5,
       },
     ])
     .eq("auth_id", authId);
+
+  const { error: referInsertError } = await supabase.from("refer").insert([
+    {
+      user_id: authId,
+    },
+  ]);
+
+  if (referInsertError) {
+    console.error("Error inserting refer data:", referInsertError.message);
+  }
 
   if (formObject.phone) {
     await updateCurrentUserPhone(formObject.phone);
@@ -57,6 +65,46 @@ export const completeOnboarding = async ({
     console.error("Error inserting data:", error.message);
   } else {
     console.log("Data inserted successfully:", data);
+    permanentRedirect("/main");
+  }
+};
+
+export const skipOnboarding = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    console.error(
+      "Error fetching session or user not logged in:",
+      userError?.message
+    );
+    return;
+  }
+
+  const authId = user.id;
+
+  const { data, error } = await supabase
+    .from("user_info")
+    .update([{ is_onboarded: true, plan: 1, alloted_sessions: 3 }])
+    .eq("auth_id", authId);
+
+  const { error: referInsertError } = await supabase.from("refer").insert([
+    {
+      user_id: authId,
+    },
+  ]);
+
+  if (referInsertError) {
+    console.error("Error inserting refer data:", referInsertError.message);
+  }
+
+  if (error) {
+    console.error("Error updating data:", error.message);
+  } else {
+    console.log("Data updated successfully:", data);
     permanentRedirect("/main");
   }
 };

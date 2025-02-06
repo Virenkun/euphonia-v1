@@ -75,7 +75,7 @@ export default function ResourcesPage() {
           content: "Generate a list of resources focused on mental health.",
         },
       ],
-      model: "llama-3.1-70b-versatile",
+      model: "llama-3.3-70b-versatile",
       temperature: 1,
       max_tokens: 2024,
       top_p: 1,
@@ -120,9 +120,9 @@ export default function ResourcesPage() {
       </div>
 
       <Tabs defaultValue="all" className="mb-8">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4 flex flex-wrap h-full">
           {categories.map((category) => (
-            <TabsTrigger key={category.id} value={category.id}>
+            <TabsTrigger key={category.id} value={category.id} className="p-2">
               {category.name}
             </TabsTrigger>
           ))}
@@ -133,13 +133,12 @@ export default function ResourcesPage() {
               {loading ? (
                 <div className="flex flex-col flex-1 justify-center items-center min-h-[600px]">
                   <Spinner />
-
                   <p className="text-sm font-normal mt-4">
                     Please wait preparing resources for you...
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredResources
                     .filter(
                       (resource) =>

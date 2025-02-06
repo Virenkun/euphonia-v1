@@ -96,3 +96,46 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* styles/globals.css */
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the vertical scrollbar */
+  height: 8px; /* Height of the horizontal scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b9b4fd; /* Color of the scroll thumb */
+  border-radius: 4px; /* Rounded corners */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #9f97f5; /* Hover effect */
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* Scrollbar track */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track:hover {
+  background-color: #e4e4e4; /* Hover effect for the track */
+}
+
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .recharts-wrapper {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .recharts-wrapper {
+    font-size: 16px;
+  }
+}

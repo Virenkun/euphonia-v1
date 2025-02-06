@@ -7,7 +7,6 @@ import { handleRequest } from "@/helpers/auth-helpers";
 import { requestPasswordUpdate } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft } from "lucide-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useToast } from "@/hooks/use-toast";
@@ -69,23 +68,7 @@ export default function ForgotPassword({
   }, [status, status_description, toast]);
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF]">
-      <div className="p-4 rounded-full">
-        <Link href="/" className="text-white hover:text-white/80">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white bg-black bg-opacity-20 font-bold hover:bg-white/10 hover:text-white rounded-full m-4"
-          >
-            <ChevronLeft
-              strokeWidth={5}
-              size={100}
-              className="font-bold text-xl"
-            />
-          </Button>
-        </Link>
-      </div>
-
+    <div>
       <main className="flex flex-col items-center px-6 gap-4">
         <div className="w-full max-w-[400px] space-y-16">
           <div className="flex justify-center text-[38px] font-[700] text-white"></div>
@@ -147,7 +130,7 @@ export default function ForgotPassword({
 
               {allowEmail && (
                 <Link
-                  href="//signin/email_signin"
+                  href="/signin/email_signin"
                   className="text-white hover:text-white/80"
                 >
                   <p className="text-[18px] font-[700] text-center text-white mt-2">

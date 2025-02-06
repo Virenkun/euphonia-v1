@@ -28,11 +28,15 @@ import EnhancedSessionSummaryModal from "@/components/SessionsSummary/session-su
 import { SessionData } from "@/components/SessionsSummary/type";
 import { insertSession } from "@/services/chats/action";
 import Link from "next/link";
+import { AuroraText } from "@/components/ui/aurora-text";
+import { MoodModal } from "@/components/SessionsSummary/mood-modal";
 
 export default function ListeningInterface({
   limitReached,
+  userName,
 }: {
   limitReached: boolean;
+  userName: string;
 }) {
   const [isListening, setIsListening] = useState(false);
   const [assistantResponse, setAssistantResponse] = useState<string>("");
@@ -45,7 +49,10 @@ export default function ListeningInterface({
   const [deleteSpeed, setDeleteSpeed] = useState<number>(99999);
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isSessionEnding, setIsSessionEnding] = useState(false);
+  const [isMooodModalOpen, setIsMooodModalOpen] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [isSpacebarHeld, setIsSpacebarHeld] = useState(false);
   const [sessionSummaryData, setSessionSummaryData] =
     useState<SessionData | null>(null);
 
@@ -75,6 +82,80 @@ export default function ListeningInterface({
 
     return () => clearInterval(timer);
   }, [isSessionActive, startTime]);
+
+  const handleMicClick = async () => {
+    if (isListening) {
+      // Stop recording
+      setThinking(true);
+      mediaRecorderRef.current?.stop();
+      setIsListening(false);
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+
+        // Handle data available event
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunksRef.current.push(event.data);
+          }
+        };
+
+        // Handle stop event
+        mediaRecorder.onstop = async () => {
+          setThinking(true);
+          setDeleteSpeed(50);
+          setAssistantResponse("");
+          const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+          chunksRef.current = [];
+          const transcription = await UseSpeechToText(audioBlob);
+          await fetchChatResponse(transcription || "");
+        };
+
+        mediaRecorder.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        isSessionActive &&
+        !isListening &&
+        !isAudioPlaying &&
+        !isLoading &&
+        !thinking &&
+        event.code === "Space" &&
+        !isSpacebarHeld
+      ) {
+        setIsSpacebarHeld(true);
+        handleMicClick();
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (isSessionActive && event.code === "Space" && isSpacebarHeld) {
+        setIsSpacebarHeld(false);
+        handleMicClick(); // Stop recording
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSpacebarHeld, isAudioPlaying, isListening, isSessionActive]);
 
   useEffect(() => {
     // Check if localStorage is available
@@ -110,45 +191,6 @@ export default function ListeningInterface({
     setIsLoading(false);
   }, [isSessionActive]);
 
-  const handleMicClick = async () => {
-    if (isListening) {
-      // Stop recording
-      mediaRecorderRef.current?.stop();
-      setIsListening(false);
-    } else {
-      // Start recording
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder;
-
-        // Handle data available event
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            chunksRef.current.push(event.data);
-          }
-        };
-
-        // Handle stop event
-        mediaRecorder.onstop = async () => {
-          setDeleteSpeed(50);
-          setAssistantResponse("");
-          const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
-          chunksRef.current = [];
-          const transcription = await UseSpeechToText(audioBlob);
-          await fetchChatResponse(transcription || "");
-        };
-
-        mediaRecorder.start();
-        setIsListening(true);
-      } catch (error) {
-        console.error("Error accessing microphone:", error);
-      }
-    }
-  };
-
   const fetchChatContext = async () => {
     const { data, error } = await supabase
       .from("messages")
@@ -167,7 +209,7 @@ export default function ListeningInterface({
   };
 
   const fetchChatResponse = async (userInput: string) => {
-    setDeleteSpeed(99999);
+    setDeleteSpeed(9999999);
     const { user } = await getUserDetails();
     setAssistantResponse("");
     setThinking(true);
@@ -200,7 +242,7 @@ export default function ListeningInterface({
             content: userInput,
           },
         ],
-        model: "llama-3.1-70b-versatile",
+        model: "llama-3.3-70b-versatile",
         temperature: 1,
         max_tokens: 1024,
         top_p: 1,
@@ -231,13 +273,13 @@ export default function ListeningInterface({
   };
 
   const beginSession = async () => {
+    setIsSessionActive(true);
     setIsLoading(true);
     const { user } = await getUserDetails();
-
     const newSessionId = uuidv4();
     setSessionId(newSessionId);
     localStorage.setItem("sessionId", newSessionId);
-    setIsSessionActive(true);
+
     const { data, error } = await supabase
       .from("user_info")
       .select("sessions")
@@ -265,7 +307,7 @@ export default function ListeningInterface({
 
   const endSession = async () => {
     stopAudioHandler();
-    setIsLoading(true);
+    setIsSessionEnding(true);
     const { user } = await getUserDetails();
     const chats = await fetchChatContext();
     const chatCompletion = await groq.chat.completions.create({
@@ -280,7 +322,7 @@ export default function ListeningInterface({
           content: JSON.stringify(chats),
         },
       ],
-      model: "llama-3.1-70b-versatile",
+      model: "llama-3.3-70b-versatile",
       temperature: 1,
       max_tokens: 1024,
       top_p: 1,
@@ -319,7 +361,7 @@ export default function ListeningInterface({
       );
     }
 
-    setIsLoading(false);
+    setIsSessionEnding(false);
     setIsSessionModalOpen(true);
   };
 
@@ -359,7 +401,17 @@ export default function ListeningInterface({
     <>
       <div className="min-h-[88vh]">
         <div className="flex min-h-[88vh] flex-col items-center justify-center p-4 gap-8 mx-auto flex-1">
-          <div className="text-neutral-800 text-lg h-6 mb-10">
+          {!isSessionActive && (
+            <div className="flex flex-col gap-2 items-center">
+              <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
+                Good {new Date().getHours() < 12 ? "Morning," : "Afternoon,"}{" "}
+              </AuroraText>
+              <AuroraText className="text-4xl font-bold text-indigo-800 dark:text-white">
+                {userName}!
+              </AuroraText>
+            </div>
+          )}
+          <div className="text-neutral-800 text-lg font-medium h-6 mb-1">
             {isListening ? "euphonia listening to you..." : ""}
           </div>
           <ForwardedAudioVisualizer
@@ -377,7 +429,7 @@ export default function ListeningInterface({
           ) : (
             <>
               {isSessionActive && !isLoading && (
-                <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 w-1/3">
+                <div className="text-center text-neutral-800 dark:text-white text-lg font-medium whitespace-pre-line mt-4 ">
                   <Typewriter
                     options={{
                       strings: [assistantResponse],
@@ -406,8 +458,12 @@ export default function ListeningInterface({
           ) : (
             <>
               {!isSessionActive || isLoading ? (
-                <RainbowButton onClick={beginSession}>
-                  {isLoading ? "Settings Things..." : "Begin Session"}
+                <RainbowButton onClick={beginSession} className="min-w-64 h-12">
+                  {isLoading
+                    ? "Preparing Your Session..."
+                    : isSessionEnding
+                    ? "Getting Session Summary..."
+                    : "Begin Session"}
                 </RainbowButton>
               ) : (
                 <div className="flex gap-8 mt-16">
@@ -425,7 +481,7 @@ export default function ListeningInterface({
                     size="icon"
                     className="w-16 h-16 rounded-full bg-[#9333ea] hover:bg-[#9333ea] dark:text-black"
                     onClick={handleMicClick}
-                    disabled={isAudioPlaying}
+                    disabled={isAudioPlaying || thinking}
                   >
                     {isListening ? (
                       <Square className="w-8 h-8 text-white dark:text-black" />
@@ -455,23 +511,43 @@ export default function ListeningInterface({
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <Button variant="destructive" onClick={endSession}>
-                          {isLoading ? "Ending..." : "End Session"}
+                        <Button
+                          variant="destructive"
+                          onClick={endSession}
+                          disabled={isSessionEnding}
+                        >
+                          {isSessionEnding ? "Ending..." : "End Session"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
               )}
+              {isSessionActive &&
+                !thinking &&
+                !isAudioPlaying &&
+                !isLoading && (
+                  <div className="text-neutral-600  font-medium h-6 my-6">
+                    Press and hold{" "}
+                    <kbd className="mx-1 px-3 py-1 text-xs font-semibold text-white bg-gray-800 border border-gray-900 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500">
+                      Spacebar
+                    </kbd>{" "}
+                    to talk or click the mic button
+                  </div>
+                )}
             </>
           )}
         </div>
       </div>
       <EnhancedSessionSummaryModal
         isOpen={isSessionModalOpen}
-        onClose={() => setIsSessionModalOpen(false)}
+        onClose={() => {
+          setIsSessionModalOpen(false);
+          setIsMooodModalOpen(true);
+        }}
         data={sessionSummaryData}
       />
+      <MoodModal isOpen={isMooodModalOpen} setIsOpen={setIsMooodModalOpen} />
     </>
   );
 }

@@ -1,8 +1,10 @@
 import React from "react";
 import ListeningInterface from "./ListeningInterface";
-import isSessionLimitReached from "@/services/users/action";
+import isSessionLimitReached, { getUserDetails } from "@/services/users/action";
 
 export default async function Page() {
   const limitReached = await isSessionLimitReached();
-  return <ListeningInterface limitReached={limitReached} />;
+  const { user } = await getUserDetails();
+  const userName = user.user_metadata.name;
+  return <ListeningInterface limitReached={limitReached} userName={userName} />;
 }

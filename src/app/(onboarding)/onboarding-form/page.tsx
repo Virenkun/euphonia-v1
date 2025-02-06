@@ -9,7 +9,10 @@ import { BasicInfo } from "@/components/steps/BasicInfo";
 import { ContactInfo } from "@/components/steps/ContactInfo";
 import { Interests } from "@/components/steps/Interests";
 import { Consent } from "@/components/steps/Consent";
-import { completeOnboarding } from "@/services/onboarding/action";
+import {
+  completeOnboarding,
+  skipOnboarding,
+} from "@/services/onboarding/action";
 
 const steps = ["Basic Info", "Contact", "Interests", "Consent"];
 
@@ -86,6 +89,10 @@ export default function OnboardingForm() {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
+  const handleSkipOnboarding = async () => {
+    await skipOnboarding();
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -103,6 +110,12 @@ export default function OnboardingForm() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800">
+      <Button
+        className="fixed left-10 z-50 top-10 p-5 rounded-xl "
+        onClick={handleSkipOnboarding}
+      >
+        Skip for now
+      </Button>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-white mb-4">

@@ -7,7 +7,7 @@ import { handleRequest } from "@/helpers/auth-helpers";
 import { signInWithOAuth, signUp } from "@/services/auth/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, EyeIcon, EyeOffIcon, Mail } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface SignUpProps {
@@ -86,6 +86,11 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
     await signInWithOAuth("google");
   };
 
+  // const handleLoginAsGuest = async () => {
+  //   setIsLoadingOAuth(true);
+  //   await loginAsGuest();
+  // };
+
   useEffect(() => {
     if (error) {
       setTimeout(() =>
@@ -100,23 +105,7 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
   }, [error, error_description, toast]);
 
   return (
-    <div className="min-h-screen bg-[#4B4ACF]">
-      <div className="p-4">
-        <Link href="/" className="text-white hover:text-white/80">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white bg-black bg-opacity-20 font-bold hover:bg-white/10 hover:text-white rounded-full m-4"
-          >
-            <ChevronLeft
-              strokeWidth={5}
-              size={100}
-              className="font-bold text-xl"
-            />
-          </Button>
-        </Link>
-      </div>
-
+    <div>
       <main className="flex flex-col items-center px-6">
         <div className="w-full max-w-[400px] space-y-16">
           <div className="flex justify-center text-[38px] font-[700] text-white"></div>
@@ -169,6 +158,15 @@ export default function SignUp({ redirectMethod }: Readonly<SignUpProps>) {
                   {isLoadingOAuth ? "Signing Up...." : "Continue with Google"}
                 </span>
               </Button>
+              {/* <Button
+                className="w-full h-[52px] bg-black rounded-[14px] flex items-center justify-center space-x-2 hover:bg-black/95 transition-colors"
+                onClick={handleLoginAsGuest}
+              >
+                <UserRound className="h-8 w-8 text-white" />
+                <span className="text-[16px] font-[700] text-white">
+                  Continue as Guest
+                </span>
+              </Button> */}
 
               <div className="relative py-2">
                 <div className="relative flex justify-center">

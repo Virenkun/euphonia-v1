@@ -12,6 +12,9 @@ import {
   getRedirectMethod,
   getViewTypes,
 } from "@/helpers/auth-helpers";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 export default async function SignIn({
   params,
@@ -60,7 +63,26 @@ export default async function SignIn({
   const disabledButton = (await searchParams).disable_button === "true";
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#4B4ACF]">
+      <div className="p-4">
+        <Link
+          href="/"
+          className="text-white flex items-center hover:text-white/80"
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white bg-black bg-opacity-20 font-bold hover:bg-white/10 hover:text-white rounded-full my-4 mx-2"
+          >
+            <ChevronLeft
+              strokeWidth={5}
+              size={100}
+              className="font-bold text-xl"
+            />
+          </Button>
+          <div className="text-white font-semibold">Back to Home</div>
+        </Link>
+      </div>
       {viewProp === "password_signin" && (
         <PasswordSignIn redirectMethod={redirectMethod} />
       )}

@@ -1,31 +1,74 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { RainbowButton } from "../ui/rainbow-button";
 import Link from "next/link";
-import AutoPlayVideo from "../auto-play-video";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Iphone15Pro from "../ui/iphone-15-pro";
+import Safari from "../ui/safari";
 
 export default function Hero() {
   const isMobile = useIsMobile();
-  console.log(isMobile, "iss");
+
   return (
-    <section className="py-20 md:py-32 overflow-hidden">
+    <section className="py-8 md:py-16 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-col  justify-center items-center lg:gap-2 md:gap-2 sm:gap-2 gap-2">
-          <div className="lg:w-[90%] md:w-full sm:w-full w-full text-center text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 lg:mb-6 md:mb-4 sm:mb-2 tracking-normal lg:tracking-wide  md:tracking-normal">
-            Therapy but make <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-              {" "}
-              it fun & way more easy
-            </span>
+          <div className="flex items-center justify-center">
+            <a
+              href="https://www.producthunt.com/posts/euphonia?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-euphonia"
+              target="_blank"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=826294&theme=dark&t=1738065505060"
+                alt="Euphonia - Your&#0032;AI&#0032;talking&#0032;buddy&#0032;here&#0032;to&#0032;listen&#0032;and&#0032;help | Product Hunt"
+                style={{ width: "200px", height: "54px" }}
+                width="200"
+                height="48"
+              />
+            </a>
           </div>
-          <h2 className="lg:w-[65%] md:w-[75%] w-full text-center text-sm sm:text-base md:text-lg lg:text-2xl lg:font-semibold font-medium text-gray-700 lg:mb-6 md:mb-4 sm:mb-2">
-            Spill your thoughts, get answers, share secrets <br /> (we won’t
-            even tell your diary).
-          </h2>
-          <p className="lg:w-[55%] md:w-[65%] sm:w-full w-full text-center lg:text-xl md:text-md sm:text-sm text-sm text-gray-600 mb-8">
-            {`Meet your new favorite therapist: always awake, never out of
-              coffee, and ready to listen without saying, "Tell me how that
+          <figure className="max-w-screen-md mx-auto text-center my-8">
+            <svg
+              className="w-8 h-8 mx-auto mb-3 text-gray-400 dark:text-gray-600"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 18 14"
+            >
+              <path d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z" />
+            </svg>
+            <blockquote>
+              <p className="text-xl italic font-medium text-gray-900 dark:text-white">
+                {` "AI won’t replace therapists, but it can provide a bridge for those who don’t have access to one."`}
+              </p>
+            </blockquote>
+            <figcaption className="flex items-center justify-center mt-6 space-x-3 rtl:space-x-reverse">
+              <img
+                className="w-4 h-4 rounded-full"
+                src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcTOOIquVIk-AUTan-9Rf0sG-Gl9P7ngVNdC2oLFUFc-4gkiB1wydkt2s36vjC8c7C8Xhtj6cxHNHEPR9xw"
+                alt="profile picture"
+              />
+              <div className="flex items-center divide-x-2 rtl:divide-x-reverse divide-gray-500 dark:divide-gray-700">
+                <cite className="pe-3 text-sm font-medium text-gray-900 dark:text-white">
+                  Andrew Ng
+                </cite>
+                <cite className="ps-3 text-sm text-gray-500 dark:text-gray-400">
+                  Co-founder of Google Brain
+                </cite>
+              </div>
+            </figcaption>
+          </figure>
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-center text-gray-900 tracking-tight mb-4">
+            Talk, Heal, Grow. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
+              The way it should be.
+            </span>
+          </h1>
+
+          <p className="lg:w-[55%] md:w-[65%] sm:w-full w-full text-center lg:text-xl md:text-md sm:text-sm text-sm text-gray-800 mb-8">
+            {`Meet your new favorite therapist always awake, never out of
+              coffee, and ready to listen without saying "Tell me how that
               makes you feel." Your mental wellness, served with a side of AI
               magic.`}
           </p>
@@ -57,12 +100,16 @@ export default function Hero() {
             </div>
           </motion.div> */}
           {!isMobile ? (
-            <div className="w-[60%] mt-28">
-              <AutoPlayVideo src={"/loop.mp4"} />
+            <div className="relative mt-28">
+              <Safari
+                url="euphonia.me"
+                className="size-full"
+                videoSrc="/loop.mp4"
+              />
             </div>
           ) : (
             <div className="w-full mt-8">
-              <video
+              {/* <video
                 height="600"
                 width="600"
                 autoPlay
@@ -73,7 +120,10 @@ export default function Hero() {
               >
                 <source src="/phonevideo.mp4" type="video/mp4" />
                 Your browser does not support the video tag...
-              </video>
+              </video> */}
+              <div className="relative">
+                <Iphone15Pro className="size-full" videoSrc="/phonevideo.mp4" />
+              </div>
             </div>
           )}
         </div>
