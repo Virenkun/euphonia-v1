@@ -47,9 +47,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* <head>
-        <link rel="canonical" href="http://localhost:3000/" />
-      </head> */}
+      <head>
+        <link rel="canonical" href="https://euphonia.me/" />
+      </head>
       <CSPostHogProvider>
         <body className={quicksand.className} suppressHydrationWarning>
           <NextTopLoader

@@ -310,10 +310,7 @@ export async function signInWithPhone(formData: FormData) {
     options: options,
   });
 
-  console.log("data", data, error);
-
   if (error) {
-    console.log("phonesignIn faled", error);
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
       `You could not be signed in. ${phoneNumber}`,
@@ -588,15 +585,13 @@ export async function updateName(formData: FormData) {
 
 export const updateCurrentUserPhone = async (phone: string) => {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.updateUser({
+  const { error } = await supabase.auth.updateUser({
     phone,
   });
 
   if (error) {
     console.error("Error updating phone number:", error.message);
     return { error: error.message };
-  } else {
-    console.log("Phone number updated successfully:", data);
   }
 };
 
@@ -605,8 +600,6 @@ export async function confirmPhoneChange(formData: FormData) {
 
   const phone = formData.get("phone") as string;
   const token = formData.get("token") as string;
-
-  console.log("phone", phone, token);
 
   const { error } = await supabase.auth.verifyOtp({
     phone,

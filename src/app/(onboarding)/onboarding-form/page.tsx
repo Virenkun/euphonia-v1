@@ -13,8 +13,7 @@ import {
   completeOnboarding,
   skipOnboarding,
 } from "@/services/onboarding/action";
-
-const steps = ["Basic Info", "Contact", "Interests", "Consent"];
+import { steps } from "@/constant/common";
 
 export interface OnboardingFormValues {
   name: string;
