@@ -23,13 +23,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { groq } from "@/utils/groq/client";
-import { synthesizeSpeech } from "@/utils/aws/polly";
+
 import EnhancedSessionSummaryModal from "@/components/SessionsSummary/session-summary-modal";
 import { SessionData } from "@/components/SessionsSummary/type";
 import { insertSession } from "@/services/chats/action";
 import Link from "next/link";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { MoodModal } from "@/components/SessionsSummary/mood-modal";
+import { synthesizeSpeech } from "@/utils/deepgram/tts";
 
 export default function ListeningInterface({
   limitReached,
